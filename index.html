@@ -159,6 +159,25 @@ pre.preview{white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--sans);
 textarea.ta{width:100%;min-height:200px;border-radius:13px;border:1px solid var(--line);background:var(--ink);color:var(--ivory);padding:12px;font-size:13px}
 .hr{height:1px;background:var(--line2);margin:6px 0}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ===== Ottimizzazione telefono ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:hidden}
+:root{--mut:#B7C8BE}
+body{font-size:16px;line-height:1.5;overflow-x:hidden}
+.sm{font-size:14.5px}.xs{font-size:13px}
+.lbl{font-size:12.5px;letter-spacing:.12em}
+.b2{font-size:11px}
+.badge{font-size:12px;padding:5px 11px}
+.pill{font-size:13px}
+.kpi .k{font-size:11px}.kpi .s{font-size:12.5px}
+.pcs span{font-size:12.5px}
+.field>span{font-size:14px}
+.btn-s,.chip,.link,.back-l,.mv{font-size:15px}
+.seg button{font-size:14px;min-height:46px}
+.steps .st{font-size:12.5px}
+input.in,textarea.in,select.in{font-size:16px}
+input[type=date].in,input[type=time].in{font-size:16px;padding-inline:10px;min-width:0;-webkit-appearance:none;appearance:none}
+.t{font-size:15px}
+@media (max-width:400px){.wrap{padding-inline:14px}.card{padding-inline:14px}}
 </style>
 
 <div id="app"></div>
@@ -363,7 +382,7 @@ const stBadge=s=>s==='PAID'?'<span class="badge paid">PAGATO</span>':'<span clas
 const notFound=()=>`<div class="wrap">${topbar()}<h1 style="margin-top:28px">Partita non trovata</h1><p class="mut">Il collegamento non corrisponde a nessuna partita. Potrebbe essere stata eliminata.</p><button class="btn" data-act="home">Vai alla Home</button></div>`;
 
 function view(){
-  if(S.dbReady===false)return `<div class="wrap">${topbar()}<h1 style="margin-top:28px">Archivio non disponibile</h1><p class="mut">Impossibile collegarsi all'archivio. Controlla la connessione e riapri la pagina.</p></div>`;
+  if(S.dbReady===false)return `<div class="wrap">${topbar()}<h1 style="margin-top:28px">Archivio non disponibile</h1><p class="mut">Impossibile collegarsi all'archivio. Controlla la connessione e riapri la pagina.</p><p class="mut xs" style="word-break:break-word">Dettaglio: ${esc(window.__dbErr||'')}</p></div>`;
   if(!db||!(S.loaded.games&&S.loaded.cfg&&S.loaded.players)||!S.reqHash)return skeleton();
   if(!unlocked())return vGate();
   if(!S.me&&V.name!=='book')return vAuth();
@@ -1002,7 +1021,7 @@ const SB_URL='https://nqlywzjhxykrfyrpkjdw.supabase.co';
 const SB_KEY='sb_publishable_n_Cesb7VT2ipKa0y9SntYA_zkn4ABgn';
 function loadScript(src){return new Promise((ok,ko)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>ko(new Error('Script non caricato'));document.head.appendChild(s)})}
 async function makeDb(){
-  await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js');
+  await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js');
   const sb=window.supabase.createClient(SB_URL,SB_KEY);
   const cache=new Map(),subs=new Set();
   const clone=o=>JSON.parse(JSON.stringify(o));
@@ -1037,7 +1056,7 @@ async function makeDb(){
 (async function start(){
   render();
   if(SB_URL.indexOf('__')===0){S.dbReady=false;render();return}
-  try{db=await makeDb()}catch(e){console.error(e);S.dbReady=false;render();return}
+  try{db=await makeDb()}catch(e){console.error(e);window.__dbErr=(e&&(e.message||e.details||e.code))||String(e);S.dbReady=false;render();return}
   S.dbReady=true;
   const onErr=e=>{toast(errMsg(e),'err')};
   db.collection('games').onSnapshot(sn=>{const o={};sn.docs.forEach(d=>{o[d.id]=d.data()});S.games=o;S.loaded.games=true;afterData()},onErr);
