@@ -1,0 +1,1049 @@
+<title>Home Poker Ledger</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0B1F17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Poker">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap">
+<style>
+/* Layout: colonna unica da smartphone (max 480px). Feltro verde con vignetta e grana, card con filo oro,
+   una sola cosa in primo piano per schermata (barra incassi, stepper di chiusura, saldi).
+   Look unico "tavolo da casinò": volutamente solo scuro. */
+:root{
+  --bg:#0B1F17; --bg2:#050E0A; --card:#12261D; --card2:#183226; --ink:#0c1a14;
+  --line:rgba(201,176,104,.26); --line2:rgba(201,176,104,.14);
+  --gold:#C9B068; --gold-l:#F2E3B3; --gold-d:#8F7F4D; --ivory:#F4EFE0; --mut:#9DB0A5;
+  --red:#FF3B30; --red-bg:rgba(255,59,48,.15); --green:#34C759; --green-bg:rgba(52,199,89,.15);
+  --wa:#25D366; --serif:'Playfair Display',Georgia,'Times New Roman',serif; --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --gold-g:linear-gradient(180deg,#E3D08C 0%,#C9B068 55%,#B39549 100%);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background-color:var(--bg)}
+body{background-image:radial-gradient(130% 70% at 50% -5%,#17382a 0%,var(--bg) 52%,var(--bg2) 100%);background-attachment:fixed;color:var(--ivory);font-family:var(--sans);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.06;z-index:0;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+body.noscroll{overflow:hidden}
+.wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-inline:16px;padding-block:14px 150px}
+.enter{animation:in .32s ease-out both}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;transition:transform .08s ease,filter .15s ease,background-color .15s ease,border-color .15s ease}
+button:active:not([disabled]){transform:scale(.97)}
+.num{font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;font-family:var(--serif);font-weight:600;color:var(--gold-l);text-wrap:balance}
+h1{font-size:28px;line-height:1.12;letter-spacing:.005em}
+.mut{color:var(--mut)} .gold{color:var(--gold)} .red{color:var(--red)} .green{color:var(--green)} .sm{font-size:13px} .xs{font-size:12px}
+.lbl{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:26px 2px 10px;display:flex;align-items:center;gap:10px}
+.lbl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.lbl.in{margin:0 0 4px}.lbl.in::after{display:none}
+.stack{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;gap:10px}
+.row.sp{justify-content:space-between}
+.grow{flex:1;min-width:0}
+svg{flex:none}
+
+.top{display:flex;align-items:center;justify-content:space-between;min-height:56px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;color:var(--gold-l);font-size:20px;flex:none;background:radial-gradient(circle at 35% 30%,rgba(201,176,104,.22),transparent 70%)}
+.b1{font-family:var(--serif);letter-spacing:.22em;color:var(--gold-l);font-size:15px;font-weight:600}
+.b2{letter-spacing:.3em;color:var(--mut);font-size:10px;margin-top:1px}
+.suits{color:var(--gold);letter-spacing:.3em;font-size:16px;opacity:.9}
+
+.card{background:linear-gradient(180deg,#152b21 0%,var(--card) 100%);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 10px 26px rgba(0,0,0,.28)}
+.card.tight{padding:12px 14px}
+.card.tap{width:100%;text-align:left}
+.card.tap:active{border-color:var(--gold)}
+.card.hero{position:relative;overflow:hidden;padding:18px}
+.card.hero::after{content:"♠";position:absolute;right:-6px;top:-30px;font-size:120px;line-height:1;color:var(--gold);opacity:.07;pointer-events:none}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;text-decoration:none;min-height:54px;border-radius:15px;padding:12px 16px;font-weight:700;font-size:16px;background:var(--gold-g);color:#1a1405;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 18px rgba(201,176,104,.22)}
+.btn.ghost{background:rgba(201,176,104,.06);border:1.5px solid var(--gold);color:var(--gold-l);min-height:50px;box-shadow:none}
+.btn.dash{background:transparent;border:1.5px dashed rgba(201,176,104,.4);color:var(--gold-l);min-height:54px;box-shadow:none}
+.btn.wa{background:var(--wa);color:#08210f;box-shadow:0 6px 18px rgba(37,211,102,.2)}
+.btn.green{background:var(--green);color:#06210f;box-shadow:none}
+.btn.redb{background:transparent;border:1.5px solid var(--red);color:var(--red);box-shadow:none}
+.btn[disabled]{opacity:.36;cursor:not-allowed;box-shadow:none}
+.btn-s{min-height:48px;padding:8px 12px;border-radius:13px;font-weight:600;font-size:14px;background:var(--card2);border:1px solid var(--line);color:var(--ivory);white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-s.go{border-color:var(--gold);color:var(--gold-l);background:rgba(201,176,104,.08)}
+.link{color:var(--mut);text-decoration:underline;text-underline-offset:3px;min-height:48px;display:inline-flex;align-items:center;font-size:14px}
+.back-l{color:var(--gold);min-height:48px;display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:600;margin-left:-6px;padding-inline:6px}
+
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.badge.paid{color:var(--green);background:var(--green-bg)} .badge.pend{color:var(--red);background:var(--red-bg)}
+.badge.grey{color:var(--mut);background:rgba(157,176,165,.15)} .badge.live{color:var(--green);background:var(--green-bg)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pl 1.4s ease-in-out infinite;flex:none}
+@keyframes pl{50%{opacity:.3}}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
+.pill.red{background:var(--red-bg);color:var(--red)}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:46px;padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card2);font-weight:600;font-size:14px}
+.chip.on{background:var(--gold-g);color:#1a1405;border-color:var(--gold)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chipx{display:inline-flex;align-items:center;gap:0}
+.trash{min-width:44px;min-height:44px;display:grid;place-items:center;color:var(--mut)}
+.seg{display:inline-flex;background:var(--ink);border:1px solid var(--line);border-radius:13px;padding:3px;flex:none}
+.seg button{min-height:42px;padding:0 14px;border-radius:10px;font-weight:600;font-size:13px;color:var(--mut)}
+.seg button.on{background:var(--gold-g);color:#1a1405}
+
+.ava{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;font-family:var(--serif);font-weight:700;font-size:15px;background:hsl(var(--h) 34% 24%);border:1px solid hsl(var(--h) 45% 56% / .6);color:hsl(var(--h) 70% 88%)}
+.ava.s{width:34px;height:34px;font-size:13px}
+
+.field{display:flex;flex-direction:column;gap:6px}
+.field>span{font-size:12px;color:var(--mut);letter-spacing:.03em}
+input.in,textarea.in{width:100%;min-height:52px;border-radius:13px;border:1px solid var(--line);background:var(--ink);padding:12px 14px;font-size:16px;color:var(--ivory);transition:border-color .15s}
+textarea.in{min-height:84px;resize:none;line-height:1.4}
+input.in.big-n{font-family:var(--serif);font-size:22px;font-weight:600;min-height:58px}
+input.in:focus,textarea.in:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 3px rgba(201,176,104,.16)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--gold-l);outline-offset:2px}
+input.in::placeholder,textarea.in::placeholder{color:#5f7469}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.two>*{min-width:0}
+input.in{min-width:0}
+.kpis.two-c>.kpi:last-child:nth-child(odd){grid-column:1/-1}
+
+.meter{display:flex;gap:3px;height:9px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.07)}
+.meter i{display:block;height:100%;min-width:0;transition:flex-grow .4s ease}
+.m-g{background:var(--green)} .m-r{background:var(--red)} .m-o{background:var(--gold-g)}
+.cassa .big-n{font-family:var(--serif);font-size:34px;font-weight:700;color:var(--gold-l);line-height:1.05}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.kpi{background:rgba(0,0,0,.2);border:1px solid var(--line2);border-radius:13px;padding:10px 8px;text-align:center;min-width:0}
+.kpi .k{font-size:10px;letter-spacing:.1em;font-weight:600;color:var(--mut)}
+.kpi .v{font-family:var(--serif);font-size:18px;font-weight:600;margin-top:3px;overflow-wrap:anywhere}
+.kpi .s{font-size:11px;margin-top:2px;color:var(--gold)}
+.ir{display:flex;align-items:center;gap:12px}
+.ir .ic{width:36px;height:36px;border-radius:11px;background:rgba(201,176,104,.1);border:1px solid var(--line2);display:grid;place-items:center;font-size:16px;flex:none}
+
+.gcard{display:flex;align-items:center;gap:12px;width:100%;text-align:left}
+.gdate{font-family:var(--serif);font-size:19px;color:var(--gold);font-weight:600}
+.suit{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:rgba(201,176,104,.1);border:1px solid var(--line2);color:var(--gold);font-size:20px;flex:none}
+.medal{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:15px;flex:none;border:1.5px solid currentColor}
+.pl-name{font-family:var(--serif);font-size:20px;color:var(--ivory);font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap;line-height:1.2}
+.pcs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.pcs>div{background:rgba(0,0,0,.2);border:1px solid var(--line2);border-radius:12px;padding:8px 10px;min-width:0}
+.pcs span{display:block;font-size:11px;color:var(--mut)}
+.pcs b{font-size:15px}
+.mv{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line2);font-size:14px;flex-wrap:wrap}
+.mv .dt{width:9px;height:9px;border-radius:50%;flex:none}
+.bdg-btn{min-height:44px;display:inline-flex;align-items:center}
+.x{min-width:44px;min-height:44px;display:grid;place-items:center;color:var(--mut)}
+.pay2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.big{min-height:62px;border-radius:15px;border:2px solid var(--line);background:var(--card2);font-weight:700;font-size:16px;color:var(--mut)}
+.big.sel-g{border-color:var(--green);background:var(--green-bg);color:var(--green)}
+.big.sel-r{border-color:var(--red);background:var(--red-bg);color:var(--red)}
+.box{border-radius:15px;padding:14px;border:1px solid}
+.box.g{border-color:var(--green);background:var(--green-bg)} .box.r{border-color:var(--red);background:var(--red-bg)} .box.o{border-color:var(--gold);background:rgba(201,176,104,.12)}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:26px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(5,14,10,0),rgba(5,14,10,.94) 34%)}
+.bar-in{max-width:480px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:2px}
+.steps{display:flex;align-items:center;gap:8px;margin:14px 0 18px}
+.steps .st{flex:1;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--mut);font-weight:600}
+.steps .st i{display:block;height:5px;border-radius:3px;background:rgba(201,176,104,.2)}
+.steps .st.on{color:var(--gold-l)} .steps .st.on i{background:var(--gold)}
+.tr{display:block;width:100%;text-align:left;border:1.5px solid;border-radius:13px;padding:11px 13px;background:rgba(0,0,0,.14)}
+.tr.paid{border-color:rgba(52,199,89,.7)} .tr.pend{border-color:rgba(255,59,48,.7)}
+.back{position:fixed;inset:0;background:rgba(2,8,5,.7);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;z-index:50}
+.sheet{width:100%;max-width:480px;max-height:92%;background:linear-gradient(180deg,#173026,var(--card));border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;display:flex;flex-direction:column;box-shadow:0 -14px 40px rgba(0,0,0,.5)}
+.sheet.anim{animation:up .26s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(60px);opacity:.3}}
+.grab{width:44px;height:4px;border-radius:2px;background:var(--line);margin:10px auto 0;flex:none}
+.sheet-body{overflow:auto;padding:12px 16px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+#toast{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:calc(100% - 32px);max-width:440px}
+.t{display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:14px;font-weight:600;font-size:14px;color:#06110c;box-shadow:0 10px 28px rgba(0,0,0,.45);animation:in .25s ease-out both}
+.t.ok{background:var(--green)} .t.err{background:var(--red);color:#fff}
+.sk{height:80px;border-radius:18px;background:linear-gradient(90deg,#12261D 25%,#1b3427 50%,#12261D 75%);background-size:200% 100%;animation:sh 1.3s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+pre.preview{white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--sans);font-size:13px;color:var(--mut);margin:0}
+textarea.ta{width:100%;min-height:200px;border-radius:13px;border:1px solid var(--line);background:var(--ink);color:var(--ivory);padding:12px;font-size:13px}
+.hr{height:1px;background:var(--line2);margin:6px 0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="app"></div>
+<div id="sheet"></div>
+<div id="toast"></div>
+
+<script>
+/*PURE-START*/
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const p2=n=>String(n).padStart(2,'0');
+const nid=p=>p+'_'+Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-3);
+const nf=new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
+const eur=c=>nf.format(c/100)+' €';
+const sgn=c=>(c>0?'+':c<0?'−':'')+nf.format(Math.abs(c)/100)+' €';
+const fch=n=>Math.round(n).toLocaleString('it-IT');
+function parseEur(s){s=String(s==null?'':s).trim().replace(/\s|€/g,'');if(!s)return NaN;if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');const n=Number(s);return isFinite(n)&&n>=0?Math.round(n*100):NaN}
+function parseCh(s){s=String(s==null?'':s).replace(/[\s.]/g,'');if(!s)return NaN;const n=Number(s);return isFinite(n)&&n>=0?Math.round(n):NaN}
+const toEuro=(chips,g)=>Math.round(chips*g.buyInCents/g.chipsPerBuyIn);
+const toChips=(c,g)=>Math.round(c*g.chipsPerBuyIn/g.buyInCents);
+const dShort=iso=>{const d=new Date(iso);return p2(d.getDate())+'/'+p2(d.getMonth()+1)+'/'+d.getFullYear()};
+const tHM=iso=>{const d=new Date(iso);return p2(d.getHours())+':'+p2(d.getMinutes())};
+const dLong=iso=>new Date(iso).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const plist=g=>Object.values(g.players||{}).sort((a,b)=>a.seq-b.seq);
+const inv=p=>sum(p.buyIns.map(b=>b.amountCents));
+const safeOf=p=>sum((p.cashOuts||[]).map(c=>c.amountCents));
+const pendOf=p=>sum(p.buyIns.filter(b=>b.paymentStatus==='PENDING').map(b=>b.amountCents));
+const grossOf=g=>sum(plist(g).map(inv));
+const netPot=g=>grossOf(g)-(g.dealerChips||0);
+
+function settle(nets){
+  const d=nets.filter(x=>x.net<0).map(x=>({n:x.name,id:x.pid||null,a:-x.net})).sort((a,b)=>b.a-a.a);
+  const c=nets.filter(x=>x.net>0).map(x=>({n:x.name,id:x.pid||null,a:x.net})).sort((a,b)=>b.a-a.a);
+  const out=[];let i=0,j=0;
+  while(i<d.length&&j<c.length){const m=Math.min(d[i].a,c[j].a);out.push({from:d[i].n,to:c[j].n,fromId:d[i].id,toId:c[j].id,amt:m});d[i].a-=m;c[j].a-=m;if(d[i].a===0)i++;if(c[j].a===0)j++}
+  return out;
+}
+function calcClose(g,cl){
+  const L=plist(g);
+  const dealer=String(cl.dealer||'').trim()===''?0:parseEur(cl.dealer);
+  const rows=L.map(p=>{
+    const v=cl.vals[p.playerId]||{mode:'chips',v:''};
+    let counted=NaN;
+    if(String(v.v||'')!==''){counted=v.mode==='chips'?toEuro(parseCh(v.v),g):parseEur(v.v)}
+    const s=safeOf(p);
+    return {p,counted,s,fin:counted+s,inv:inv(p)};
+  });
+  if(isNaN(dealer)||rows.some(r=>isNaN(r.counted)))return {ok:false,rows,dealer};
+  const totIn=sum(rows.map(r=>r.inv)),totFin=sum(rows.map(r=>r.fin));
+  const bal=totIn-dealer-totFin;
+  const adj=rows.map(()=>0);
+  if(bal!==0){
+    let idx=rows.map((_,i)=>i);
+    if(bal<0&&cl.holeMode==='split_winners'){const w=idx.filter(i=>rows[i].fin-rows[i].inv>0);if(w.length)idx=w}
+    const n=idx.length,base=Math.trunc(bal/n),rem=bal-base*n;
+    idx.forEach(i=>{adj[i]=base});
+    const step=rem>0?1:-1;
+    for(let k=0;k<Math.abs(rem);k++)adj[idx[k]]+=step;
+  }
+  const nets=rows.map((r,i)=>({name:r.p.playerName,pid:r.p.playerId,net:r.fin-r.inv+adj[i],fin:r.fin,inv:r.inv}));
+  if(dealer>0)nets.push({name:'Dealer',pid:'dealer',net:dealer,dealer:true});
+  const sumNet=sum(nets.map(x=>x.net));
+  return {ok:true,rows,dealer,totIn,totFin,bal,nets,sumNet,tx:settle(nets)};
+}
+function recompute(d){
+  d.paidAmount=sum(d.transactions.filter(t=>t.status==='PAID').map(t=>t.amount));
+  d.remainingAmount=sum(d.transactions.filter(t=>t.status==='PENDING').map(t=>t.amount));
+}
+function dPayFull(d,sid,now){const t=d.transactions.find(x=>x.subId===sid);if(!t||t.status!=='PENDING')return false;t.status='PAID';t.lastUpdated=now;recompute(d);return true}
+function dPartial(d,sid,amt,now){
+  const i=d.transactions.findIndex(x=>x.subId===sid),t=d.transactions[i];
+  if(!t||t.status!=='PENDING'||!(amt>0))return false;
+  if(amt>=t.amount)return dPayFull(d,sid,now);
+  d.transactions.splice(i,1,{subId:nid('s'),amount:amt,status:'PAID',lastUpdated:now},{subId:nid('s'),amount:t.amount-amt,status:'PENDING',lastUpdated:now});
+  recompute(d);return true;
+}
+function dModify(d,sid,newAmt,now){
+  const i=d.transactions.findIndex(x=>x.subId===sid),t=d.transactions[i];
+  if(!t||t.status!=='PAID'||!(newAmt>0))return false;
+  const diff=newAmt-t.amount;if(diff===0)return false;
+  const pi=d.transactions.findIndex(x=>x.status==='PENDING');
+  if(diff>0){
+    if(pi<0||diff>d.transactions[pi].amount)return false;
+    const p=d.transactions[pi];p.amount-=diff;p.lastUpdated=now;
+    if(p.amount===0)d.transactions.splice(pi,1);
+  }else{
+    if(pi>=0){const p=d.transactions[pi];p.amount-=diff;p.lastUpdated=now}
+    else d.transactions.splice(i+1,0,{subId:nid('s'),amount:-diff,status:'PENDING',lastUpdated:now});
+  }
+  t.amount=newAmt;t.lastUpdated=now;recompute(d);return true;
+}
+function dRestore(d,sid,now){
+  const i=d.transactions.findIndex(x=>x.subId===sid),t=d.transactions[i];
+  if(!t||t.status!=='PAID')return false;
+  const pi=d.transactions.findIndex(x=>x.status==='PENDING');
+  if(pi>=0){const p=d.transactions[pi];p.amount+=t.amount;p.lastUpdated=now;d.transactions.splice(i,1)}
+  else{t.status='PENDING';t.lastUpdated=now}
+  recompute(d);return true;
+}
+/*PURE-END*/
+
+/* ===== Configurazione ===== */
+const APP_URL=location.href.split('#')[0];
+const DEFAULT_PW='burcione';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mem={};
+const LS={
+  get(k,d){try{const v=localStorage.getItem('hpl.'+k);return v==null?(k in mem?mem[k]:d):JSON.parse(v)}catch(e){return k in mem?mem[k]:d}},
+  set(k,v){mem[k]=v;try{localStorage.setItem('hpl.'+k,JSON.stringify(v))}catch(e){}},
+  del(k){delete mem[k];try{localStorage.removeItem('hpl.'+k)}catch(e){}}
+};
+async function sha(s){
+  try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  catch(e){let h=5381;for(const c of s)h=((h<<5)+h+c.charCodeAt(0))|0;return 'x'+(h>>>0).toString(16)}
+}
+
+/* ===== Icone e avatar ===== */
+const IP={plus:'M12 5v14M5 12h14',close:'M6 6l12 12M18 6L6 18',trash:'M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3',chev:'M6 9l6 6 6-6',chevu:'M6 15l6-6 6 6',chevr:'M9 6l6 6-6 6',back:'M15 6l-6 6 6 6',check:'M5 12l5 5 9-10',eye:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 100 6 3 3 0 000-6z',lock:'M7 11V8a5 5 0 0110 0v3M6 11h12v9H6z'};
+const ico=(k,s)=>`<svg width="${s||18}" height="${s||18}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${IP[k]}"/></svg>`;
+const hueOf=s=>{let h=7;for(const c of String(s).toLowerCase())h=(h*31+c.charCodeAt(0))%360;return h};
+const inits=n=>{const w=String(n).trim().split(/\s+/);return ((w[0]||'?')[0]+(w.length>1?w[1][0]:'')).toUpperCase()};
+const ava=(n,s)=>`<span class="ava ${s||''}" style="--h:${hueOf(n)}">${esc(inits(n))}</span>`;
+
+/* ===== Stato ===== */
+let db=null,canWrite=true,ENTER=false;
+const S={me:LS.get('me',null),games:{},players:{},res:[],cfg:null,loaded:{games:false,players:false,cfg:false},admin:{},reqHash:null,dbReady:undefined,booted:false,resGid:null,unsubRes:null};
+let V={name:'home'};
+let SH=null;
+const F={pw:'',pwErr:false,pin:'',pinErr:false,open:{},resOpen:false,pinShow:false,rname:'',ng:null,ap:{sel:{},names:''},bi:{},co:{},cl:null,pay:{},mod:{},npw:'',auth:{mode:null,name:'',pin:'',pin2:'',err:''},pinp:'',chpin:{old:'',nw:''}};
+const armed={};
+function arm(k){if(armed[k]){clearTimeout(armed[k]);delete armed[k];return true}armed[k]=setTimeout(()=>{delete armed[k];render()},3000);render();return false}
+function setPath(path,val){const k=path.split('.');let o=F;for(let i=0;i<k.length-1;i++){if(o[k[i]]==null||typeof o[k[i]]!=='object')o[k[i]]={};o=o[k[i]]}o[k[k.length-1]]=val}
+function toast(msg,kind){const el=document.createElement('div');el.className='t '+(kind||'ok');el.innerHTML=(kind==='err'?ico('close',16):ico('check',16))+'<span></span>';el.lastChild.textContent=msg;$('#toast').appendChild(el);setTimeout(()=>el.remove(),2900)}
+const errMsg=e=>e&&e.code==='invalid_argument'?'Il tuo account non può modificare questi dati. Chiedi di essere invitato come collaboratore.':(e&&e.message)||'Operazione non riuscita';
+const unlocked=()=>S.reqHash&&LS.get('pwOk',null)===S.reqHash;
+const isAdmin=gid=>!!S.admin[gid];
+const resSorted=()=>S.res.slice().sort((a,b)=>String(a.reservedAt).localeCompare(String(b.reservedAt))||a.id.localeCompare(b.id));
+
+/* ===== Scrittura partita (una alla volta per documento) ===== */
+const wq={};
+function saveGame(gid,fn){
+  const prev=wq[gid]||Promise.resolve();
+  const next=prev.then(async()=>{
+    const cur=S.games[gid];if(!cur)throw new Error('Partita non trovata');
+    const g=JSON.parse(JSON.stringify(cur));
+    if(fn(g)===false)return false;
+    await db.doc('games/'+gid).set(g);
+    S.games[gid]=g;render();return true;
+  }).catch(e=>{toast(errMsg(e),'err');return false});
+  wq[gid]=next;return next;
+}
+
+/* ===== Navigazione ===== */
+function subRes(gid){
+  if(S.resGid===gid)return;
+  if(S.unsubRes){try{S.unsubRes()}catch(e){}S.unsubRes=null}
+  S.res=[];S.resGid=gid;
+  if(!gid||!db)return;
+  S.unsubRes=db.collection('games/'+gid+'/reservations').onSnapshot(sn=>{S.res=sn.docs.map(d=>Object.assign({id:d.id},d.data()));render()},()=>{});
+}
+function go(name,gid,extra){
+  V=Object.assign({name,gid:gid||null},extra||{});SH=null;ENTER=true;
+  subRes(gid&&['live','book','detail'].includes(name)?gid:null);
+  if(name==='new'&&!F.ng)resetNew();
+  render();window.scrollTo(0,0);
+}
+function parseHash(){const m=/^#prenota-([A-Za-z0-9_.~-]+)$/.exec(location.hash||'');return m?m[1]:null}
+function boot(){
+  if(S.booted||!(S.loaded.games&&S.loaded.cfg&&S.loaded.players))return;
+  S.booted=true;
+  const h=parseHash();
+  if(h){go('book',h);return}
+  const a=LS.get('active',null);
+  if(a&&S.games[a]&&S.games[a].status==='live'){go('live',a);return}
+  if(a)LS.del('active');
+  go('home');
+}
+async function checkAdmin(){
+  const pins=LS.get('pins',{});let ch=false;
+  for(const gid of Object.keys(pins)){
+    const g=S.games[gid];if(!g)continue;
+    const ok=(await sha(gid+':'+pins[gid]))===g.pinHash;
+    if(S.admin[gid]!==ok){S.admin[gid]=ok;ch=true}
+  }
+  if(ch)render();
+}
+async function afterData(){
+  const dh=await sha('hpl:'+DEFAULT_PW);
+  S.reqHash=dh;
+  await checkAdmin();
+  if(V.name==='live'||V.name==='detail'){if(!S.games[V.gid]&&S.loaded.games){const a=LS.get('active',null);if(a===V.gid)LS.del('active');V={name:'home'}}}
+  if(S.me&&S.loaded.players){const p=S.players[S.me.id];if(!p||!p.pinHash){S.me=null;LS.del('me')}else if(p.name!==S.me.name){S.me={id:S.me.id,name:p.name};LS.set('me',S.me)}}
+  boot();render();
+}
+
+/* ===== Viste ===== */
+const brand=()=>`<div class="brand"><div class="logo">♠</div><div><div class="b1">HOME POKER</div><div class="b2">LEDGER</div></div></div>`;
+const topbar=()=>`<div class="top">${brand()}<span class="suits">♥ ♣ ♦</span></div>`;
+const backBtn=(act,txt,gid)=>`<button class="back-l" data-act="${act}" ${gid?`data-gid="${gid}"`:''}>${ico('back',20)}${txt}</button>`;
+const skeleton=()=>`<div class="wrap">${topbar()}<div class="stack" style="margin-top:24px"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div></div>`;
+const stBadge=s=>s==='PAID'?'<span class="badge paid">PAGATO</span>':'<span class="badge pend">DA PAGARE</span>';
+const notFound=()=>`<div class="wrap">${topbar()}<h1 style="margin-top:28px">Partita non trovata</h1><p class="mut">Il collegamento non corrisponde a nessuna partita. Potrebbe essere stata eliminata.</p><button class="btn" data-act="home">Vai alla Home</button></div>`;
+
+function view(){
+  if(S.dbReady===false)return `<div class="wrap">${topbar()}<h1 style="margin-top:28px">Archivio non disponibile</h1><p class="mut">Impossibile collegarsi all'archivio. Controlla la connessione e riapri la pagina.</p></div>`;
+  if(!db||!(S.loaded.games&&S.loaded.cfg&&S.loaded.players)||!S.reqHash)return skeleton();
+  if(!unlocked())return vGate();
+  if(!S.me&&V.name!=='book')return vAuth();
+  switch(V.name){
+    case 'new':return vNew();
+    case 'live':return vLive();
+    case 'close':return vClose();
+    case 'detail':return vDetail();
+    case 'book':return vBook();
+    default:return vHome();
+  }
+}
+
+/* --- Profili giocatore: nome utente + PIN (salvato solo come hash con sale = id del giocatore) --- */
+async function pinHash(id,pin){return sha('hplpin:'+id+':'+pin)}
+const PIN_RE=/^\d{4,6}$/;
+function vAuth(){
+  const regd=Object.values(S.players).filter(p=>p.pinHash).map(p=>p.name).sort((x,y)=>x.localeCompare(y,'it'));
+  const a=F.auth;if(a.mode===null)a.mode=regd.length?'login':'reg';
+  const reg=a.mode==='reg';
+  return `<div class="wrap">${topbar()}
+<form id="f-auth" class="card hero stack" style="margin-top:16px;gap:14px">
+<div><h1>${reg?'Crea il tuo profilo':'Accedi'}</h1><p class="mut" style="margin:6px 0 0">${reg?'Scegli un nome utente e un PIN: ti servono per giocare e per riscuotere i tuoi saldi.':'Entra con il tuo nome utente e il tuo PIN.'}</p></div>
+<div class="seg" style="align-self:stretch"><button type="button" class="${!reg?'on':''}" style="flex:1" data-act="authmode" data-m="login">Accedi</button><button type="button" class="${reg?'on':''}" style="flex:1" data-act="authmode" data-m="reg">Registrati</button></div>
+${!reg&&regd.length?`<div class="chips">${regd.map(n=>`<button type="button" class="chip ${a.name.trim().toLowerCase()===n.toLowerCase()?'on':''}" data-act="authpick" data-n="${esc(n)}">${esc(n)}</button>`).join('')}</div>`:''}
+<label class="field"><span>Nome utente</span><input class="in" id="au-name" data-bind="auth.name" value="${esc(a.name)}" autocomplete="username" maxlength="24"></label>
+<label class="field"><span>PIN (da 4 a 6 cifre)</span><input class="in" id="au-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="auth.pin" value="${esc(a.pin)}" autocomplete="${reg?'new-password':'current-password'}"></label>
+${reg?`<label class="field"><span>Ripeti il PIN</span><input class="in" id="au-pin2" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="auth.pin2" value="${esc(a.pin2)}" autocomplete="new-password"></label>`:''}
+${a.err?`<div class="red sm">${esc(a.err)}</div>`:''}
+<button class="btn" type="submit" ${canWrite||!reg?'':'disabled'}>${reg?'Registrati':'Entra'}</button>
+<div class="mut xs">${reg?'Se i tuoi amici ti hanno già aggiunto al tavolo, usa lo stesso nome: il profilo sarà tuo.':'Hai dimenticato il PIN? Chiedi a chi gestisce la pagina di azzerarlo.'}</div></form></div>`;
+}
+function enterAs(id,name){S.me={id,name};LS.set('me',S.me);LS.set('name',name);F.auth={mode:null,name:'',pin:'',pin2:'',err:''};go('home');toast('Ciao '+name+'!','ok')}
+async function doAuth(){
+  const a=F.auth,name=a.name.trim(),lk=name.toLowerCase();
+  const fail=m=>{a.err=m;render()};
+  const ent=Object.entries(S.players).find(([id,p])=>String(p.name).toLowerCase()===lk);
+  if(a.mode==='login'){
+    if(!ent)return fail('Nome utente non trovato. Se è la prima volta, tocca Registrati.');
+    const [id,p]=ent;
+    if(!p.pinHash)return fail('Questo nome non ha ancora un PIN: tocca Registrati per sceglierlo.');
+    if((await pinHash(id,a.pin))!==p.pinHash)return fail('Nome utente o PIN errati.');
+    return enterAs(id,p.name);
+  }
+  if(name.length<2)return fail('Il nome utente deve avere almeno 2 caratteri.');
+  if(lk==='dealer')return fail('Questo nome utente è riservato.');
+  if(!PIN_RE.test(a.pin))return fail('Il PIN deve avere da 4 a 6 cifre.');
+  if(a.pin!==a.pin2)return fail('I due PIN non coincidono.');
+  if(ent&&ent[1].pinHash)return fail('Nome utente già registrato: tocca Accedi.');
+  const id=ent?ent[0]:nid('p'),now=new Date().toISOString();
+  const doc=Object.assign({},ent?ent[1]:{name,createdAt:now},{pinHash:await pinHash(id,a.pin),registeredAt:now});
+  try{await db.doc('players/'+id).set(doc)}catch(e){return fail(errMsg(e))}
+  S.players[id]=doc;enterAs(id,doc.name);
+}
+const isCreditor=d=>!!S.me&&(d.toPlayerId?d.toPlayerId===S.me.id:S.me.name.toLowerCase()===String(d.toPlayerName).toLowerCase());
+function debtPerm(gid,d){
+  const dealer=d.toPlayerId?d.toPlayerId==='dealer':String(d.toPlayerName)==='Dealer';
+  if(dealer)return {can:isAdmin(gid),needPin:false,who:'chi ha avviato la partita'};
+  return {can:isCreditor(d),needPin:true,who:d.toPlayerName};
+}
+async function authDebt(did){
+  const g=S.games[V.gid],d=g&&(g.debts||[]).find(x=>x.debtId===did);if(!d)return false;
+  const perm=debtPerm(V.gid,d);
+  if(!perm.can){toast('Solo '+perm.who+' può modificare questo saldo','err');return false}
+  if(perm.needPin){
+    const p=S.me&&S.players[S.me.id];
+    if(!p||!p.pinHash||(await pinHash(S.me.id,F.pinp))!==p.pinHash){toast('PIN errato, riprova.','err');return false}
+  }
+  F.pinp='';return true;
+}
+const pinField=perm=>perm.needPin?`<label class="field"><span>Il tuo PIN · ${esc(perm.who)}</span><input class="in" id="pay-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="pinp" value="${esc(F.pinp)}" placeholder="PIN" autocomplete="off"></label>`:'';
+const pinReady=perm=>!perm.needPin||PIN_RE.test(F.pinp);
+const meCard=()=>S.me?`<div class="card tight row" style="margin-top:6px">${ava(S.me.name,'s')}<div class="grow" style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(S.me.name)}</div><button class="btn-s" data-act="chpin">Cambia PIN</button><button class="btn-s" data-act="logout">Esci</button></div>`:'';
+function myCredits(gs){const out=[];gs.filter(g=>g.status==='closed').forEach(g=>(g.debts||[]).forEach(d=>{if(d.remainingAmount>0&&isCreditor(d))out.push({g,d})}));return out}
+function vGate(){return `<div class="wrap">${topbar()}
+<form id="f-gate" class="card hero stack" style="margin-top:40px;padding:22px;gap:14px">
+<div class="logo" style="width:56px;height:56px;font-size:26px">♠</div>
+<h1>🔒 Accesso riservato</h1><p class="mut" style="margin:0">Inserisci la password per aprire la cassa</p>
+<input class="in" id="pw" type="password" placeholder="Password" autocomplete="current-password" data-bind="pw" value="${esc(F.pw)}">
+${F.pwErr?'<div class="red sm">Password errata, riprova.</div>':''}
+<button class="btn" type="submit">Entra</button></form></div>`}
+
+/* --- Classifica: saldi aperti per persona (da riscuotere / da dare) --- */
+function owedMap(gs){
+  const bal={};
+  gs.filter(g=>g.status==='closed').forEach(g=>(g.debts||[]).forEach(d=>{
+    if(!(d.remainingAmount>0))return;
+    const fk=String(d.fromPlayerName).trim().toLowerCase(),tk=String(d.toPlayerName).trim().toLowerCase();
+    (bal[fk]=bal[fk]||{give:[],get:[]}).give.push({who:d.toPlayerName,amt:d.remainingAmount,gid:g.id,at:g.scheduledAt});
+    (bal[tk]=bal[tk]||{give:[],get:[]}).get.push({who:d.fromPlayerName,amt:d.remainingAmount,gid:g.id,at:g.scheduledAt});
+  }));
+  return bal;
+}
+function rankRow(r,i,bal){
+  const mc=['var(--gold)','var(--gold-l)','var(--gold-d)'];
+  const k=r.name.trim().toLowerCase(),b=bal[k]||{give:[],get:[]};
+  const give=sum(b.give.map(x=>x.amt)),get=sum(b.get.map(x=>x.amt)),has=give+get>0,open=has&&!!F.open['rk:'+k];
+  const items=(list,cls,amtCls)=>list.slice().sort((x,y)=>String(y.at).localeCompare(String(x.at))).map(x=>`<button class="tr ${cls}" data-act="detail" data-gid="${x.gid}"><div class="row sp"><span><b>${esc(x.who)}</b><span class="mut xs"> · partita del ${dShort(x.at)}</span></span><b class="num ${amtCls}">${eur(x.amt)}</b></div></button>`).join('');
+  return `<div class="card tight">
+<div class="row" ${has?`data-act="rk" data-k="${esc(k)}" style="cursor:pointer"`:''}><span class="medal" style="color:${mc[i]||'var(--mut)'}">${i+1}°</span>${ava(r.name,'s')}<div class="grow"><div style="font-weight:600">${esc(r.name)}</div><div class="mut xs">${r.n} partit${r.n===1?'a':'e'} · ${r.w} in positivo</div></div><b class="num ${r.tot>=0?'green':'red'}">${sgn(r.tot)}</b>${has?`<span class="mut">${ico(open?'chevu':'chev',18)}</span>`:''}</div>
+<div class="chips" style="gap:6px;margin-top:10px">${get>0?`<span class="badge paid num" style="text-transform:none;letter-spacing:0">A credito ${eur(get)}</span>`:''}${give>0?`<span class="badge pend num" style="text-transform:none;letter-spacing:0">A debito ${eur(give)}</span>`:''}${has?'':'<span class="badge grey" style="text-transform:none;letter-spacing:0">Nessun saldo aperto</span>'}</div>
+${open?`<div class="stack" style="gap:8px;margin-top:12px">${b.get.length?`<div class="lbl in" style="margin:0">Da chi riscuotere</div>${items(b.get,'paid','green')}`:''}${b.give.length?`<div class="lbl in" style="margin:${b.get.length?'8px':'0'} 0 0">A chi dare</div>${items(b.give,'pend','red')}`:''}</div>`:''}</div>`;
+}
+function vHome(){
+  const gs=Object.entries(S.games).map(([id,g])=>Object.assign({id},g)).sort((a,b)=>String(b.scheduledAt).localeCompare(String(a.scheduledAt)));
+  const live=gs.find(g=>g.status==='live'&&g.id===LS.get('active',null))||gs.find(g=>g.status==='live');
+  const agg={};
+  gs.filter(g=>g.status==='closed').forEach(g=>plist(g).forEach(p=>{
+    const k=p.playerName.trim().toLowerCase();const a=agg[k]||(agg[k]={name:p.playerName,n:0,w:0,tot:0});
+    a.n++;if((p.netCents||0)>0)a.w++;a.tot+=p.netCents||0;
+  }));
+  const rank=Object.values(agg).sort((a,b)=>b.tot-a.tot);const bal=owedMap(gs);
+  const mc=['var(--gold)','var(--gold-l)','var(--gold-d)'];
+  const liveN=live?plist(live).length:0;const cr=myCredits(gs);
+  return `<div class="wrap">${topbar()}${meCard()}
+${canWrite?'':'<div class="box o sm" style="margin-top:12px">Questo account può solo leggere. Per creare o modificare partite chiedi di essere invitato come collaboratore.</div>'}
+<div class="stack" style="margin-top:14px">
+${live?`<div class="card hero stack" style="gap:12px"><div class="row sp"><span class="badge live"><i class="dot"></i>In corso</span><span class="mut sm">${dLong(live.scheduledAt)}</span></div>
+<div><div class="gdate num" style="font-size:24px">${dShort(live.scheduledAt)}</div><div class="mut num">${liveN} giocator${liveN===1?'e':'i'} · Montepremi ${eur(netPot(live))}</div></div>
+<button class="btn" data-act="live" data-gid="${live.id}">▶ Riprendi partita in corso</button><button class="btn ghost" data-act="newgame">${ico('plus',18)} Nuova Partita</button></div>`
+:`<div class="card hero stack" style="gap:12px"><div><h1>Cassa del tavolo</h1><p class="mut" style="margin:6px 0 0">Buy-in, cash out e saldi della serata, sempre aggiornati su tutti i telefoni.</p></div><button class="btn" data-act="newgame">${ico('plus',18)} Nuova Partita</button></div>`}</div>
+${cr.length?`<div class="lbl">Da riscuotere</div><div class="stack">${cr.map(x=>`<button class="card tap gcard" data-act="detail" data-gid="${x.g.id}"><span class="suit">💰</span><div class="grow"><div style="font-weight:600">${esc(x.d.fromPlayerName)} ti deve <span class="gold num">${eur(x.d.remainingAmount)}</span></div><div class="mut xs">Partita del ${dShort(x.g.scheduledAt)}</div></div><span class="mut">${ico('chevr',18)}</span></button>`).join('')}</div>`:''}
+<div class="lbl">Storico partite</div>
+<div class="stack">${gs.length?gs.map(g=>{const n=plist(g).length;return `<button class="card tap gcard" data-act="${g.status==='live'?'live':'detail'}" data-gid="${g.id}"><span class="suit">♠</span><div class="grow"><div class="gdate num">${dShort(g.scheduledAt)}</div><div class="mut sm num">${n} giocator${n===1?'e':'i'} · Montepremi ${eur(netPot(g))}</div></div>${g.status==='live'?'<span class="badge live"><i class="dot"></i>In corso</span>':'<span class="badge grey">Conclusa</span>'}<span class="mut">${ico('chevr',18)}</span></button>`}).join(''):'<div class="card mut sm">Nessuna partita ancora. Crea la prima e tieni la cassa sotto controllo. ♠</div>'}</div>
+<div class="lbl">Classifica del gruppo</div>
+<div class="stack">${rank.length?rank.map((r,i)=>rankRow(r,i,bal)).join(''):'<div class="card mut sm">La classifica apparirà dopo la prima partita conclusa.</div>'}</div>
+</div>`;
+}
+
+/* --- Giocatori: scelta multipla (nuova partita e cassa live) --- */
+function targetsFrom(sel,namesStr){
+  const out=[],seen=new Set();
+  Object.keys(sel||{}).filter(id=>sel[id]&&S.players[id]).forEach(id=>{const n=S.players[id].name,k=n.toLowerCase();if(!seen.has(k)){seen.add(k);out.push({id,name:n})}});
+  String(namesStr||'').split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean).forEach(n=>{
+    const k=n.toLowerCase();if(seen.has(k))return;seen.add(k);
+    const ex=Object.entries(S.players).find(([id,p])=>p.name.toLowerCase()===k);
+    out.push({id:ex?ex[0]:null,name:ex?ex[1].name:n});
+  });
+  return out;
+}
+async function ensurePlayers(ts){
+  const out=[];
+  for(const t of ts){
+    let id=t.id;
+    if(!id){id=nid('p');await db.doc('players/'+id).set({name:t.name,createdAt:new Date().toISOString()});S.players[id]={name:t.name}}
+    out.push({id,name:t.name});
+  }
+  return out;
+}
+const rubrica=()=>Object.entries(S.players).map(([id,p])=>({id,name:p.name,reg:!!p.pinHash})).sort((a,b)=>a.name.localeCompare(b.name,'it'));
+
+/* --- Nuova partita --- */
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
+function resetNew(){F.ng={host:LS.get('name','')||'',date:todayStr(),time:'21:00',loc:'',seats:'',buy:2000,custom:false,cv:'',chips:'2000',sel:{},names:'',pstatus:'PENDING'}}
+function ngVals(){
+  const n=F.ng;const buy=n.custom?parseEur(n.cv):n.buy;const chips=parseCh(n.chips);
+  const seats=n.seats.trim()===''?null:parseCh(n.seats);
+  const ok=n.host.trim()&&n.date&&n.time&&buy>0&&chips>0&&(seats===null||(seats>=2&&seats<=50));
+  return {buy,chips,seats,ok:!!ok};
+}
+function vNew(){
+  const n=F.ng,v=ngVals(),ts=targetsFrom(n.sel,n.names),rb=rubrica();
+  return `<div class="wrap">${backBtn('home','Indietro')}
+<h1>Nuova Partita</h1><p class="mut" style="margin:6px 0 0">Imposta i parametri, poi gestisci tutto dalla cassa live.</p>
+<div class="stack" style="margin-top:16px;gap:14px">
+<div class="card stack" style="gap:14px"><div class="lbl in">Serata</div>
+<label class="field"><span>Chi avvia la partita?</span><input class="in" id="ng-host" data-bind="ng.host" value="${esc(n.host)}" placeholder="Il tuo nome" autocomplete="given-name"><span class="xs">All'avvio verrà generato un PIN a 4 cifre: solo chi lo conosce potrà modificare la partita mentre è in corso.</span></label>
+<div class="two"><label class="field"><span>Data</span><input class="in" id="ng-date" type="date" data-bind="ng.date" data-ev="change" value="${esc(n.date)}"></label>
+<label class="field"><span>Ora</span><input class="in" id="ng-time" type="time" data-bind="ng.time" data-ev="change" value="${esc(n.time)}"></label></div>
+<label class="field"><span>Luogo / Host (opzionale)</span><input class="in" id="ng-loc" data-bind="ng.loc" value="${esc(n.loc)}" placeholder="Casa di Giovanni, via Roma 1"><span class="xs">Se vuoto, nell'invito compare il nome di chi avvia la partita.</span></label>
+<label class="field"><span>Posti al tavolo (opzionale)</span><input class="in" id="ng-seats" inputmode="numeric" data-bind="ng.seats" value="${esc(n.seats)}" placeholder="Da 2 a 50"></label></div>
+<div class="card stack" style="gap:14px"><div class="lbl in">Buy-in</div>
+<div class="field"><span>Valore buy-in</span><div class="chips">${[500,1000,2000,5000].map(c=>`<button class="chip ${!n.custom&&n.buy===c?'on':''}" data-act="nbuy" data-v="${c}">${c/100} €</button>`).join('')}<button class="chip ${n.custom?'on':''}" data-act="nbuy" data-v="custom">Altro…</button></div>
+${n.custom?`<input class="in" id="ng-cv" inputmode="decimal" data-bind="ng.cv" value="${esc(n.cv)}" placeholder="Importo in euro, es. 15,50">`:''}</div>
+<label class="field"><span>Fiches per buy-in</span><input class="in" id="ng-chips" inputmode="numeric" data-bind="ng.chips" value="${esc(n.chips)}"><span class="xs num">${v.buy>0&&v.chips>0?`${eur(v.buy)} = ${fch(v.chips)} fiches`:'Inserisci importo e fiches validi'}</span></label></div>
+<div class="card stack" style="gap:14px"><div class="row sp"><div class="lbl in">Giocatori</div><span class="badge ${ts.length?'paid':'grey'}">${ts.length} al tavolo</span></div>
+<p class="mut sm" style="margin:0">Inserisci subito tutti quelli che giocano: ognuno parte con il suo primo buy-in. Puoi aggiungere altri giocatori anche dopo, dalla cassa live.</p>
+${rb.length?`<div class="field"><span>Dalla rubrica</span><div class="chips">${rb.map(p=>`<button class="chip ${n.sel[p.id]?'on':''}" data-act="nsel" data-id="${p.id}">${n.sel[p.id]?ico('check',16):''}${esc(p.name)}</button>`).join('')}</div></div>`:''}
+<label class="field"><span>${rb.length?'Nuovi nomi':'Nomi dei giocatori'} (separati da virgola o a capo)</span><textarea class="in" id="ng-names" data-bind="ng.names" placeholder="Marco, Luca, Anna">${esc(n.names)}</textarea></label>
+${ts.length?`<div class="chips">${ts.map(t=>`<span class="row" style="gap:8px;background:var(--card2);border:1px solid var(--line2);border-radius:999px;padding:4px 12px 4px 4px">${ava(t.name,'s')}<span class="sm">${esc(t.name)}</span></span>`).join('')}</div>
+<div class="field"><span>Come pagano il primo buy-in? (${eur(v.buy>0?v.buy:0)} a testa)</span><div class="pay2"><button class="big ${n.pstatus==='PAID'?'sel-g':''}" data-act="nst" data-s="PAID">Pagato subito</button><button class="big ${n.pstatus==='PENDING'?'sel-r':''}" data-act="nst" data-s="PENDING">Da pagare</button></div></div>
+<div class="mut sm num">${ts.length} giocator${ts.length===1?'e':'i'} · ${v.buy>0?eur(v.buy*ts.length):'—'} di buy-in iniziali</div>`:''}</div>
+<button class="btn" data-act="creategame" ${v.ok&&canWrite?'':'disabled'}>Crea partita e apri la cassa</button></div></div>`;
+}
+async function createGame(){
+  const v=ngVals();if(!v.ok||!db)return;
+  const n=F.ng,ts=targetsFrom(n.sel,n.names);
+  const gid='g'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  const pin=String(crypto.getRandomValues(new Uint32Array(1))[0]%10000).padStart(4,'0');
+  let rs;try{rs=await ensurePlayers(ts)}catch(e){toast(errMsg(e),'err');return}
+  const now=new Date().toISOString(),players={};
+  rs.forEach((r,i)=>{players[r.id]={playerId:r.id,playerName:r.name,seq:i+1,buyIns:[{buyInId:nid('b'),amountCents:v.buy,paymentStatus:n.pstatus,timestamp:now}],cashOuts:[],cashOutCents:null,netCents:null}});
+  const doc={scheduledAt:new Date(n.date+'T'+n.time).toISOString(),hostName:n.host.trim(),location:n.loc.trim(),maxSeats:v.seats,dealerChips:0,buyInCents:v.buy,chipsPerBuyIn:v.chips,status:'live',pinHash:await sha(gid+':'+pin),holeCents:null,holeMode:'',createdAt:now,players,debts:[],seq:rs.length};
+  try{await db.doc('games/'+gid).set(doc)}catch(e){toast(errMsg(e),'err');return}
+  S.games[gid]=doc;
+  const pins=LS.get('pins',{});pins[gid]=pin;LS.set('pins',pins);S.admin[gid]=true;
+  LS.set('active',gid);LS.set('name',doc.hostName);F.ng=null;F.pinShow=false;
+  go('live',gid);toast('Partita creata: apri la cassa!','ok');
+}
+
+/* --- Prenotazioni, inviti --- */
+function seatsText(g,n){
+  if(g.maxSeats){const m=g.maxSeats;return `${Math.min(n,m)}/${m} posti occupati · ${Math.max(m-n,0)} liberi${n>m?` · ${n-m} in attesa`:''}`}
+  return `${n} prenotat${n===1?'o':'i'}`;
+}
+function inviteLink(gid){return (APP_URL||'')+'#prenota-'+gid}
+function inviteText(gid){const g=S.games[gid];return `Poker Night! ♠️♥️\n📅 ${dLong(g.scheduledAt)} · ore ${tHM(g.scheduledAt)}\n📍 ${g.location||g.hostName}\n\nClicca sul link per prenotare il tuo posto al tavolo:\n${inviteLink(gid)}`}
+const waHref=t=>'https://wa.me/?text='+encodeURIComponent(t);
+function resList(g,A){
+  const L=resSorted();
+  if(!L.length)return '<div class="mut sm">Nessuna prenotazione ancora.</div>';
+  return L.map((r,i)=>{const pr=i+1,wait=g.maxSeats&&pr>g.maxSeats;return `<div class="row" style="min-height:48px;border-top:${i?'1px solid var(--line2)':'0'}"><b class="gold num" style="width:22px;text-align:center">${pr}</b>${ava(r.playerName,'s')}<div class="grow">${esc(r.playerName)} ${wait?'<span class="badge grey">In attesa</span>':''}</div><span class="mut xs num">Ore ${tHM(r.reservedAt)}</span>${A?`<button class="x" data-act="delres" data-id="${r.id}" aria-label="Rimuovi prenotazione">${ico('close',16)}</button>`:''}</div>`}).join('');
+}
+async function renumber(list,skip){
+  for(let i=0;i<list.length;i++){const x=list[i];if(x.id===skip)continue;if(x.priorityOrder!==i+1){try{await db.doc(`games/${V.gid||''}/reservations/${x.id}`).update({priorityOrder:i+1})}catch(e){}}}
+}
+async function reserve(gid,name){
+  name=String(name||'').trim();const g=S.games[gid];
+  if(!name)return toast('Scrivi il tuo nome','err');
+  if(!g||g.status==='closed')return;
+  if(S.res.some(r=>String(r.playerName).trim().toLowerCase()===name.toLowerCase()))return toast(`${name} è già prenotato`,'err');
+  const pl=Object.entries(S.players).find(([id,p])=>String(p.name).toLowerCase()===name.toLowerCase());
+  const rid=nid('r'),now=new Date().toISOString().replace(/\.\d+Z$/,'Z');
+  const list=resSorted().concat([{id:rid,reservedAt:now}]).sort((a,b)=>String(a.reservedAt).localeCompare(String(b.reservedAt))||a.id.localeCompare(b.id));
+  const rank=list.findIndex(x=>x.id===rid)+1;
+  const data={playerName:name,reservedAt:now,priorityOrder:rank};if(pl)data.playerId=pl[0];
+  try{await db.doc(`games/${gid}/reservations/${rid}`).set(data);await renumber(list,rid)}catch(e){toast(errMsg(e),'err');return}
+  LS.set('name',name);F.rname='';
+  toast(g.maxSeats&&rank>g.maxSeats?`Prenotato! Sei n° ${rank}: in lista d'attesa`:`Prenotato! Sei n° ${rank} ♠`,'ok');render();
+}
+async function removeRes(id){
+  const gid=V.gid;
+  try{await db.doc(`games/${gid}/reservations/${id}`).delete();await renumber(resSorted().filter(r=>r.id!==id))}catch(e){toast(errMsg(e),'err')}
+}
+function pinBox(gid,text){return `<form id="f-pin" class="card stack" data-gid="${gid}" style="gap:10px"><div class="row" style="gap:8px;font-weight:600"><span class="gold">${ico('lock',20)}</span><span>🔒 Modalità Lettura · partita avviata da ${esc(S.games[gid].hostName)}</span></div><div class="mut sm">${text}</div><div class="row"><input class="in" id="pininp" type="password" inputmode="numeric" maxlength="4" placeholder="PIN a 4 cifre" data-bind="pin" value="${esc(F.pin)}" autocomplete="off"><button class="btn-s go" type="submit" style="min-height:52px">Sblocca</button></div>${F.pinErr?'<div class="red sm">PIN errato, riprova.</div>':''}</form>`}
+async function unlockPin(gid){
+  const g=S.games[gid];if(!g)return;
+  if((await sha(gid+':'+F.pin))===g.pinHash){const pins=LS.get('pins',{});pins[gid]=F.pin;LS.set('pins',pins);S.admin[gid]=true;F.pin='';F.pinErr=false;toast('Modalità Admin attiva','ok')}
+  else F.pinErr=true;
+  render();
+}
+
+/* --- Cassa live --- */
+function closable(g){const L=plist(g);return L.length>=2&&L.every(p=>p.buyIns.length>=1)}
+function vLive(){
+  const gid=V.gid,g=S.games[gid];if(!g)return notFound();
+  if(g.status==='closed')return `<div class="wrap">${topbar()}<h1 style="margin-top:28px">Partita già conclusa</h1><p class="mut">Questa serata è chiusa: trovi tutti i dati nel resoconto.</p><button class="btn" data-act="detail" data-gid="${gid}">Vai al resoconto</button></div>`;
+  const A=isAdmin(gid),L=plist(g),total=grossOf(g),paid=sum(L.map(p=>sum(p.buyIns.filter(b=>b.paymentStatus==='PAID').map(b=>b.amountCents)))),pend=sum(L.map(pendOf)),safe=sum(L.map(safeOf));
+  const inPlay=Math.max(0,toChips(total-safe,g));
+  const pin=(LS.get('pins',{}))[gid];
+  const R=resSorted();
+  return `<div class="wrap">${backBtn('home','Home')}
+<div class="row sp" style="align-items:flex-start"><div class="grow"><h1>Cassa Live</h1><div class="mut sm" style="margin-top:2px">${dLong(g.scheduledAt)}</div></div><span class="badge ${A?'paid':'grey'}" style="margin-top:6px">${A?'🔓 Admin':'👁 Lettura'}</span></div>
+<div class="stack" style="margin-top:14px">
+${A?`<button class="card tap tight row sp" data-act="showpin" style="min-height:56px"><span class="row" style="gap:8px"><span class="gold">${ico('lock',18)}</span>🔑 PIN Admin della partita</span><span class="row" style="gap:10px"><b class="num gold" style="letter-spacing:.24em;font-size:19px">${F.pinShow?esc(pin||'----'):'••••'}</b><span class="mut">${ico('eye',20)}</span></span></button>`:pinBox(gid,'Puoi guardare la cassa in tempo reale, ma per aggiungere giocatori, registrare re-buy, cash out o chiudere la partita serve il PIN Admin a 4 cifre.')}
+<div class="card cassa hero stack" style="gap:12px">
+<div class="row sp" style="align-items:flex-end"><div><div class="lbl in" style="margin-bottom:2px">Cassa</div><div class="big-n num">${eur(total)}</div><div class="mut xs">buy-in raccolti da ${L.length} giocator${L.length===1?'e':'i'}</div></div></div>
+${total>0?`<div class="meter" role="img" aria-label="Incassato ${eur(paid)}, da pagare ${eur(pend)}"><i class="m-g" style="flex:${paid} 1 0"></i><i class="m-r" style="flex:${pend} 1 0"></i></div>`:''}
+<div class="kpis"><div class="kpi"><div class="k">INCASSATO</div><div class="v num green">${eur(paid)}</div></div>
+<div class="kpi"><div class="k">DA PAGARE</div><div class="v num" style="color:${pend>0?'var(--red)':'var(--mut)'}">${eur(pend)}</div></div>
+<div class="kpi"><div class="k">FICHES IN GIOCO</div><div class="v num gold">${fch(inPlay)}</div>${safe>0?`<div class="s num">💰 ${eur(safe)} al sicuro</div>`:''}</div></div></div>
+<div class="card stack" style="gap:12px"><div class="lbl in">Serata</div>
+<div class="ir"><span class="ic">📅</span><div>${dLong(g.scheduledAt)} · ore ${tHM(g.scheduledAt)}</div></div>
+<div class="ir"><span class="ic">📍</span><div>${esc(g.location||g.hostName)}</div></div>
+<div><div class="mut sm num" style="margin-bottom:6px">${seatsText(g,R.length)}</div>${g.maxSeats?`<div class="meter"><i class="m-o" style="flex:${Math.min(R.length,g.maxSeats)} 1 0"></i><i style="flex:${Math.max(g.maxSeats-R.length,0)} 1 0"></i></div>`:''}</div>
+<a class="btn wa" href="${waHref(inviteText(gid))}" target="_blank" rel="noopener">Invita su WhatsApp</a>
+<button class="row sp" data-act="resopen" style="min-height:48px"><b>Prenotazioni (${R.length})</b><span class="gold">${ico(F.resOpen?'chevu':'chev',20)}</span></button>
+${F.resOpen?`<div class="stack" style="gap:0">${resList(g,A)}</div>
+<form id="f-res" class="row" style="margin-top:6px"><input class="in" id="rname" data-bind="rname" value="${esc(F.rname)}" placeholder="Il tuo nome" autocomplete="given-name"><button class="btn-s go" type="submit" style="min-height:52px">Prenota</button></form>`:''}</div>
+</div>
+<div class="lbl">Al tavolo · ${L.length}</div>
+<div class="stack">${L.length?L.map(p=>livePlayer(g,p,A)).join(''):'<div class="card mut sm">Nessun giocatore al tavolo. Aggiungi i giocatori e registra il loro buy-in.</div>'}
+${A?`<button class="btn dash" data-act="addpl">${ico('plus',18)} Aggiungi giocatori</button>`:''}</div></div>
+<div class="bar"><div class="bar-in">${A?`<button class="btn ghost" style="font-size:16px" data-act="startclose" ${closable(g)&&canWrite?'':'disabled'}>Chiudi partita · Conta le fiches</button>
+${closable(g)?'':'<div class="mut xs" style="padding-top:4px">Servono almeno 2 giocatori per chiudere la partita.</div>'}
+<button class="link" data-act="delgame" style="min-height:44px">${armed.delgame?'Confermi? Tocca di nuovo':'Elimina partita'}</button>`:'<div class="mut sm" style="text-align:center;padding:6px 0">🔒 Modalità Lettura: inserisci il PIN Admin per chiudere o modificare questa partita.</div>'}</div></div>`;
+}
+function livePlayer(g,p,A){
+  const i=inv(p),s=safeOf(p),pe=pendOf(p),stack=Math.max(0,toChips(i-s,g)),open=!!F.open[p.playerId];
+  return `<div class="card"><div class="row" data-act="tgl" data-pid="${p.playerId}" style="cursor:pointer">
+${ava(p.playerName)}<div class="grow"><div class="pl-name">${esc(p.playerName)}${pe>0?`<span class="pill red num">da pagare ${eur(pe)}</span>`:''}</div>
+<div class="mut sm num">${p.buyIns.length} ingress${p.buyIns.length===1?'o':'i'} · investiti ${eur(i)}</div></div><span class="mut">${ico(open?'chevu':'chev',20)}</span></div>
+<div class="pcs"><div><span>stack attivo</span><b class="num">${fch(stack)} fiches</b></div><div><span>al sicuro</span><b class="num ${s>0?'gold':'mut'}">${s>0?'💰 ':''}${eur(s)}</b></div></div>
+${A?`<div class="two" style="margin-top:10px"><button class="btn-s go" data-act="cashout" data-pid="${p.playerId}">💰 Cash Out</button><button class="btn-s" data-act="rebuy" data-pid="${p.playerId}">+ Re-buy</button></div>`:'<div class="mut xs" style="margin-top:10px">🔒 Solo l\'Admin può registrare movimenti</div>'}
+${open?`<div style="margin-top:10px">${p.buyIns.map((b,k)=>`<div class="mv"><i class="dt" style="background:${b.paymentStatus==='PAID'?'var(--green)':'var(--red)'}"></i><span class="num">#${k+1} · Ore ${tHM(b.timestamp)}</span>
+${A?`<button class="bdg-btn" data-act="flip" data-pid="${p.playerId}" data-bid="${b.buyInId}">${stBadge(b.paymentStatus)}</button>`:stBadge(b.paymentStatus)}
+<b class="num grow" style="text-align:right">${eur(b.amountCents)}</b>${A?`<button class="x" data-act="delbi" data-pid="${p.playerId}" data-bid="${b.buyInId}" aria-label="Elimina movimento">${armed['bi'+b.buyInId]?'<span class="red xs">Sicuro?</span>':ico('close',16)}</button>`:''}</div>`).join('')}
+${(p.cashOuts||[]).map(c=>`<div class="mv"><i class="dt" style="background:var(--gold)"></i><span class="gold">Cash out · 💰 messo al sicuro</span><b class="num grow gold" style="text-align:right">${eur(c.amountCents)}</b></div>`).join('')}</div>`:''}</div>`;
+}
+
+/* --- Chiusura cassa --- */
+function startClose(){
+  const g=S.games[V.gid];const d=g.dealerChips||0;
+  F.cl={step:1,dealer:d?(d/100).toFixed(2).replace('.',','):'',vals:{},holeMode:'split_all'};
+  plist(g).forEach(p=>{F.cl.vals[p.playerId]={mode:'chips',v:''}});
+  go('close',V.gid);
+}
+function vClose(){
+  const gid=V.gid,g=S.games[gid];if(!g||!F.cl)return notFound();
+  if(g.status==='closed')return vLive();
+  const cl=F.cl,c=calcClose(g,cl),L=plist(g);
+  const titles=['1. Conteggio fiches','2. Verifica cassa','3. Saldi'],short=['Conteggio','Verifica','Saldi'];
+  const head=`${backBtn('live','Cassa live',gid)}<h1>${titles[cl.step-1]}</h1><div class="steps">${[1,2,3].map(i=>`<div class="st ${i<=cl.step?'on':''}"><i></i>${short[i-1]}</div>`).join('')}</div>`;
+  if(cl.step===1){
+    return `<div class="wrap">${head}<p class="mut sm num" style="margin:0 0 12px">Per ogni giocatore inserisci quante fiches ha davanti (esclusi i cash out già messi al sicuro). Cambio: ${eur(g.buyInCents)} = ${fch(g.chipsPerBuyIn)} fiches</p>
+<div class="stack">
+<div class="card"><label class="field"><span>Fiches / Mance Dealer (opzionale)</span><input class="in" id="cl-dealer" inputmode="decimal" data-bind="cl.dealer" value="${esc(cl.dealer)}" placeholder="Importo in euro"><span class="xs">L'importo viene sottratto dal montepremi: la somma algebrica di tutti i saldi torna a 0,00 €.</span></label></div>
+${L.map(p=>{const v=cl.vals[p.playerId]||{mode:'chips',v:''},s=safeOf(p);return `<div class="card stack" style="gap:12px"><div class="row">${ava(p.playerName)}<div class="grow"><div class="pl-name">${esc(p.playerName)}</div><div class="mut sm num">ha investito ${eur(inv(p))}</div></div></div>
+${s>0?`<div class="box o sm num">💰 Ha già incassato ${eur(s)} durante la partita: inserisci solo le fiches rimaste sul tavolo.</div>`:''}
+<div class="row"><input class="in big-n" id="cv-${p.playerId}" inputmode="decimal" data-bind="cl.vals.${p.playerId}.v" value="${esc(v.v)}" placeholder="${v.mode==='chips'?'Fiches':'Euro'}">
+<div class="seg"><button class="${v.mode==='chips'?'on':''}" data-act="clmode" data-pid="${p.playerId}" data-m="chips">Fiches</button><button class="${v.mode==='eur'?'on':''}" data-act="clmode" data-pid="${p.playerId}" data-m="eur">€</button></div></div>
+<button class="link" data-act="lost" data-pid="${p.playerId}" style="align-self:flex-start;min-height:40px">Ha perso tutto (0)</button></div>`}).join('')}
+<button class="btn" data-act="clnext" ${c.ok?'':'disabled'}>Verifica la cassa →</button></div></div>`;
+  }
+  if(!c.ok){F.cl.step=1;return vClose()}
+  if(cl.step===2){
+    const b=c.bal;
+    return `<div class="wrap">${head}<div class="stack">
+<div class="card stack num" style="gap:10px">
+<div class="row sp"><span class="mut">Totale buy-in raccolti</span><b>${eur(c.totIn)}</b></div>
+${c.dealer>0?`<div class="row sp"><span class="mut">Mance dealer (sottratte)</span><b class="red">−${eur(c.dealer)}</b></div><div class="row sp"><span class="mut">Montepremi netto</span><b>${eur(c.totIn-c.dealer)}</b></div>`:''}
+<div class="row sp"><span class="mut">Totale fiches dichiarate</span><b>${eur(c.totFin)}</b></div><div class="hr"></div>
+<div class="row sp"><b>Bilancio cassa</b><b style="font-family:var(--serif);font-size:22px" class="${b===0?'green':b<0?'red':'gold'}">${b===0?eur(0):sgn(b)}</b></div></div>
+${b===0?'<div class="box g"><b class="green">✅ Cassa Perfetta!</b><div class="sm">Ogni fiche sul tavolo corrisponde ai soldi raccolti.</div></div>':''}
+${b<0?`<div class="box r stack"><div><b class="red">⚠ Ammanco di ${eur(-b)}</b><div class="sm">Le fiches dichiarate valgono più dei soldi raccolti. Come lo gestiamo?</div></div>
+<button class="big ${cl.holeMode==='split_all'?'sel-r':''}" data-act="hole" data-m="split_all">Dividi tra tutti i partecipanti</button>
+<button class="big ${cl.holeMode==='split_winners'?'sel-r':''}" data-act="hole" data-m="split_winners">Dividi tra chi ha chiuso in attivo</button></div>`:''}
+${b>0?`<div class="box o"><b class="gold">Avanzo di ${eur(b)}</b><div class="sm">Verrà diviso in parti uguali tra tutti i partecipanti.</div></div>`:''}
+<div class="two"><button class="btn ghost" data-act="clback">← Correggi</button><button class="btn" data-act="clnext">Calcola i saldi →</button></div></div></div>`;
+  }
+  const sorted=c.nets.slice().sort((a,b)=>b.net-a.net);
+  return `<div class="wrap">${head}<div class="stack">
+<div class="card stack" style="gap:10px"><div class="lbl in">Risultati netti</div>
+${sorted.map(x=>`<div class="row">${x.dealer?'<span class="ava s" style="--h:45">🃏</span>':ava(x.name,'s')}<span class="grow">${x.dealer?'🃏 Dealer':esc(x.name)}</span><b class="num ${x.net>=0?'green':'red'}" style="font-size:17px">${sgn(x.net)}</b></div>`).join('')}
+<div class="hr"></div><div class="row sp mut sm"><span>Somma algebrica dei saldi</span><b class="num">${eur(c.sumNet)}</b></div></div>
+<div class="card stack" style="gap:10px"><div class="lbl in">Saldi da fare</div>
+${c.tx.length?`<div class="mut sm">Bastano ${c.tx.length} transazion${c.tx.length===1?'e':'i'} per saldare tutto.</div>${c.tx.map(t=>`<div class="num" style="padding:6px 0;border-top:1px solid var(--line2)"><b>${esc(t.from)}</b> dà <b class="gold">${eur(t.amt)}</b> a <b>${esc(t.to)}</b></div>`).join('')}`:'<div class="mut sm">Nessuna transazione necessaria ✅</div>'}</div>
+<div class="two"><button class="btn ghost" data-act="clback">←</button><button class="btn" data-act="clsave">Salva e chiudi partita</button></div></div></div>`;
+}
+async function saveClose(){
+  const gid=V.gid;const cl=F.cl;
+  const ok=await saveGame(gid,g=>{
+    const c=calcClose(g,cl);if(!c.ok)return false;
+    const now=new Date().toISOString();
+    c.rows.forEach((r,i)=>{const p=g.players[r.p.playerId];p.cashOutCents=r.fin;p.netCents=c.nets[i].net});
+    g.holeCents=-c.bal;g.holeMode=c.bal<0?cl.holeMode:c.bal>0?'split_all':'';g.dealerChips=c.dealer;
+    g.debts=c.tx.map((t,i)=>({debtId:'debt_'+(i+1)+'_'+Math.random().toString(36).slice(2,5),fromPlayerName:t.from,toPlayerName:t.to,fromPlayerId:t.fromId,toPlayerId:t.toId,totalAmount:t.amt,paidAmount:0,remainingAmount:t.amt,transactions:[{subId:nid('s'),amount:t.amt,status:'PENDING',lastUpdated:now}]}));
+    g.status='closed';g.closedAt=now;
+  });
+  if(ok){if(LS.get('active',null)===gid)LS.del('active');F.cl=null;go('detail',gid);toast('Partita chiusa','ok')}
+}
+
+/* --- Dettaglio --- */
+function waText(gid){
+  const g=S.games[gid],L=plist(g).slice().sort((a,b)=>(b.netCents||0)-(a.netCents||0));
+  let t=`♠️ *Home Poker — Resoconto*\n📅 ${dShort(g.scheduledAt)}\n👥 ${L.length} giocatori · Montepremi ${eur(netPot(g))}\n`;
+  if((g.dealerChips||0)>0)t+=`🃏 Mance dealer: ${eur(g.dealerChips)} (già sottratte dal montepremi)\n`;
+  t+=`\n*Risultati netti*\n`+L.map(p=>`• ${p.playerName}: ${sgn(p.netCents||0)}`).join('\n');
+  t+=`\n\n*Saldi da fare*\n`;
+  t+=(g.debts&&g.debts.length)?g.debts.map(d=>`• ${d.fromPlayerName} → ${d.toPlayerName}: ${eur(d.totalAmount)}  ${d.remainingAmount===0?'✅ pagato':`(pagati ${eur(d.paidAmount)}, restano ${eur(d.remainingAmount)})`}`).join('\n'):'• Nessuna transazione necessaria ✅';
+  return t;
+}
+function jsonFor(gid){
+  const g=S.games[gid],E=c=>Math.round(c)/100;
+  return {session:{sessionId:gid,hostName:g.hostName,scheduledAt:g.scheduledAt,dealerChips:E(g.dealerChips||0),maxSeats:g.maxSeats,reservations:resSorted().map((r,i)=>({playerId:r.playerId||null,playerName:r.playerName,reservedAt:r.reservedAt,priorityOrder:i+1}))},
+  buyIns:plist(g).flatMap(p=>p.buyIns.map(b=>({buyInId:b.buyInId,playerId:p.playerId,amount:E(b.amountCents),paymentStatus:b.paymentStatus,timestamp:b.timestamp}))),
+  debts:(g.debts||[]).map(d=>({debtId:d.debtId,fromPlayerName:d.fromPlayerName,toPlayerName:d.toPlayerName,totalAmount:E(d.totalAmount),paidAmount:E(d.paidAmount),remainingAmount:E(d.remainingAmount),transactions:d.transactions.map(t=>({subId:t.subId,amount:E(t.amount),status:t.status,lastUpdated:t.lastUpdated}))}))};
+}
+function vDetail(){
+  const gid=V.gid,g=S.games[gid];if(!g)return notFound();
+  const A=isAdmin(gid),L=plist(g).slice().sort((a,b)=>(b.netCents||0)-(a.netCents||0)),closed=g.status==='closed';
+  const hole=g.holeCents||0;
+  const cassa=!closed?'—':hole===0?'Perfetta ✅':hole>0?`Ammanco ${eur(hole)}`:`Avanzo ${eur(-hole)}`;
+  const tile=(k,v,cls)=>`<div class="kpi" style="padding:12px 8px"><div class="k">${k}</div><div class="v num ${cls||''}">${v}</div></div>`;
+  return `<div class="wrap">${backBtn('home','Home')}
+<div class="row sp" style="align-items:flex-start"><div class="grow"><h1>Partita del ${dShort(g.scheduledAt)}</h1><div class="mut sm" style="margin-top:4px">${dLong(g.scheduledAt)} · avviata da ${esc(g.hostName)}</div></div><span style="margin-top:6px">${closed?'<span class="badge grey">Conclusa</span>':'<span class="badge live"><i class="dot"></i>In corso</span>'}</span></div>
+${closed?'':`<button class="btn" style="margin-top:14px" data-act="live" data-gid="${gid}">▶ Torna alla cassa live</button>`}
+<div class="kpis two-c" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-top:16px">${tile('GIOCATORI',L.length)}${tile('MONTEPREMI',eur(netPot(g)),'gold')}${tile('BUY-IN',eur(grossOf(g)))}${(g.dealerChips||0)>0?tile('MANCE DEALER',eur(g.dealerChips)):''}${tile('CASSA',cassa,hole===0?'green':'gold')}</div>
+<div class="lbl">Risultati</div>
+<div class="stack">${L.map(p=>`<div class="card"><div class="row" style="align-items:flex-start">${ava(p.playerName)}<div class="grow"><div class="pl-name">${esc(p.playerName)}</div>
+<div class="mut sm num">${p.buyIns.length} ingress${p.buyIns.length===1?'o':'i'} · ${eur(inv(p))} investiti${closed?` · incassate ${eur(p.cashOutCents||0)}`:''}</div>
+${safeOf(p)>0?`<div class="gold sm num">💰 ${eur(safeOf(p))} messi al sicuro durante la partita</div>`:''}</div>
+${closed?`<b class="num ${(p.netCents||0)>=0?'green':'red'}" style="font-family:var(--serif);font-size:21px">${sgn(p.netCents||0)}</b>`:''}</div>
+<div class="chips" style="margin-top:10px;gap:6px">${p.buyIns.map(b=>`<span class="badge ${b.paymentStatus==='PAID'?'paid':'pend'} num" style="text-transform:none;letter-spacing:0">${b.paymentStatus==='PAID'?'PAGATO':'DA PAGARE'} ${eur(b.amountCents)} · Ore ${tHM(b.timestamp)}</span>`).join('')}</div>
+${pendOf(p)>0?`<div class="red sm num" style="margin-top:8px">⏳ deve ancora saldare ${eur(pendOf(p))} di buy-in</div>`:''}</div>`).join('')}</div>
+${closed?`<div class="lbl">Saldi da fare</div><div class="stack">
+${!A&&(g.debts||[]).some(d=>!debtPerm(gid,d).needPin)?pinBox(gid,'I saldi verso il Dealer li registra chi ha avviato la partita: serve il suo PIN Admin a 4 cifre.'):''}
+${(g.debts&&g.debts.length)?g.debts.map(d=>debtCard(d,debtPerm(gid,d))).join(''):'<div class="card mut sm">Nessuna transazione necessaria ✅</div>'}</div>
+<div class="lbl">Condividi</div><div class="stack">
+<a class="btn wa" href="${waHref(waText(gid))}" target="_blank" rel="noopener">Condividi su WhatsApp</a>
+<div class="two"><button class="btn ghost" data-act="copyjson" data-gid="${gid}">Copia dati JSON</button><button class="btn ghost" data-act="copytxt" data-gid="${gid}">Copia resoconto</button></div>
+<div class="card"><pre class="preview">${esc(waText(gid))}</pre></div></div>`:''}
+${A?`<div style="text-align:center;margin-top:18px"><button class="link" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Elimina partita'}</button></div>`:''}</div>`;
+}
+function debtCard(d,perm){
+  const A=perm.can;const done=d.remainingAmount===0;
+  return `<div class="card stack" style="gap:10px"><div class="row sp" style="align-items:flex-start"><div class="grow num" style="font-size:16px"><b>${esc(d.fromPlayerName)}</b> dà <b class="gold">${eur(d.totalAmount)}</b> a <b>${esc(d.toPlayerName)}</b></div>${done?'<span class="badge paid">PAGATO</span>':'<span class="badge pend">DA PAGARE</span>'}</div>
+${d.paidAmount>0?`<div class="meter"><i class="m-g" style="flex:${d.paidAmount} 1 0"></i><i class="m-r" style="flex:${d.remainingAmount} 1 0"></i></div><div class="sm num">Pagati <b class="green">${eur(d.paidAmount)}</b> · restano <b class="red">${eur(d.remainingAmount)}</b></div>`:''}
+${d.transactions.map(t=>{const inner=`<div class="row sp"><b class="num">${eur(t.amount)}</b>${stBadge(t.status)}</div><div class="mut xs num">Ultima modifica: ${dShort(t.lastUpdated)} alle ${tHM(t.lastUpdated)}</div>`;const cls='tr '+(t.status==='PAID'?'paid':'pend');return A?`<button class="${cls}" data-act="subtap" data-did="${d.debtId}" data-sid="${t.subId}">${inner}</button>`:`<div class="${cls}">${inner}</div>`}).join('')}${!A&&!done?`<div class="mut xs">🔒 Solo ${esc(perm.who)} può registrare i pagamenti${perm.needPin?' con il suo PIN':''}.</div>`:''}</div>`;
+}
+async function deleteGame(gid){
+  try{
+    const sn=await db.collection('games/'+gid+'/reservations').get();
+    for(const d of sn.docs)await db.doc(`games/${gid}/reservations/${d.id}`).delete();
+    await db.doc('games/'+gid).delete();
+  }catch(e){toast(errMsg(e),'err');return}
+  delete S.games[gid];if(LS.get('active',null)===gid)LS.del('active');
+  go('home');toast('Partita eliminata','ok');
+}
+
+/* --- Prenotazione (da invito) --- */
+function vBook(){
+  const gid=V.gid,g=S.games[gid];if(!g)return notFound();
+  const R=resSorted(),closed=g.status==='closed',name=F.rname!==''?F.rname:(LS.get('name','')||'');
+  return `<div class="wrap">${topbar()}
+<div class="card hero stack" style="margin-top:12px;gap:14px"><div><h1>Poker Night ♠️♥️</h1><p class="mut" style="margin:6px 0 0">Prenota il tuo posto al tavolo</p></div>
+<div class="ir"><span class="ic">📅</span><div>${dLong(g.scheduledAt)} · ore ${tHM(g.scheduledAt)}</div></div><div class="ir"><span class="ic">📍</span><div>${esc(g.location||g.hostName)}</div></div>
+<div><div class="mut sm num" style="margin-bottom:6px">Organizza ${esc(g.hostName)} · ${seatsText(g,R.length)}</div>${g.maxSeats?`<div class="meter"><i class="m-o" style="flex:${Math.min(R.length,g.maxSeats)} 1 0"></i><i style="flex:${Math.max(g.maxSeats-R.length,0)} 1 0"></i></div>`:''}</div></div>
+<div class="stack" style="margin-top:14px">
+${closed?'<div class="box o">Questa serata è conclusa: le prenotazioni sono chiuse.</div>':`<div class="card"><div class="lbl in" style="margin-bottom:10px">Prenotati</div><form id="f-res" class="stack"><input class="in" id="rname" data-bind="rname" value="${esc(name)}" placeholder="Il tuo nome" autocomplete="given-name"><button class="btn" type="submit" ${canWrite?'':'disabled'}>Prenota</button></form></div>`}
+<div class="card stack" style="gap:6px"><div class="lbl in">Iscritti · ${R.length}</div>${resList(g,false)}</div>
+<a class="btn wa" href="${waHref(inviteText(gid))}" target="_blank" rel="noopener">Invita su WhatsApp</a>
+<button class="btn ghost" data-act="live" data-gid="${gid}">Apri la cassa</button></div></div>`;
+}
+
+/* ===== Sheets ===== */
+function buyForm(g,btnLabel,count){
+  const b=F.bi,amts=[...new Set([g.buyInCents,500,1000,2000])];
+  const amt=b.custom?parseEur(b.cv):b.amt;
+  return `<div class="field"><span>IMPORTO${count>1?' (a testa)':''}</span><div class="chips">${amts.map(c=>`<button class="chip ${!b.custom&&b.amt===c?'on':''}" data-act="bamt" data-v="${c}">${c/100} €</button>`).join('')}<button class="chip ${b.custom?'on':''}" data-act="bamt" data-v="custom">Altro…</button></div>
+${b.custom?`<input class="in" id="bi-cv" inputmode="decimal" data-bind="bi.cv" value="${esc(b.cv)}" placeholder="Importo in euro">`:''}</div>
+<div class="field"><span>COME PAGA?</span><div class="pay2"><button class="big ${b.status==='PAID'?'sel-g':''}" data-act="bst" data-s="PAID">Pagato subito</button><button class="big ${b.status==='PENDING'?'sel-r':''}" data-act="bst" data-s="PENDING">Da pagare</button></div></div>
+<button class="btn" data-act="bsave" ${amt>0?'':'disabled'}>${btnLabel} · ${amt>0?eur(amt*(count||1)):'—'}</button>`;
+}
+function freshBi(g){F.bi={amt:g.buyInCents,custom:false,cv:'',status:'PENDING'}}
+function sheetHtml(){
+  const g=V.gid?S.games[V.gid]:null,s=SH;let title='',body='';
+  if(s.type==='add'&&g){
+    const rb=rubrica(),at=new Set(plist(g).map(p=>p.playerId)),ts=targetsFrom(F.ap.sel,F.ap.names);
+    const atNames=new Set(plist(g).map(p=>p.playerName.toLowerCase()));
+    const isAt=t=>(t.id&&at.has(t.id))||atNames.has(t.name.toLowerCase());
+    const nre=ts.filter(isAt).length;
+    title='Aggiungi giocatori';
+    body=`<p class="mut sm" style="margin:0">Scegli dalla rubrica o scrivi più nomi insieme, poi registra il buy-in: vale per tutti i selezionati.</p>
+<div class="field"><span>RUBRICA</span><div class="chips">${rb.length?rb.map(p=>`<span class="chipx"><button class="chip ${F.ap.sel[p.id]?'on':''}" data-act="selpl" data-id="${p.id}">${F.ap.sel[p.id]?ico('check',16):''}${esc(p.name)}${at.has(p.id)?' <span class="xs">(già al tavolo → re-buy)</span>':''}</button>${p.reg?'':`<button class="trash" data-act="delpl" data-id="${p.id}" aria-label="Elimina dalla rubrica">${ico('trash',18)}</button>`}</span>`).join(''):'<span class="mut sm">Nessun nome salvato.</span>'}</div></div>
+<label class="field"><span>NUOVI NOMI (separati da virgola o a capo)</span><textarea class="in" id="ap-names" data-bind="ap.names" placeholder="Marco, Luca, Anna">${esc(F.ap.names||'')}</textarea></label>
+${ts.length?`<div class="hr"></div><div class="row sp"><b>${ts.length} giocator${ts.length===1?'e':'i'} selezionat${ts.length===1?'o':'i'}</b>${nre?`<span class="gold xs">${nre} già al tavolo → re-buy</span>`:''}</div>
+<div class="chips">${ts.map(t=>`<span class="row" style="gap:8px;background:var(--card2);border:1px solid var(--line2);border-radius:999px;padding:4px 12px 4px 4px">${ava(t.name,'s')}<span class="sm">${esc(t.name)}</span></span>`).join('')}</div>
+${buyForm(g,nre===ts.length?'Registra re-buy':'Siedi al tavolo',ts.length)}`:''}`;
+  }else if(s.type==='rebuy'&&g&&g.players[s.pid]){
+    title='Re-buy · '+g.players[s.pid].playerName;
+    body=`<p class="mut sm" style="margin:0">Registra importo e stato del pagamento.</p>${buyForm(g,'Registra re-buy',1)}`;
+  }else if(s.type==='cashout'&&g&&g.players[s.pid]){
+    const p=g.players[s.pid],safe=safeOf(p),stack=Math.max(0,toChips(inv(p)-safe,g)),co=F.co;
+    const cents=co.mode==='chips'?toEuro(parseCh(co.v)||0,g):(parseEur(co.v)||0);
+    const activeE=toEuro(stack,g);
+    title='Cash Out · '+p.playerName;
+    body=`<p class="mut sm" style="margin:0">Le fiches ritirate vengono accreditate nel saldo assicurato: non sono più a rischio nelle giocate successive.</p>
+<div class="two"><div class="card tight"><div class="xs mut">STACK ATTIVO</div><b class="num">${fch(stack)} fiches</b><div class="xs mut num">≈ ${eur(activeE)}</div></div><div class="card tight" style="border-color:var(--gold)"><div class="xs gold">GIÀ AL SICURO</div><b class="num gold">${eur(safe)}</b><div class="xs mut">non più a rischio</div></div></div>
+<div class="field"><span>QUANTO RITIRI?</span><div class="chips"><button class="chip" data-act="copct" data-p="25">25%</button><button class="chip" data-act="copct" data-p="50">50%</button><button class="chip" data-act="copct" data-p="100">Tutto</button></div></div>
+<div class="row"><input class="in big-n" id="co-v" inputmode="decimal" data-bind="co.v" value="${esc(co.v)}" placeholder="${co.mode==='chips'?'Fiches':'Euro'}"><div class="seg"><button class="${co.mode==='chips'?'on':''}" data-act="comode" data-m="chips">Fiches</button><button class="${co.mode==='eur'?'on':''}" data-act="comode" data-m="eur">€</button></div></div>
+<div class="sm num">${cents>0?`Verranno messi al sicuro <b class="gold">${eur(cents)}</b>${cents>activeE?' <span class="mut">(più dello stack iniziale: include eventuali vincite)</span>':''}`:'Inserisci quanto ritiri'}</div>
+<button class="btn" data-act="cosave" ${cents>0?'':'disabled'}>Incassa e metti al sicuro · ${cents>0?eur(cents):'—'}</button>`;
+  }else if(s.type==='delpl'){
+    const p=S.players[s.id];title='Eliminare dalla rubrica?';
+    body=`<p style="margin:0">Sei sicuro di voler eliminare <b>${esc(p?p.name:'')}</b> dalla rubrica? L'azione è definitiva.</p><div class="two"><button class="btn ghost" data-act="sheetback">Annulla</button><button class="btn redb" data-act="delplok" data-id="${s.id}">Elimina</button></div>`;
+  }else if(s.type==='pay'&&g){
+    const d=(g.debts||[]).find(x=>x.debtId===s.did),t=d&&d.transactions.find(x=>x.subId===s.sid);
+    if(!t)return '';
+    const perm=debtPerm(V.gid,d),pr=pinReady(perm),pv=parseEur(F.pay.v),ok=pv>0&&pr;
+    title='Registra pagamento';
+    body=`<div class="num"><b>${esc(d.fromPlayerName)}</b> → <b>${esc(d.toPlayerName)}</b> · da pagare <b class="red">${eur(t.amount)}</b></div>
+${pinField(perm)}
+<button class="btn green" data-act="payfull" ${pr?'':'disabled'}>Paga Totale · ${eur(t.amount)}</button>
+<button class="btn ghost" data-act="paypart">Paga Parziale</button>
+${F.pay.partial?`<label class="field"><span>Importo dell'acconto (euro)</span><input class="in big-n" id="pay-v" inputmode="decimal" data-bind="pay.v" value="${esc(F.pay.v)}" placeholder="Es. 30,00"></label>
+<div class="sm num">${ok?`Acconto <b class="green">${eur(Math.min(pv,t.amount))}</b> · residuo da pagare <b class="red">${eur(Math.max(t.amount-pv,0))}</b>`:'Inserisci l\'importo dell\'acconto'}</div>
+<button class="btn" data-act="payconf" ${ok?'':'disabled'}>Conferma acconto</button>`:''}`;
+  }else if(s.type==='paid'&&g){
+    const d=(g.debts||[]).find(x=>x.debtId===s.did),t=d&&d.transactions.find(x=>x.subId===s.sid);
+    if(!t)return '';
+    const perm=debtPerm(V.gid,d),pr=pinReady(perm),mv=parseEur(F.mod.v),max=t.amount+d.remainingAmount,ok=mv>0&&mv!==t.amount&&mv<=max&&pr;
+    title='Pagamento registrato';
+    body=`<div class="num"><b>${esc(d.fromPlayerName)}</b> → <b>${esc(d.toPlayerName)}</b> · pagati <b class="green">${eur(t.amount)}</b></div>
+${pinField(perm)}
+<label class="field"><span>Nuovo importo</span><input class="in big-n" id="mod-v" inputmode="decimal" data-bind="mod.v" value="${esc(F.mod.v)}" placeholder="${(t.amount/100).toFixed(2).replace('.',',')}"><span class="xs">Massimo ${eur(max)}. La differenza si sposta sul residuo da pagare.</span></label>
+<button class="btn" data-act="modok" ${ok?'':'disabled'}>Modifica importo</button>
+<button class="btn redb" data-act="restore" ${pr?'':'disabled'}>Ripristina a Da pagare</button>`;
+  }else if(s.type==='chpin'){
+    const ok=PIN_RE.test(F.chpin.old)&&PIN_RE.test(F.chpin.nw);
+    title='Cambia PIN';
+    body=`<p class="mut sm" style="margin:0">Il nuovo PIN sostituisce quello attuale. Ti serve per accedere e per registrare i tuoi incassi.</p>
+<label class="field"><span>PIN attuale</span><input class="in" id="cp-old" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="chpin.old" value="${esc(F.chpin.old)}" autocomplete="current-password"></label>
+<label class="field"><span>Nuovo PIN (da 4 a 6 cifre)</span><input class="in" id="cp-new" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="chpin.nw" value="${esc(F.chpin.nw)}" autocomplete="new-password"></label>
+<button class="btn" data-act="chpinok" ${ok?'':'disabled'}>Salva PIN</button>`;
+  }else if(s.type==='copy'){
+    title='Copia a mano';
+    body=`<p class="mut sm" style="margin:0">Il telefono non permette la copia automatica. Seleziona il testo e copialo.</p><textarea class="ta" id="copyta" readonly>${esc(s.text)}</textarea>`;
+  }else return '';
+  return `<div class="back" data-act="closesheet"><div class="sheet ${s.anim?'anim':''}" role="dialog" aria-label="${esc(title)}"><div class="grab"></div><div class="sheet-body"><div class="row sp"><h2 style="font-size:22px">${esc(title)}</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>${body}</div></div></div>`;
+}
+function openSheet(s){SH=Object.assign({anim:true},s);render()}
+
+/* ===== Azioni di gioco ===== */
+async function addBuyIn(pid,name){
+  const gid=V.gid,b=F.bi,amt=b.custom?parseEur(b.cv):b.amt;
+  if(!(amt>0))return;
+  const bi={buyInId:nid('b'),amountCents:amt,paymentStatus:b.status,timestamp:new Date().toISOString()};
+  const ok=await saveGame(gid,gg=>{if(!gg.players[pid])return false;gg.players[pid].buyIns.push(bi)});
+  if(ok){SH=null;render();toast('Re-buy registrato','ok')}
+}
+async function seatMany(){
+  const g=S.games[V.gid],ts=targetsFrom(F.ap.sel,F.ap.names);if(!ts.length)return;
+  const b=F.bi,amt=b.custom?parseEur(b.cv):b.amt;if(!(amt>0))return;
+  let rs;try{rs=await ensurePlayers(ts)}catch(e){toast(errMsg(e),'err');return}
+  const now=new Date().toISOString();let rebuys=0;
+  const ok=await saveGame(V.gid,gg=>{
+    rebuys=0;
+    rs.forEach(r=>{
+      const ex=Object.values(gg.players).find(p=>p.playerId===r.id||p.playerName.toLowerCase()===r.name.toLowerCase());
+      const bi={buyInId:nid('b'),amountCents:amt,paymentStatus:b.status,timestamp:now};
+      if(ex){ex.buyIns.push(bi);rebuys++}
+      else{gg.seq=(gg.seq||0)+1;gg.players[r.id]={playerId:r.id,playerName:r.name,seq:gg.seq,buyIns:[bi],cashOuts:[],cashOutCents:null,netCents:null}}
+    });
+  });
+  if(ok){SH=null;F.ap={sel:{},names:''};render();toast(rebuys===rs.length?'Re-buy registrati':rs.length>1?`${rs.length} giocatori al tavolo`:'Giocatore al tavolo','ok')}
+}
+function playedBefore(pid,name){return Object.values(S.games).some(g=>Object.values(g.players||{}).some(p=>p.playerId===pid||p.playerName.toLowerCase()===name.toLowerCase()))}
+async function delPlayerOk(id){
+  const p=S.players[id];if(!p)return;
+  if(p.pinHash){SH={type:'add',anim:false};render();toast(`${p.name} ha un profilo registrato: non si può eliminare dalla rubrica.`,'err');return}
+  if(playedBefore(id,p.name)){SH={type:'add',anim:false};render();toast(`${p.name} ha già partecipato a una o più partite: eliminarlo farebbe perdere lo storico.`,'err');return}
+  try{await db.doc('players/'+id).delete();delete S.players[id]}catch(e){toast(errMsg(e),'err');return}
+  delete F.ap.sel[id];
+  SH={type:'add',anim:false};render();
+}
+
+/* ===== Eventi ===== */
+const H={
+  home(){go('home')},
+  newgame(){F.ng=null;resetNew();go('new')},
+  live(d){go('live',d.gid)},
+  detail(d){go('detail',d.gid)},
+  nbuy(d){if(d.v==='custom')F.ng.custom=true;else{F.ng.custom=false;F.ng.buy=+d.v}render()},
+  nsel(d){F.ng.sel[d.id]=!F.ng.sel[d.id];render()},
+  nst(d){F.ng.pstatus=d.s;render()},
+  creategame(){createGame()},
+  showpin(){F.pinShow=true;clearTimeout(H._pt);H._pt=setTimeout(()=>{F.pinShow=false;render()},4000);render()},
+  resopen(){F.resOpen=!F.resOpen;render()},
+  delres(d){removeRes(d.id)},
+  tgl(d){F.open[d.pid]=!F.open[d.pid];render()},
+  flip(d){saveGame(V.gid,g=>{const b=g.players[d.pid].buyIns.find(x=>x.buyInId===d.bid);if(!b)return false;b.paymentStatus=b.paymentStatus==='PAID'?'PENDING':'PAID'})},
+  delbi(d){if(!arm('bi'+d.bid))return;saveGame(V.gid,g=>{const p=g.players[d.pid];p.buyIns=p.buyIns.filter(x=>x.buyInId!==d.bid);if(!p.buyIns.length&&!(p.cashOuts||[]).length)delete g.players[d.pid]})},
+  addpl(){F.ap={sel:{},names:''};freshBi(S.games[V.gid]);openSheet({type:'add'})},
+  selpl(d){F.ap.sel[d.id]=!F.ap.sel[d.id];render()},
+  delpl(d){SH={type:'delpl',id:d.id,anim:false};render()},
+  delplok(d){delPlayerOk(d.id)},
+  sheetback(){SH={type:'add',anim:false};render()},
+  rebuy(d){freshBi(S.games[V.gid]);openSheet({type:'rebuy',pid:d.pid})},
+  bamt(d){if(d.v==='custom')F.bi.custom=true;else{F.bi.custom=false;F.bi.amt=+d.v}render()},
+  bst(d){F.bi.status=d.s;render()},
+  bsave(){if(SH.type==='rebuy')addBuyIn(SH.pid);else seatMany()},
+  cashout(d){F.co={mode:'chips',v:''};openSheet({type:'cashout',pid:d.pid})},
+  comode(d){F.co.mode=d.m;F.co.v='';render()},
+  copct(d){const g=S.games[V.gid],p=g.players[SH.pid],stack=Math.max(0,toChips(inv(p)-safeOf(p),g)),ch=Math.round(stack*(+d.p)/100);F.co.v=F.co.mode==='chips'?String(ch):(toEuro(ch,g)/100).toFixed(2).replace('.',',');render()},
+  async cosave(){
+    const g=S.games[V.gid],co=F.co,cents=co.mode==='chips'?toEuro(parseCh(co.v)||0,g):(parseEur(co.v)||0);if(!(cents>0))return;
+    const pid=SH.pid;
+    const ok=await saveGame(V.gid,gg=>{const p=gg.players[pid];p.cashOuts=(p.cashOuts||[]).concat([{id:nid('c'),amountCents:cents,createdAt:new Date().toISOString()}])});
+    if(ok){SH=null;render();toast('Messi al sicuro '+eur(cents),'ok')}
+  },
+  closesheet(d,e){if(e.target===e.currentTarget||e.currentTarget.classList.contains('x')){SH=null;render()}},
+  startclose(){startClose()},
+  clmode(d){F.cl.vals[d.pid].mode=d.m;F.cl.vals[d.pid].v='';render()},
+  lost(d){F.cl.vals[d.pid].v='0';render()},
+  clnext(){F.cl.step=Math.min(3,F.cl.step+1);ENTER=true;render();window.scrollTo(0,0)},
+  clback(){F.cl.step=Math.max(1,F.cl.step-1);ENTER=true;render();window.scrollTo(0,0)},
+  hole(d){F.cl.holeMode=d.m;render()},
+  clsave(){saveClose()},
+  delgame(){if(!arm('delgame'))return;deleteGame(V.gid)},
+  subtap(d){const g=S.games[V.gid],dd=g.debts.find(x=>x.debtId===d.did),t=dd.transactions.find(x=>x.subId===d.sid);if(!debtPerm(V.gid,dd).can)return;F.pay={partial:false,v:''};F.mod={v:''};F.pinp='';openSheet({type:t.status==='PAID'?'paid':'pay',did:d.did,sid:d.sid})},
+  paypart(){F.pay.partial=true;render()},
+  async payfull(){const s=SH;if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dPayFull(g.debts.find(x=>x.debtId===s.did),s.sid,new Date().toISOString()));if(ok){SH=null;render();toast('Pagamento registrato','ok')}},
+  async payconf(){const s=SH,a=parseEur(F.pay.v);if(!(a>0))return;if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dPartial(g.debts.find(x=>x.debtId===s.did),s.sid,a,new Date().toISOString()));if(ok){SH=null;render();toast('Acconto registrato','ok')}},
+  async modok(){const s=SH,a=parseEur(F.mod.v);if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dModify(g.debts.find(x=>x.debtId===s.did),s.sid,a,new Date().toISOString()));if(ok){SH=null;render();toast('Importo modificato','ok')}},
+  async restore(){const s=SH;if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dRestore(g.debts.find(x=>x.debtId===s.did),s.sid,new Date().toISOString()));if(ok){SH=null;render();toast('Ripristinato a Da pagare','ok')}},
+  copyjson(d){copyText(JSON.stringify(jsonFor(d.gid),null,2))},
+  copytxt(d){copyText(waText(d.gid))},
+  rk(d){F.open['rk:'+d.k]=!F.open['rk:'+d.k];render()},
+  authmode(d){F.auth.mode=d.m;F.auth.err='';F.auth.pin='';F.auth.pin2='';render()},
+  authpick(d){F.auth.name=d.n;render()},
+  logout(){S.me=null;LS.del('me');F.auth={mode:null,name:'',pin:'',pin2:'',err:''};V={name:'home'};SH=null;render()},
+  chpin(){F.chpin={old:'',nw:''};openSheet({type:'chpin'})},
+  async chpinok(){
+    const p=S.me&&S.players[S.me.id];
+    if(!p||(await pinHash(S.me.id,F.chpin.old))!==p.pinHash){toast('PIN attuale errato','err');return}
+    const doc=Object.assign({},p,{pinHash:await pinHash(S.me.id,F.chpin.nw)});
+    try{await db.doc('players/'+S.me.id).set(doc);S.players[S.me.id]=doc;SH=null;F.chpin={old:'',nw:''};render();toast('PIN aggiornato','ok')}catch(e){toast(errMsg(e),'err')}
+  },
+};
+async function copyText(t){
+  try{await navigator.clipboard.writeText(t);toast('Copiato negli appunti','ok')}
+  catch(e){openSheet({type:'copy',text:t});setTimeout(()=>{const ta=$('#copyta');if(ta){ta.focus();ta.select()}},60)}
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-act]');if(!t)return;
+  const f=H[t.dataset.act];if(!f)return;
+  f(t.dataset,{target:e.target,currentTarget:t});
+});
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.bind&&t.dataset.ev!=='change'){if(t.dataset.digits&&/\D/.test(t.value))t.value=t.value.replace(/\D/g,'');setPath(t.dataset.bind,t.value);render()}});
+document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.bind&&t.dataset.ev==='change'){setPath(t.dataset.bind,t.value);render()}});
+document.addEventListener('submit',e=>{
+  e.preventDefault();const id=e.target.id;
+  if(id==='f-gate'){(async()=>{const h=await sha('hpl:'+F.pw);if(h===S.reqHash){LS.set('pwOk',h);F.pw='';F.pwErr=false}else F.pwErr=true;render()})()}
+  else if(id==='f-auth')doAuth();
+  else if(id==='f-pin')unlockPin(e.target.dataset.gid);
+  else if(id==='f-res')reserve(V.gid,F.rname!==''?F.rname:(V.name==='book'?(LS.get('name','')||''):''));
+});
+window.addEventListener('hashchange',()=>{const h=parseHash();if(h&&S.booted)go('book',h)});
+
+/* ===== Render ===== */
+function render(){
+  const ae=document.activeElement,fid=ae&&ae.id;let ss=null,se=null;
+  try{ss=ae.selectionStart;se=ae.selectionEnd}catch(e){}
+  const sb=document.querySelector('.sheet-body'),st=sb?sb.scrollTop:0;
+  const app=$('#app');app.innerHTML=view();
+  if(ENTER){ENTER=false;if(app.firstElementChild)app.firstElementChild.classList.add('enter')}
+  $('#sheet').innerHTML=(SH&&db&&unlocked())?sheetHtml():'';
+  if(SH){const n=document.querySelector('.sheet-body');if(n)n.scrollTop=st;SH.anim=false}
+  if(fid){const el=document.getElementById(fid);if(el){el.focus();try{if(ss!=null)el.setSelectionRange(ss,se)}catch(e){}}}
+  document.body.classList.toggle('noscroll',!!SH);
+}
+
+/* ===== Archivio Supabase ===== */
+const SB_URL='https://nqlywzjhxykrfyrpkjdw.supabase.co';
+const SB_KEY='sb_publishable_n_Cesb7VT2ipKa0y9SntYA_zkn4ABgn';
+function loadScript(src){return new Promise((ok,ko)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>ko(new Error('Script non caricato'));document.head.appendChild(s)})}
+async function makeDb(){
+  await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js');
+  const sb=window.supabase.createClient(SB_URL,SB_KEY);
+  const cache=new Map(),subs=new Set();
+  const clone=o=>JSON.parse(JSON.stringify(o));
+  const parentOf=p=>p.split('/').slice(0,-1).join('/');
+  const notify=()=>subs.forEach(f=>{try{f()}catch(e){console.error(e)}});
+  const sig=()=>{let x='';[...cache.keys()].sort().forEach(k=>{x+=k+JSON.stringify(cache.get(k))});return x};
+  async function loadAll(){const {data,error}=await sb.from('hpl_docs').select('path,data');if(error)throw error;cache.clear();data.forEach(r=>cache.set(r.path,r.data))}
+  async function refresh(){try{const a=sig();await loadAll();if(sig()!==a)notify()}catch(e){}}
+  await loadAll();
+  sb.channel('hpl-docs').on('postgres_changes',{event:'*',schema:'public',table:'hpl_docs'},pl=>{
+    if(pl.eventType==='DELETE'){if(pl.old&&pl.old.path)cache.delete(pl.old.path)}else if(pl.new){cache.set(pl.new.path,pl.new.data)}
+    notify()}).subscribe();
+  setInterval(refresh,20000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
+  const snapDoc=p=>({id:p.split('/').pop(),exists:cache.has(p),data:()=>cache.has(p)?clone(cache.get(p)):undefined});
+  const colDocs=c=>[...cache.keys()].filter(k=>parentOf(k)===c).sort().map(snapDoc);
+  const watch=(fn,cb)=>{const f=()=>cb(fn());subs.add(f);setTimeout(f,0);return()=>subs.delete(f)};
+  const put=async(p,d)=>{const {error}=await sb.from('hpl_docs').upsert({path:p,parent:parentOf(p),data:d,updated_at:new Date().toISOString()});if(error)throw error;cache.set(p,clone(d));notify()};
+  const doc=p=>({id:p.split('/').pop(),path:p,
+    async get(){const {data,error}=await sb.from('hpl_docs').select('data').eq('path',p).maybeSingle();if(error)throw error;if(data)cache.set(p,data.data);else cache.delete(p);return snapDoc(p)},
+    async set(d){await put(p,d)},
+    async update(d){await put(p,Object.assign({},cache.get(p)||{},clone(d)))},
+    async delete(){const {error}=await sb.from('hpl_docs').delete().eq('path',p);if(error)throw error;cache.delete(p);notify()},
+    onSnapshot(cb){return watch(()=>snapDoc(p),cb)}});
+  const collection=c=>({path:c,doc:id=>doc(c+'/'+id),
+    async get(){await refresh();const d=colDocs(c);return {docs:d,size:d.length}},
+    onSnapshot(cb){return watch(()=>{const d=colDocs(c);return {docs:d,size:d.length,empty:!d.length}},cb)}});
+  return {doc,collection};
+}
+
+/* ===== Avvio ===== */
+(async function start(){
+  render();
+  if(SB_URL.indexOf('__')===0){S.dbReady=false;render();return}
+  try{db=await makeDb()}catch(e){console.error(e);S.dbReady=false;render();return}
+  S.dbReady=true;
+  const onErr=e=>{toast(errMsg(e),'err')};
+  db.collection('games').onSnapshot(sn=>{const o={};sn.docs.forEach(d=>{o[d.id]=d.data()});S.games=o;S.loaded.games=true;afterData()},onErr);
+  db.collection('players').onSnapshot(sn=>{const o={};sn.docs.forEach(d=>{o[d.id]=d.data()});S.players=o;S.loaded.players=true;afterData()},onErr);
+  db.doc('config/app').onSnapshot(sn=>{S.cfg=sn.exists?sn.data():null;S.loaded.cfg=true;afterData()},onErr);
+})();
+</script>
+
+
