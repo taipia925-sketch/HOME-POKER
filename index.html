@@ -9,175 +9,207 @@
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: colonna unica da smartphone (max 480px). Feltro verde con vignetta e grana, card con filo oro,
-   una sola cosa in primo piano per schermata (barra incassi, stepper di chiusura, saldi).
-   Look unico "tavolo da casinò": volutamente solo scuro. */
+/* Home Poker: app da telefono. Fondo inchiostro, fiches come motivo (avatar a gettone, bordo tratteggiato),
+   cifre grandi in Bricolage Grotesque, barra a schede fluttuante, schermate che scorrono. Solo scuro. */
 :root{
-  --bg:#0B1F17; --bg2:#050E0A; --card:#12261D; --card2:#183226; --ink:#0c1a14;
-  --line:rgba(201,176,104,.26); --line2:rgba(201,176,104,.14);
-  --gold:#C9B068; --gold-l:#F2E3B3; --gold-d:#8F7F4D; --ivory:#F4EFE0; --mut:#9DB0A5;
-  --red:#FF3B30; --red-bg:rgba(255,59,48,.15); --green:#34C759; --green-bg:rgba(52,199,89,.15);
-  --wa:#25D366; --serif:'Playfair Display',Georgia,'Times New Roman',serif; --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --gold-g:linear-gradient(180deg,#E3D08C 0%,#C9B068 55%,#B39549 100%);
+  --bg:#0E0F13; --bg2:#0E0F13; --card:#16181F; --card2:#20232D; --ink:#1B1E27;
+  --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.06);
+  --gold:#8E9CFF; --gold-l:#C9D0FF; --gold-d:#6572D6; --ivory:#F4F2ED; --mut:#9EA3B3;
+  --red:#FF3B30; --red-bg:rgba(255,59,48,.14); --green:#34C759; --green-bg:rgba(52,199,89,.14);
+  --wa:#25D366; --serif:'Bricolage Grotesque','Instrument Sans',system-ui,sans-serif; --sans:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --gold-g:#8E9CFF; --on-acc:#0B1033;
+  --ease:cubic-bezier(.22,1,.36,1);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html,body{background-color:var(--bg)}
-body{background-image:radial-gradient(130% 70% at 50% -5%,#17382a 0%,var(--bg) 52%,var(--bg2) 100%);background-attachment:fixed;color:var(--ivory);font-family:var(--sans);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
-body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.06;z-index:0;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:hidden;background:var(--bg)}
+body{margin:0;background:radial-gradient(120% 38% at 50% -8%,rgba(142,156,255,.16),transparent 62%) fixed,var(--bg);color:var(--ivory);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 body.noscroll{overflow:hidden}
-.wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-inline:16px;padding-block:14px 150px}
-.enter{animation:in .32s ease-out both}
-@keyframes in{from{opacity:0;transform:translateY(10px)}}
 button,input,textarea{font:inherit;color:inherit}
-button{cursor:pointer;border:0;background:none;transition:transform .08s ease,filter .15s ease,background-color .15s ease,border-color .15s ease}
-button:active:not([disabled]){transform:scale(.97)}
+button{cursor:pointer;border:0;background:none;padding:0;touch-action:manipulation;transition:transform .12s var(--ease),background-color .2s,border-color .2s,opacity .2s}
+button:active:not([disabled]){transform:scale(.965)}
 .num{font-variant-numeric:tabular-nums}
-h1,h2,h3{margin:0;font-family:var(--serif);font-weight:600;color:var(--gold-l);text-wrap:balance}
-h1{font-size:28px;line-height:1.12;letter-spacing:.005em}
-.mut{color:var(--mut)} .gold{color:var(--gold)} .red{color:var(--red)} .green{color:var(--green)} .sm{font-size:13px} .xs{font-size:12px}
-.lbl{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:26px 2px 10px;display:flex;align-items:center;gap:10px}
-.lbl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
-.lbl.in{margin:0 0 4px}.lbl.in::after{display:none}
+svg{flex:none}
+h1,h2,h3{margin:0;font-family:var(--serif);font-weight:800;color:var(--ivory);text-wrap:balance;letter-spacing:-.02em}
+h1{font-size:30px;line-height:1.08}
+h2{font-size:22px}
+.mut{color:var(--mut)} .gold{color:var(--gold)} .red{color:var(--red)} .green{color:var(--green)}
+.sm{font-size:14.5px} .xs{font-size:13px}
 .stack{display:flex;flex-direction:column;gap:10px}
 .row{display:flex;align-items:center;gap:10px}
 .row.sp{justify-content:space-between}
 .grow{flex:1;min-width:0}
-svg{flex:none}
-
-.top{display:flex;align-items:center;justify-content:space-between;min-height:56px}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;color:var(--gold-l);font-size:20px;flex:none;background:radial-gradient(circle at 35% 30%,rgba(201,176,104,.22),transparent 70%)}
-.b1{font-family:var(--serif);letter-spacing:.22em;color:var(--gold-l);font-size:15px;font-weight:600}
-.b2{letter-spacing:.3em;color:var(--mut);font-size:10px;margin-top:1px}
-.suits{color:var(--gold);letter-spacing:.3em;font-size:16px;opacity:.9}
-
-.card{background:linear-gradient(180deg,#152b21 0%,var(--card) 100%);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 10px 26px rgba(0,0,0,.28)}
-.card.tight{padding:12px 14px}
-.card.tap{width:100%;text-align:left}
-.card.tap:active{border-color:var(--gold)}
-.card.hero{position:relative;overflow:hidden;padding:18px}
-.card.hero::after{content:"♠";position:absolute;right:-6px;top:-30px;font-size:120px;line-height:1;color:var(--gold);opacity:.07;pointer-events:none}
-
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;text-decoration:none;min-height:54px;border-radius:15px;padding:12px 16px;font-weight:700;font-size:16px;background:var(--gold-g);color:#1a1405;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 18px rgba(201,176,104,.22)}
-.btn.ghost{background:rgba(201,176,104,.06);border:1.5px solid var(--gold);color:var(--gold-l);min-height:50px;box-shadow:none}
-.btn.dash{background:transparent;border:1.5px dashed rgba(201,176,104,.4);color:var(--gold-l);min-height:54px;box-shadow:none}
-.btn.wa{background:var(--wa);color:#08210f;box-shadow:0 6px 18px rgba(37,211,102,.2)}
-.btn.green{background:var(--green);color:#06210f;box-shadow:none}
-.btn.redb{background:transparent;border:1.5px solid var(--red);color:var(--red);box-shadow:none}
-.btn[disabled]{opacity:.36;cursor:not-allowed;box-shadow:none}
-.btn-s{min-height:48px;padding:8px 12px;border-radius:13px;font-weight:600;font-size:14px;background:var(--card2);border:1px solid var(--line);color:var(--ivory);white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px}
-.btn-s.go{border-color:var(--gold);color:var(--gold-l);background:rgba(201,176,104,.08)}
-.link{color:var(--mut);text-decoration:underline;text-underline-offset:3px;min-height:48px;display:inline-flex;align-items:center;font-size:14px}
-.back-l{color:var(--gold);min-height:48px;display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:600;margin-left:-6px;padding-inline:6px}
-
-.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
-.badge.paid{color:var(--green);background:var(--green-bg)} .badge.pend{color:var(--red);background:var(--red-bg)}
-.badge.grey{color:var(--mut);background:rgba(157,176,165,.15)} .badge.live{color:var(--green);background:var(--green-bg)}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pl 1.4s ease-in-out infinite;flex:none}
-@keyframes pl{50%{opacity:.3}}
-.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
-.pill.red{background:var(--red-bg);color:var(--red)}
-.chip{display:inline-flex;align-items:center;gap:6px;min-height:46px;padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card2);font-weight:600;font-size:14px}
-.chip.on{background:var(--gold-g);color:#1a1405;border-color:var(--gold)}
-.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.chipx{display:inline-flex;align-items:center;gap:0}
-.trash{min-width:44px;min-height:44px;display:grid;place-items:center;color:var(--mut)}
-.seg{display:inline-flex;background:var(--ink);border:1px solid var(--line);border-radius:13px;padding:3px;flex:none}
-.seg button{min-height:42px;padding:0 14px;border-radius:10px;font-weight:600;font-size:13px;color:var(--mut)}
-.seg button.on{background:var(--gold-g);color:#1a1405}
-
-.ava{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;font-family:var(--serif);font-weight:700;font-size:15px;background:hsl(var(--h) 34% 24%);border:1px solid hsl(var(--h) 45% 56% / .6);color:hsl(var(--h) 70% 88%)}
-.ava.s{width:34px;height:34px;font-size:13px}
-
-.field{display:flex;flex-direction:column;gap:6px}
-.field>span{font-size:12px;color:var(--mut);letter-spacing:.03em}
-input.in,textarea.in{width:100%;min-height:52px;border-radius:13px;border:1px solid var(--line);background:var(--ink);padding:12px 14px;font-size:16px;color:var(--ivory);transition:border-color .15s}
-textarea.in{min-height:84px;resize:none;line-height:1.4}
-input.in.big-n{font-family:var(--serif);font-size:22px;font-weight:600;min-height:58px}
-input.in:focus,textarea.in:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 3px rgba(201,176,104,.16)}
-button:focus-visible,a:focus-visible{outline:2px solid var(--gold-l);outline-offset:2px}
-input.in::placeholder,textarea.in::placeholder{color:#5f7469}
 .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .two>*{min-width:0}
-input.in{min-width:0}
-.kpis.two-c>.kpi:last-child:nth-child(odd){grid-column:1/-1}
+.hr{height:1px;background:var(--line2);margin:6px 0}
 
-.meter{display:flex;gap:3px;height:9px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.07)}
-.meter i{display:block;height:100%;min-width:0;transition:flex-grow .4s ease}
-.m-g{background:var(--green)} .m-r{background:var(--red)} .m-o{background:var(--gold-g)}
-.cassa .big-n{font-family:var(--serif);font-size:34px;font-weight:700;color:var(--gold-l);line-height:1.05}
+/* struttura */
+.app{max-width:480px;margin:0 auto;min-height:100dvh;padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:480px;margin:0 auto;padding:calc(8px + env(safe-area-inset-top,0px)) 16px 150px}
+.hd{position:sticky;top:0;z-index:12;display:flex;align-items:center;gap:12px;padding:calc(16px + env(safe-area-inset-top,0px)) 18px 12px;background:linear-gradient(var(--bg) 62%,rgba(14,15,19,0))}
+.hd .t1{flex:1;min-width:0}
+.hd h1{font-size:34px;letter-spacing:-.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd .t2{color:var(--mut);font-size:14.5px;margin-top:2px}
+.me-btn{border-radius:50%;padding:3px;background:var(--card2);border:1px solid var(--line)}
+.pg{padding:4px 16px 0;display:flex;flex-direction:column;gap:12px}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:16px 4px 0;font-family:var(--serif);font-weight:700;font-size:19px;letter-spacing:-.01em}
+.sec small{font-family:var(--sans);font-weight:500;color:var(--mut);font-size:14px;letter-spacing:0}
+.lbl{font-family:var(--serif);font-weight:700;font-size:19px;letter-spacing:-.01em;margin:20px 4px 10px;color:var(--ivory)}
+.lbl.in{margin:0 0 2px;font-size:17px}
+.note{margin:0 16px 4px;padding:12px 14px;border-radius:16px;background:rgba(142,156,255,.12);color:var(--gold-l);font-size:14.5px}
+
+/* transizioni tra schermate */
+.enter-push{animation:pushIn .36s var(--ease) both}
+.enter-back{animation:backIn .36s var(--ease) both}
+.enter-fade{animation:fadeIn .26s ease-out both}
+@keyframes pushIn{from{opacity:0;transform:translateX(34px)}}
+@keyframes backIn{from{opacity:0;transform:translateX(-34px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}}
+
+/* barra a schede */
+.tabs{position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(calc(100% - 28px),420px);display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:6px;background:rgba(27,30,39,.84);-webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5);border:1px solid var(--line);border-radius:28px;z-index:30;box-shadow:0 20px 44px rgba(0,0,0,.5)}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:58px;border-radius:22px;color:var(--mut);font-size:12.5px;font-weight:600}
+.tab.on{background:rgba(142,156,255,.17);color:var(--gold-l)}
+
+/* card */
+.card{background:var(--card);border-radius:24px;padding:16px;position:relative}
+.card.tight{padding:12px 14px;border-radius:20px}
+.card.tap{width:100%;text-align:left;display:block}
+.card.tap.gcard,.card.tap.row{display:flex}
+.card.tap:active{background:var(--card2)}
+.hero{position:relative;overflow:hidden;border-radius:30px;padding:22px;background:linear-gradient(155deg,#2A3160 0%,#1B1F36 52%,#171A24 100%);border:1px solid rgba(142,156,255,.3)}
+.hero::after{content:"";position:absolute;right:-70px;top:-70px;width:210px;height:210px;border-radius:50%;border:24px dashed rgba(255,255,255,.07);pointer-events:none}
+.hero>*{position:relative;z-index:1}
+.bignum{font-family:var(--serif);font-weight:800;font-size:56px;letter-spacing:-.035em;line-height:1;font-variant-numeric:tabular-nums}
+
+/* pulsanti */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;text-decoration:none;min-height:56px;border-radius:20px;padding:12px 18px;font-weight:700;font-size:17px;background:var(--gold);color:var(--on-acc);text-align:center}
+.btn.ghost{background:var(--card2);color:var(--ivory)}
+.btn.dash{background:transparent;border:1.5px dashed rgba(255,255,255,.2);color:var(--gold-l)}
+.btn.wa{background:var(--wa);color:#06200e}
+.btn.green{background:var(--green);color:#05210d}
+.btn.redb{background:var(--red-bg);color:#FF6A60}
+.btn[disabled]{opacity:.35;cursor:not-allowed}
+.btn-s{min-height:50px;padding:8px 14px;border-radius:17px;font-weight:600;font-size:15px;background:var(--card2);color:var(--ivory);white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-s.go{background:rgba(142,156,255,.18);color:var(--gold-l)}
+.link{color:var(--mut);text-decoration:underline;text-underline-offset:3px;min-height:48px;display:inline-flex;align-items:center;font-size:15px}
+.back-l{color:var(--gold-l);min-height:48px;display:inline-flex;align-items:center;gap:2px;font-size:16px;font-weight:600;margin-left:-8px;padding-inline:6px}
+
+/* etichette di stato */
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:13px;font-weight:600;white-space:nowrap}
+.badge.paid{color:#5BE07D;background:var(--green-bg)} .badge.pend{color:#FF6A60;background:var(--red-bg)}
+.badge.grey{color:var(--mut);background:rgba(255,255,255,.07)} .badge.live{color:#5BE07D;background:var(--green-bg)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pl 1.4s ease-in-out infinite;flex:none}
+@keyframes pl{50%{opacity:.25}}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:13px;font-weight:600}
+.pill.red{background:var(--red-bg);color:#FF6A60}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:7px;min-height:48px;padding:6px 16px 6px 8px;border-radius:999px;background:var(--card2);font-weight:600;font-size:15px}
+.chip.t{padding-left:16px}
+.chip.on{background:var(--gold);color:var(--on-acc)}
+.chipx{display:inline-flex;align-items:center}
+.trash{min-width:44px;min-height:44px;display:grid;place-items:center;color:var(--mut)}
+.seg{display:inline-flex;background:var(--ink);border-radius:16px;padding:4px;flex:none}
+.seg button{min-height:46px;padding:0 16px;border-radius:12px;font-weight:600;font-size:15px;color:var(--mut)}
+.seg button.on{background:var(--gold);color:var(--on-acc)}
+
+/* avatar a gettone */
+.ava{--c:hsl(var(--h) 62% 46%);position:relative;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;flex:none;font-family:var(--serif);font-weight:800;font-size:16px;color:#fff;background:var(--c);box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)}
+.ava::before{content:"";position:absolute;inset:4px;border-radius:50%;border:2px dashed rgba(255,255,255,.55)}
+.ava::after{content:"";position:absolute;inset:9px;border-radius:50%;background:rgba(0,0,0,.18)}
+.ava>*,.ava{text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.ava{z-index:0}
+.ava.s{width:36px;height:36px;font-size:13px}
+.ava.s::before{inset:3px;border-width:1.5px}.ava.s::after{inset:7px}
+.ava.l{width:56px;height:56px;font-size:19px}
+.ava i{position:relative;z-index:1;font-style:normal}
+.stk{display:flex}
+.stk .ava{margin-left:-11px;box-shadow:0 0 0 3px #1D2140,inset 0 0 0 2px rgba(255,255,255,.18)}
+.stk .ava:first-child{margin-left:0}
+.stk .more{margin-left:-11px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:13px;font-weight:700;box-shadow:0 0 0 3px #1D2140}
+
+/* campi */
+.field{display:flex;flex-direction:column;gap:7px}
+.field>span{font-size:14px;color:var(--mut);font-weight:500}
+input.in,textarea.in{width:100%;min-height:56px;border-radius:18px;border:2px solid transparent;background:var(--ink);padding:12px 16px;font-size:17px;color:var(--ivory);transition:border-color .2s,background-color .2s;min-width:0}
+input[type=date].in,input[type=time].in{font-size:16px;padding-inline:12px;-webkit-appearance:none;appearance:none}
+textarea.in{min-height:90px;resize:none;line-height:1.4}
+input.in.big-n{font-family:var(--serif);font-size:26px;font-weight:700;min-height:62px;letter-spacing:-.01em}
+input.in:focus,textarea.in:focus{border-color:var(--gold);outline:none;background:#20243A}
+button:focus-visible,a:focus-visible{outline:2px solid var(--gold-l);outline-offset:2px}
+input.in::placeholder,textarea.in::placeholder{color:#5F6477}
+
+/* cassa e numeri */
+.meter{display:flex;gap:3px;height:10px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.08)}
+.meter i{display:block;height:100%;min-width:0;transition:flex-grow .5s var(--ease)}
+.m-g{background:var(--green)} .m-r{background:var(--red)} .m-o{background:var(--gold)}
+.cassa .big-n{font-family:var(--serif);font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.05}
 .kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
-.kpi{background:rgba(0,0,0,.2);border:1px solid var(--line2);border-radius:13px;padding:10px 8px;text-align:center;min-width:0}
-.kpi .k{font-size:10px;letter-spacing:.1em;font-weight:600;color:var(--mut)}
-.kpi .v{font-family:var(--serif);font-size:18px;font-weight:600;margin-top:3px;overflow-wrap:anywhere}
-.kpi .s{font-size:11px;margin-top:2px;color:var(--gold)}
+.kpi{background:rgba(255,255,255,.05);border-radius:18px;padding:12px 8px;text-align:center;min-width:0}
+.kpi .k{font-size:13px;font-weight:500;color:var(--mut)}
+.kpi .v{font-family:var(--serif);font-size:21px;font-weight:700;margin-top:3px;overflow-wrap:anywhere;letter-spacing:-.01em}
+.kpi .s{font-size:12.5px;margin-top:2px;color:var(--gold-l)}
+.kpis.two-c>.kpi:last-child:nth-child(odd){grid-column:1/-1}
 .ir{display:flex;align-items:center;gap:12px}
-.ir .ic{width:36px;height:36px;border-radius:11px;background:rgba(201,176,104,.1);border:1px solid var(--line2);display:grid;place-items:center;font-size:16px;flex:none}
+.ir .ic{width:40px;height:40px;border-radius:14px;background:rgba(142,156,255,.14);color:var(--gold-l);display:grid;place-items:center;flex:none}
 
-.gcard{display:flex;align-items:center;gap:12px;width:100%;text-align:left}
-.gdate{font-family:var(--serif);font-size:19px;color:var(--gold);font-weight:600}
-.suit{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:rgba(201,176,104,.1);border:1px solid var(--line2);color:var(--gold);font-size:20px;flex:none}
-.medal{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:15px;flex:none;border:1.5px solid currentColor}
-.pl-name{font-family:var(--serif);font-size:20px;color:var(--ivory);font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap;line-height:1.2}
-.pcs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.pcs>div{background:rgba(0,0,0,.2);border:1px solid var(--line2);border-radius:12px;padding:8px 10px;min-width:0}
-.pcs span{display:block;font-size:11px;color:var(--mut)}
-.pcs b{font-size:15px}
-.mv{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line2);font-size:14px;flex-wrap:wrap}
+.gcard{display:flex;align-items:center;gap:14px;width:100%;text-align:left}
+.gdate{font-family:var(--serif);font-size:20px;font-weight:700;letter-spacing:-.01em}
+.suit{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:rgba(142,156,255,.14);color:var(--gold-l);flex:none}
+.dtile{width:54px;height:58px;border-radius:17px;background:var(--card2);display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none}
+.dtile b{font-family:var(--serif);font-size:23px;font-weight:800;line-height:1}
+.dtile span{font-size:12.5px;color:var(--mut);margin-top:2px}
+.dtile.live{background:var(--green-bg)}.dtile.live b{color:#5BE07D}
+.medal{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-weight:800;font-size:16px;flex:none;background:rgba(255,255,255,.07);color:var(--mut)}
+.medal.m1{background:#F2C94C;color:#3A2C00}.medal.m2{background:#CBD1DC;color:#222733}.medal.m3{background:#D08B5B;color:#2E1503}
+.pl-name{font-family:var(--serif);font-size:21px;font-weight:700;letter-spacing:-.01em;display:flex;gap:8px;align-items:center;flex-wrap:wrap;line-height:1.2}
+.pcs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.pcs>div{background:rgba(255,255,255,.05);border-radius:16px;padding:10px 12px;min-width:0}
+.pcs span{display:block;font-size:13px;color:var(--mut)}
+.pcs b{font-family:var(--serif);font-size:18px;font-weight:700}
+.mv{display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--line2);font-size:15px;flex-wrap:wrap}
 .mv .dt{width:9px;height:9px;border-radius:50%;flex:none}
 .bdg-btn{min-height:44px;display:inline-flex;align-items:center}
 .x{min-width:44px;min-height:44px;display:grid;place-items:center;color:var(--mut)}
 .pay2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.big{min-height:62px;border-radius:15px;border:2px solid var(--line);background:var(--card2);font-weight:700;font-size:16px;color:var(--mut)}
-.big.sel-g{border-color:var(--green);background:var(--green-bg);color:var(--green)}
-.big.sel-r{border-color:var(--red);background:var(--red-bg);color:var(--red)}
-.box{border-radius:15px;padding:14px;border:1px solid}
-.box.g{border-color:var(--green);background:var(--green-bg)} .box.r{border-color:var(--red);background:var(--red-bg)} .box.o{border-color:var(--gold);background:rgba(201,176,104,.12)}
-.bar{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:26px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(5,14,10,0),rgba(5,14,10,.94) 34%)}
+.big{min-height:64px;border-radius:20px;background:var(--card2);font-weight:700;font-size:16px;color:var(--mut);border:2px solid transparent}
+.big.sel-g{border-color:var(--green);background:var(--green-bg);color:#5BE07D}
+.big.sel-r{border-color:var(--red);background:var(--red-bg);color:#FF6A60}
+.box{border-radius:20px;padding:14px 16px}
+.box.g{background:var(--green-bg)} .box.r{background:var(--red-bg)} .box.o{background:rgba(142,156,255,.14)}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:30px 16px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(14,15,19,0),rgba(14,15,19,.96) 36%)}
 .bar-in{max-width:480px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:2px}
 .steps{display:flex;align-items:center;gap:8px;margin:14px 0 18px}
-.steps .st{flex:1;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--mut);font-weight:600}
-.steps .st i{display:block;height:5px;border-radius:3px;background:rgba(201,176,104,.2)}
+.steps .st{flex:1;display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--mut);font-weight:600}
+.steps .st i{display:block;height:6px;border-radius:3px;background:rgba(255,255,255,.1);transition:background-color .3s}
 .steps .st.on{color:var(--gold-l)} .steps .st.on i{background:var(--gold)}
-.tr{display:block;width:100%;text-align:left;border:1.5px solid;border-radius:13px;padding:11px 13px;background:rgba(0,0,0,.14)}
-.tr.paid{border-color:rgba(52,199,89,.7)} .tr.pend{border-color:rgba(255,59,48,.7)}
-.back{position:fixed;inset:0;background:rgba(2,8,5,.7);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;z-index:50}
-.sheet{width:100%;max-width:480px;max-height:92%;background:linear-gradient(180deg,#173026,var(--card));border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;display:flex;flex-direction:column;box-shadow:0 -14px 40px rgba(0,0,0,.5)}
-.sheet.anim{animation:up .26s cubic-bezier(.2,.8,.2,1)}
-@keyframes up{from{transform:translateY(60px);opacity:.3}}
-.grab{width:44px;height:4px;border-radius:2px;background:var(--line);margin:10px auto 0;flex:none}
-.sheet-body{overflow:auto;padding:12px 16px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
-#toast{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:calc(100% - 32px);max-width:440px}
-.t{display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:14px;font-weight:600;font-size:14px;color:#06110c;box-shadow:0 10px 28px rgba(0,0,0,.45);animation:in .25s ease-out both}
-.t.ok{background:var(--green)} .t.err{background:var(--red);color:#fff}
-.sk{height:80px;border-radius:18px;background:linear-gradient(90deg,#12261D 25%,#1b3427 50%,#12261D 75%);background-size:200% 100%;animation:sh 1.3s linear infinite}
+.tr{display:block;width:100%;text-align:left;border-radius:18px;padding:13px 15px;background:rgba(255,255,255,.05);}
+.tr.paid{box-shadow:inset 4px 0 0 var(--green)} .tr.pend{box-shadow:inset 4px 0 0 var(--red)}
+
+/* fogli */
+.back{position:fixed;inset:0;background:rgba(5,6,10,.66);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;z-index:50;animation:fadeBg .25s ease-out both}
+@keyframes fadeBg{from{opacity:0}}
+.sheet{width:100%;max-width:480px;max-height:92%;background:#1A1D26;border-radius:30px 30px 0 0;display:flex;flex-direction:column;box-shadow:0 -20px 60px rgba(0,0,0,.55)}
+.sheet.anim{animation:up .42s var(--ease)}
+@keyframes up{from{transform:translateY(100%)}}
+.grab{width:42px;height:5px;border-radius:3px;background:rgba(255,255,255,.18);margin:10px auto 0;flex:none}
+.sheet-body{overflow:auto;padding:12px 18px calc(26px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;overscroll-behavior:contain}
+#toast{position:fixed;bottom:calc(108px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column-reverse;gap:8px;align-items:center;pointer-events:none;width:calc(100% - 32px);max-width:440px}
+.t{display:flex;align-items:center;gap:9px;padding:13px 18px;border-radius:999px;font-weight:600;font-size:15px;color:#fff;background:#2A2E3B;box-shadow:0 14px 34px rgba(0,0,0,.5);animation:toastIn .42s var(--ease) both}
+@keyframes toastIn{from{opacity:0;transform:translateY(18px) scale(.94)}}
+.t.ok svg{color:#5BE07D}.t.err{background:#4A1713}.t.err svg{color:#FF6A60}
+.sk{height:96px;border-radius:24px;background:linear-gradient(90deg,#16181F 25%,#20232D 50%,#16181F 75%);background-size:200% 100%;animation:sh 1.3s linear infinite}
 @keyframes sh{to{background-position:-200% 0}}
-pre.preview{white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--sans);font-size:13px;color:var(--mut);margin:0}
-textarea.ta{width:100%;min-height:200px;border-radius:13px;border:1px solid var(--line);background:var(--ink);color:var(--ivory);padding:12px;font-size:13px}
-.hr{height:1px;background:var(--line2);margin:6px 0}
+pre.preview{white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--sans);font-size:14px;color:var(--mut);margin:0}
+textarea.ta{width:100%;min-height:200px;border-radius:18px;border:0;background:var(--ink);color:var(--ivory);padding:14px;font-size:14px}
+.pick{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;border-radius:20px;background:var(--card2);border:2px solid transparent}
+.pick.on{border-color:var(--gold);background:rgba(142,156,255,.14)}
+.pick .tick{margin-left:auto;width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.2);display:grid;place-items:center;color:transparent;flex:none;transition:all .2s var(--ease)}
+.pick.on .tick{background:var(--gold);border-color:var(--gold);color:var(--on-acc)}
+@media (max-width:400px){.pg{padding-inline:14px}.bignum{font-size:50px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-/* ===== Ottimizzazione telefono ===== */
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:hidden}
-:root{--mut:#B7C8BE}
-body{font-size:16px;line-height:1.5;overflow-x:hidden}
-.sm{font-size:14.5px}.xs{font-size:13px}
-.lbl{font-size:12.5px;letter-spacing:.12em}
-.b2{font-size:11px}
-.badge{font-size:12px;padding:5px 11px}
-.pill{font-size:13px}
-.kpi .k{font-size:11px}.kpi .s{font-size:12.5px}
-.pcs span{font-size:12.5px}
-.field>span{font-size:14px}
-.btn-s,.chip,.link,.back-l,.mv{font-size:15px}
-.seg button{font-size:14px;min-height:46px}
-.steps .st{font-size:12.5px}
-input.in,textarea.in,select.in{font-size:16px}
-input[type=date].in,input[type=time].in{font-size:16px;padding-inline:10px;min-width:0;-webkit-appearance:none;appearance:none}
-.t{font-size:15px}
-@media (max-width:400px){.wrap{padding-inline:14px}.card{padding-inline:14px}}
 </style>
 
 <div id="app"></div>
@@ -297,9 +329,14 @@ async function sha(s){
 /* ===== Icone e avatar ===== */
 const IP={plus:'M12 5v14M5 12h14',close:'M6 6l12 12M18 6L6 18',trash:'M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3',chev:'M6 9l6 6 6-6',chevu:'M6 15l6-6 6 6',chevr:'M9 6l6 6-6 6',back:'M15 6l-6 6 6 6',check:'M5 12l5 5 9-10',eye:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 100 6 3 3 0 000-6z',lock:'M7 11V8a5 5 0 0110 0v3M6 11h12v9H6z'};
 const ico=(k,s)=>`<svg width="${s||18}" height="${s||18}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${IP[k]}"/></svg>`;
+Object.assign(IP,{chip:'M12 3a9 9 0 100 18 9 9 0 000-18zM12 8a4 4 0 100 8 4 4 0 000-8z',list:'M4 6h16M4 12h16M4 18h10',bars:'M6 20V11M12 20V4M18 20v-6',cal:'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',pin:'M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11zM12 7a3 3 0 100 6 3 3 0 000-6z',coins:'M4 8c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 8v4c0 1.7 3.6 3 8 3s8-1.3 8-3V8M4 12v4c0 1.7 3.6 3 8 3s8-1.3 8-3v-4',share:'M12 15V3M8 7l4-4 4 4M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6',user:'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0'});
 const hueOf=s=>{let h=7;for(const c of String(s).toLowerCase())h=(h*31+c.charCodeAt(0))%360;return h};
 const inits=n=>{const w=String(n).trim().split(/\s+/);return ((w[0]||'?')[0]+(w.length>1?w[1][0]:'')).toUpperCase()};
-const ava=(n,s)=>`<span class="ava ${s||''}" style="--h:${hueOf(n)}">${esc(inits(n))}</span>`;
+const ava=(n,s)=>`<span class="ava ${s||''}" style="--h:${hueOf(n)}"><i>${esc(inits(n))}</i></span>`;
+const dDay=iso=>new Date(iso).getDate();
+const dMon=iso=>new Date(iso).toLocaleDateString('it-IT',{month:'short'}).replace('.','');
+const stackAva=(names,max)=>{const a=names.slice(0,max||5);return `<div class="stk">${a.map(n=>ava(n,'s')).join('')}${names.length>a.length?`<span class="more">+${names.length-a.length}</span>`:''}</div>`};
+const TAB=()=>{const t=LS.get('tab','serata');return ['serata','storico','classifica'].includes(t)?t:'serata'};
 
 /* ===== Stato ===== */
 let db=null,canWrite=true,ENTER=false;
@@ -339,7 +376,7 @@ function subRes(gid){
   S.unsubRes=db.collection('games/'+gid+'/reservations').onSnapshot(sn=>{S.res=sn.docs.map(d=>Object.assign({id:d.id},d.data()));render()},()=>{});
 }
 function go(name,gid,extra){
-  V=Object.assign({name,gid:gid||null},extra||{});SH=null;ENTER=true;
+  V=Object.assign({name,gid:gid||null},extra||{});SH=null;ENTER=name==='home'?'back':'push';
   subRes(gid&&['live','book','detail'].includes(name)?gid:null);
   if(name==='new'&&!F.ng)resetNew();
   render();window.scrollTo(0,0);
@@ -374,18 +411,20 @@ async function afterData(){
 }
 
 /* ===== Viste ===== */
-const brand=()=>`<div class="brand"><div class="logo">♠</div><div><div class="b1">HOME POKER</div><div class="b2">LEDGER</div></div></div>`;
-const topbar=()=>`<div class="top">${brand()}<span class="suits">♥ ♣ ♦</span></div>`;
+const brand=()=>`<div class="row"><span class="ava s" style="--h:235"><i>♠</i></span><b style="font-family:var(--serif);font-size:19px;letter-spacing:-.01em">Home Poker</b></div>`;
+const topbar=()=>`<div class="row sp" style="min-height:56px">${brand()}</div>`;
+const hd=(title,sub)=>`<header class="hd"><div class="t1"><h1>${esc(title)}</h1>${sub?`<div class="t2">${esc(sub)}</div>`:''}</div>${S.me?`<button class="me-btn" data-act="meopen" aria-label="Il mio profilo">${ava(S.me.name)}</button>`:''}</header>`;
+const tabbar=t=>`<nav class="tabs" aria-label="Sezioni">${[['serata','chip','Serata'],['storico','list','Storico'],['classifica','bars','Classifica']].map(x=>`<button class="tab ${t===x[0]?'on':''}" data-act="tab" data-t="${x[0]}" ${t===x[0]?'aria-current="page"':''}>${ico(x[1],24)}<span>${x[2]}</span></button>`).join('')}</nav>`;
 const backBtn=(act,txt,gid)=>`<button class="back-l" data-act="${act}" ${gid?`data-gid="${gid}"`:''}>${ico('back',20)}${txt}</button>`;
 const skeleton=()=>`<div class="wrap">${topbar()}<div class="stack" style="margin-top:24px"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div></div>`;
-const stBadge=s=>s==='PAID'?'<span class="badge paid">PAGATO</span>':'<span class="badge pend">DA PAGARE</span>';
+const stBadge=s=>s==='PAID'?'<span class="badge paid">Pagato</span>':'<span class="badge pend">Da pagare</span>';
 const notFound=()=>`<div class="wrap">${topbar()}<h1 style="margin-top:28px">Partita non trovata</h1><p class="mut">Il collegamento non corrisponde a nessuna partita. Potrebbe essere stata eliminata.</p><button class="btn" data-act="home">Vai alla Home</button></div>`;
 
 function view(){
   if(S.dbReady===false)return `<div class="wrap">${topbar()}<h1 style="margin-top:28px">Archivio non disponibile</h1><p class="mut">Impossibile collegarsi all'archivio. Controlla la connessione e riapri la pagina.</p><p class="mut xs" style="word-break:break-word">Dettaglio: ${esc(window.__dbErr||'')}</p></div>`;
   if(!db||!(S.loaded.games&&S.loaded.cfg&&S.loaded.players)||!S.reqHash)return skeleton();
   if(!unlocked())return vGate();
-  if(!S.me&&V.name!=='book')return vAuth();
+  if(!S.me)return vAuth();
   switch(V.name){
     case 'new':return vNew();
     case 'live':return vLive();
@@ -413,9 +452,9 @@ ${!reg&&regd.length?`<div class="chips">${regd.map(n=>`<button type="button" cla
 ${reg?`<label class="field"><span>Ripeti il PIN</span><input class="in" id="au-pin2" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="auth.pin2" value="${esc(a.pin2)}" autocomplete="new-password"></label>`:''}
 ${a.err?`<div class="red sm">${esc(a.err)}</div>`:''}
 <button class="btn" type="submit" ${canWrite||!reg?'':'disabled'}>${reg?'Registrati':'Entra'}</button>
-<div class="mut xs">${reg?'Se i tuoi amici ti hanno già aggiunto al tavolo, usa lo stesso nome: il profilo sarà tuo.':'Hai dimenticato il PIN? Chiedi a chi gestisce la pagina di azzerarlo.'}</div></form></div>`;
+<div class="mut xs">${reg?'Solo i giocatori registrati possono sedersi al tavolo e riscuotere i propri saldi.':'Hai dimenticato il PIN? Chiedi a chi gestisce la pagina di azzerarlo.'}</div></form></div>`;
 }
-function enterAs(id,name){S.me={id,name};LS.set('me',S.me);LS.set('name',name);F.auth={mode:null,name:'',pin:'',pin2:'',err:''};go('home');toast('Ciao '+name+'!','ok')}
+function enterAs(id,name){S.me={id,name};LS.set('me',S.me);LS.set('name',name);F.auth={mode:null,name:'',pin:'',pin2:'',err:''};{const hh=parseHash();if(hh)go('book',hh);else go('home')}toast('Ciao '+name+'!','ok')}
 async function doAuth(){
   const a=F.auth,name=a.name.trim(),lk=name.toLowerCase();
   const fail=m=>{a.err=m;render()};
@@ -455,17 +494,15 @@ async function authDebt(did){
 }
 const pinField=perm=>perm.needPin?`<label class="field"><span>Il tuo PIN · ${esc(perm.who)}</span><input class="in" id="pay-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="pinp" value="${esc(F.pinp)}" placeholder="PIN" autocomplete="off"></label>`:'';
 const pinReady=perm=>!perm.needPin||PIN_RE.test(F.pinp);
-const meCard=()=>S.me?`<div class="card tight row" style="margin-top:6px">${ava(S.me.name,'s')}<div class="grow" style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(S.me.name)}</div><button class="btn-s" data-act="chpin">Cambia PIN</button><button class="btn-s" data-act="logout">Esci</button></div>`:'';
+const meCard=()=>'';
 function myCredits(gs){const out=[];gs.filter(g=>g.status==='closed').forEach(g=>(g.debts||[]).forEach(d=>{if(d.remainingAmount>0&&isCreditor(d))out.push({g,d})}));return out}
 function vGate(){return `<div class="wrap">${topbar()}
-<form id="f-gate" class="card hero stack" style="margin-top:40px;padding:22px;gap:14px">
-<div class="logo" style="width:56px;height:56px;font-size:26px">♠</div>
-<h1>🔒 Accesso riservato</h1><p class="mut" style="margin:0">Inserisci la password per aprire la cassa</p>
+<form id="f-gate" class="hero stack" style="margin-top:28px;gap:16px">
+<span class="ava l" style="--h:235"><i>♠</i></span>
+<div><h1>Accesso riservato</h1><p class="mut" style="margin:8px 0 0">Inserisci la password per aprire la cassa.</p></div>
 <input class="in" id="pw" type="password" placeholder="Password" autocomplete="current-password" data-bind="pw" value="${esc(F.pw)}">
 ${F.pwErr?'<div class="red sm">Password errata, riprova.</div>':''}
 <button class="btn" type="submit">Entra</button></form></div>`}
-
-/* --- Classifica: saldi aperti per persona (da riscuotere / da dare) --- */
 function owedMap(gs){
   const bal={};
   gs.filter(g=>g.status==='closed').forEach(g=>(g.debts||[]).forEach(d=>{
@@ -477,16 +514,15 @@ function owedMap(gs){
   return bal;
 }
 function rankRow(r,i,bal){
-  const mc=['var(--gold)','var(--gold-l)','var(--gold-d)'];
   const k=r.name.trim().toLowerCase(),b=bal[k]||{give:[],get:[]};
   const give=sum(b.give.map(x=>x.amt)),get=sum(b.get.map(x=>x.amt)),has=give+get>0,open=has&&!!F.open['rk:'+k];
   const items=(list,cls,amtCls)=>list.slice().sort((x,y)=>String(y.at).localeCompare(String(x.at))).map(x=>`<button class="tr ${cls}" data-act="detail" data-gid="${x.gid}"><div class="row sp"><span><b>${esc(x.who)}</b><span class="mut xs"> · partita del ${dShort(x.at)}</span></span><b class="num ${amtCls}">${eur(x.amt)}</b></div></button>`).join('');
-  return `<div class="card tight">
-<div class="row" ${has?`data-act="rk" data-k="${esc(k)}" style="cursor:pointer"`:''}><span class="medal" style="color:${mc[i]||'var(--mut)'}">${i+1}°</span>${ava(r.name,'s')}<div class="grow"><div style="font-weight:600">${esc(r.name)}</div><div class="mut xs">${r.n} partit${r.n===1?'a':'e'} · ${r.w} in positivo</div></div><b class="num ${r.tot>=0?'green':'red'}">${sgn(r.tot)}</b>${has?`<span class="mut">${ico(open?'chevu':'chev',18)}</span>`:''}</div>
-<div class="chips" style="gap:6px;margin-top:10px">${get>0?`<span class="badge paid num" style="text-transform:none;letter-spacing:0">A credito ${eur(get)}</span>`:''}${give>0?`<span class="badge pend num" style="text-transform:none;letter-spacing:0">A debito ${eur(give)}</span>`:''}${has?'':'<span class="badge grey" style="text-transform:none;letter-spacing:0">Nessun saldo aperto</span>'}</div>
-${open?`<div class="stack" style="gap:8px;margin-top:12px">${b.get.length?`<div class="lbl in" style="margin:0">Da chi riscuotere</div>${items(b.get,'paid','green')}`:''}${b.give.length?`<div class="lbl in" style="margin:${b.get.length?'8px':'0'} 0 0">A chi dare</div>${items(b.give,'pend','red')}`:''}</div>`:''}</div>`;
+  return `<div class="card">
+<div class="row" ${has?`data-act="rk" data-k="${esc(k)}" style="cursor:pointer"`:''}><span class="medal ${i<3?'m'+(i+1):''}">${i+1}</span>${ava(r.name)}<div class="grow"><div style="font-weight:700;font-size:17px">${esc(r.name)}</div><div class="mut xs">${r.n} partit${r.n===1?'a':'e'} · ${r.w} vint${r.w===1?'a':'e'}</div></div><b class="num ${r.tot>=0?'green':'red'}" style="font-family:var(--serif);font-weight:800;font-size:21px;letter-spacing:-.02em">${sgn(r.tot)}</b>${has?`<span class="mut">${ico(open?'chevu':'chev',18)}</span>`:''}</div>
+<div class="chips" style="gap:6px;margin-top:12px">${get>0?`<span class="badge paid num">A credito ${eur(get)}</span>`:''}${give>0?`<span class="badge pend num">A debito ${eur(give)}</span>`:''}${has?'':'<span class="badge grey">Nessun saldo aperto</span>'}</div>
+${open?`<div class="stack" style="gap:8px;margin-top:14px">${b.get.length?`<div class="mut sm" style="font-weight:600">Da chi riscuotere</div>${items(b.get,'paid','green')}`:''}${b.give.length?`<div class="mut sm" style="font-weight:600;margin-top:${b.get.length?'8px':'0'}">A chi dare</div>${items(b.give,'pend','red')}`:''}</div>`:''}</div>`;
 }
-function vHome(){
+function homeData(){
   const gs=Object.entries(S.games).map(([id,g])=>Object.assign({id},g)).sort((a,b)=>String(b.scheduledAt).localeCompare(String(a.scheduledAt)));
   const live=gs.find(g=>g.status==='live'&&g.id===LS.get('active',null))||gs.find(g=>g.status==='live');
   const agg={};
@@ -494,33 +530,51 @@ function vHome(){
     const k=p.playerName.trim().toLowerCase();const a=agg[k]||(agg[k]={name:p.playerName,n:0,w:0,tot:0});
     a.n++;if((p.netCents||0)>0)a.w++;a.tot+=p.netCents||0;
   }));
-  const rank=Object.values(agg).sort((a,b)=>b.tot-a.tot);const bal=owedMap(gs);
-  const mc=['var(--gold)','var(--gold-l)','var(--gold-d)'];
-  const liveN=live?plist(live).length:0;const cr=myCredits(gs);
-  return `<div class="wrap">${topbar()}${meCard()}
-${canWrite?'':'<div class="box o sm" style="margin-top:12px">Questo account può solo leggere. Per creare o modificare partite chiedi di essere invitato come collaboratore.</div>'}
-<div class="stack" style="margin-top:14px">
-${live?`<div class="card hero stack" style="gap:12px"><div class="row sp"><span class="badge live"><i class="dot"></i>In corso</span><span class="mut sm">${dLong(live.scheduledAt)}</span></div>
-<div><div class="gdate num" style="font-size:24px">${dShort(live.scheduledAt)}</div><div class="mut num">${liveN} giocator${liveN===1?'e':'i'} · Montepremi ${eur(netPot(live))}</div></div>
-<button class="btn" data-act="live" data-gid="${live.id}">▶ Riprendi partita in corso</button><button class="btn ghost" data-act="newgame">${ico('plus',18)} Nuova Partita</button></div>`
-:`<div class="card hero stack" style="gap:12px"><div><h1>Cassa del tavolo</h1><p class="mut" style="margin:6px 0 0">Buy-in, cash out e saldi della serata, sempre aggiornati su tutti i telefoni.</p></div><button class="btn" data-act="newgame">${ico('plus',18)} Nuova Partita</button></div>`}</div>
-${cr.length?`<div class="lbl">Da riscuotere</div><div class="stack">${cr.map(x=>`<button class="card tap gcard" data-act="detail" data-gid="${x.g.id}"><span class="suit">💰</span><div class="grow"><div style="font-weight:600">${esc(x.d.fromPlayerName)} ti deve <span class="gold num">${eur(x.d.remainingAmount)}</span></div><div class="mut xs">Partita del ${dShort(x.g.scheduledAt)}</div></div><span class="mut">${ico('chevr',18)}</span></button>`).join('')}</div>`:''}
-<div class="lbl">Storico partite</div>
-<div class="stack">${gs.length?gs.map(g=>{const n=plist(g).length;return `<button class="card tap gcard" data-act="${g.status==='live'?'live':'detail'}" data-gid="${g.id}"><span class="suit">♠</span><div class="grow"><div class="gdate num">${dShort(g.scheduledAt)}</div><div class="mut sm num">${n} giocator${n===1?'e':'i'} · Montepremi ${eur(netPot(g))}</div></div>${g.status==='live'?'<span class="badge live"><i class="dot"></i>In corso</span>':'<span class="badge grey">Conclusa</span>'}<span class="mut">${ico('chevr',18)}</span></button>`}).join(''):'<div class="card mut sm">Nessuna partita ancora. Crea la prima e tieni la cassa sotto controllo. ♠</div>'}</div>
-<div class="lbl">Classifica del gruppo</div>
-<div class="stack">${rank.length?rank.map((r,i)=>rankRow(r,i,bal)).join(''):'<div class="card mut sm">La classifica apparirà dopo la prima partita conclusa.</div>'}</div>
-</div>`;
+  const rank=Object.values(agg).sort((a,b)=>b.tot-a.tot),bal=owedMap(gs);
+  const mine=S.me?(bal[S.me.name.trim().toLowerCase()]||{give:[],get:[]}):{give:[],get:[]};
+  return {gs,live,rank,bal,mine};
+}
+const inviteFriends=()=>waHref(`Ciao! Registrati su Home Poker per giocare con noi e tenere i conti delle serate:\n${APP_URL}`);
+function tabSerata(D){
+  const {gs,live,mine}=D,cr=myCredits(gs);
+  const get=sum(mine.get.map(x=>x.amt)),give=sum(mine.give.map(x=>x.amt));
+  let h='';
+  if(live){const L=plist(live);
+    h+=`<section class="hero stack" style="gap:18px"><div class="row sp"><span class="badge live"><i class="dot"></i>In corso</span><span class="xs mut">${dLong(live.scheduledAt)}</span></div>
+<div><div class="mut sm">Montepremi</div><div class="bignum">${eur(netPot(live))}</div></div>
+<div class="row sp">${stackAva(L.map(p=>p.playerName))}<span class="mut sm">${L.length} al tavolo</span></div>
+<div class="stack"><button class="btn" data-act="live" data-gid="${live.id}">Riprendi partita in corso</button><button class="btn ghost" data-act="newgame">${ico('plus',18)} Nuova Partita</button></div></section>`;
+  }else{
+    h+=`<section class="hero stack" style="gap:16px"><div><h2 style="font-size:30px;line-height:1.1">Pronti a giocare?</h2><p class="mut" style="margin:10px 0 0">Apri un tavolo, scegli i giocatori registrati e tieni la cassa sempre sotto controllo.</p></div><button class="btn" data-act="newgame">${ico('plus',18)} Nuova Partita</button></section>`;
+  }
+  if(get>0||give>0)h+=`<div class="two"><div class="card tight"><div class="mut xs">Da riscuotere</div><div class="num green" style="font-family:var(--serif);font-weight:800;font-size:26px;letter-spacing:-.02em">${eur(get)}</div></div><div class="card tight"><div class="mut xs">Da dare</div><div class="num ${give>0?'red':'mut'}" style="font-family:var(--serif);font-weight:800;font-size:26px;letter-spacing:-.02em">${eur(give)}</div></div></div>`;
+  if(cr.length)h+=`<div class="sec">Da riscuotere</div>${cr.map(x=>`<button class="card tap gcard" data-act="detail" data-gid="${x.g.id}"><span class="suit">${ico('coins',22)}</span><div class="grow"><div style="font-weight:600">${esc(x.d.fromPlayerName)} ti deve <span class="gold num">${eur(x.d.remainingAmount)}</span></div><div class="mut xs">Partita del ${dShort(x.g.scheduledAt)}</div></div><span class="mut">${ico('chevr',18)}</span></button>`).join('')}`;
+  if(mine.give.length)h+=`<div class="sec">Da dare</div>${mine.give.slice().sort((a,b)=>String(b.at).localeCompare(String(a.at))).map(x=>`<button class="card tap gcard" data-act="detail" data-gid="${x.gid}"><span class="suit" style="background:var(--red-bg);color:#FF6A60">${ico('coins',22)}</span><div class="grow"><div style="font-weight:600">Devi <span class="red num">${eur(x.amt)}</span> a ${esc(x.who)}</div><div class="mut xs">Partita del ${dShort(x.at)}</div></div><span class="mut">${ico('chevr',18)}</span></button>`).join('')}`;
+  h+=`<a class="card tap gcard" style="margin-top:6px;text-decoration:none;color:inherit" href="${inviteFriends()}" target="_blank" rel="noopener"><span class="suit">${ico('share',22)}</span><div class="grow"><div style="font-weight:600">Invita gli amici</div><div class="mut sm">Per sedersi al tavolo devono registrarsi</div></div><span class="mut">${ico('chevr',18)}</span></a>`;
+  return h;
+}
+function tabStorico(D){
+  const {gs}=D;
+  if(!gs.length)return `<div class="card"><b>Ancora nessuna partita</b><p class="mut sm" style="margin:6px 0 0">Quando ne chiudi una, la trovi qui con tutti i saldi.</p></div>`;
+  return gs.map(g=>{const n=plist(g).length,lv=g.status==='live';return `<button class="card tap gcard" data-act="${lv?'live':'detail'}" data-gid="${g.id}"><span class="dtile ${lv?'live':''}"><b>${dDay(g.scheduledAt)}</b><span>${dMon(g.scheduledAt)}</span></span><div class="grow"><div class="num" style="font-weight:700;font-size:17px">${eur(netPot(g))} di montepremi</div><div class="mut sm">${n} giocator${n===1?'e':'i'} · ${esc(g.hostName)}</div></div>${lv?'<span class="badge live"><i class="dot"></i>In corso</span>':`<span class="badge grey">Conclusa</span>`}</button>`}).join('');
+}
+function tabClassifica(D){
+  const {rank,bal}=D;
+  if(!rank.length)return `<div class="card"><b>La classifica parte dalla prima partita</b><p class="mut sm" style="margin:6px 0 0">Dopo la chiusura vedrai chi è in vantaggio e chi deve ancora saldare.</p></div>`;
+  return `<div class="mut sm" style="margin:0 4px">Tocca un giocatore per vedere da chi riscuotere e a chi dare.</div>`+rank.map((r,i)=>rankRow(r,i,bal)).join('');
+}
+function vHome(){
+  const D=homeData(),t=TAB();
+  const T={serata:S.me?'Ciao '+S.me.name.split(/\s+/)[0]:'Serata',storico:'Storico',classifica:'Classifica'};
+  const sub={serata:'',storico:'Tutte le serate',classifica:'Saldo totale del gruppo'};
+  const body=t==='storico'?tabStorico(D):t==='classifica'?tabClassifica(D):tabSerata(D);
+  return `<div class="app">${hd(T[t],sub[t])}${canWrite?'':'<div class="note">Questo account può solo leggere.</div>'}<main class="pg">${body}</main>${tabbar(t)}</div>`;
 }
 
 /* --- Giocatori: scelta multipla (nuova partita e cassa live) --- */
-function targetsFrom(sel,namesStr){
-  const out=[],seen=new Set();
-  Object.keys(sel||{}).filter(id=>sel[id]&&S.players[id]).forEach(id=>{const n=S.players[id].name,k=n.toLowerCase();if(!seen.has(k)){seen.add(k);out.push({id,name:n})}});
-  String(namesStr||'').split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean).forEach(n=>{
-    const k=n.toLowerCase();if(seen.has(k))return;seen.add(k);
-    const ex=Object.entries(S.players).find(([id,p])=>p.name.toLowerCase()===k);
-    out.push({id:ex?ex[0]:null,name:ex?ex[1].name:n});
-  });
+function targetsFrom(sel){
+  const out=[];
+  Object.keys(sel||{}).filter(id=>sel[id]&&S.players[id]&&S.players[id].pinHash).forEach(id=>out.push({id,name:S.players[id].name}));
   return out;
 }
 async function ensurePlayers(ts){
@@ -536,7 +590,7 @@ const rubrica=()=>Object.entries(S.players).map(([id,p])=>({id,name:p.name,reg:!
 
 /* --- Nuova partita --- */
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
-function resetNew(){F.ng={host:LS.get('name','')||'',date:todayStr(),time:'21:00',loc:'',seats:'',buy:2000,custom:false,cv:'',chips:'2000',sel:{},names:'',pstatus:'PENDING'}}
+function resetNew(){F.ng={host:(S.me&&S.me.name)||LS.get('name','')||'',date:todayStr(),time:'21:00',loc:'',seats:'',buy:2000,custom:false,cv:'',chips:'2000',sel:S.me?{[S.me.id]:true}:{},names:'',pstatus:'PENDING'}}
 function ngVals(){
   const n=F.ng;const buy=n.custom?parseEur(n.cv):n.buy;const chips=parseCh(n.chips);
   const seats=n.seats.trim()===''?null:parseCh(n.seats);
@@ -544,28 +598,28 @@ function ngVals(){
   return {buy,chips,seats,ok:!!ok};
 }
 function vNew(){
-  const n=F.ng,v=ngVals(),ts=targetsFrom(n.sel,n.names),rb=rubrica();
+  const n=F.ng,v=ngVals(),ts=targetsFrom(n.sel),rb=rubrica().filter(p=>p.reg);
   return `<div class="wrap">${backBtn('home','Indietro')}
-<h1>Nuova Partita</h1><p class="mut" style="margin:6px 0 0">Imposta i parametri, poi gestisci tutto dalla cassa live.</p>
-<div class="stack" style="margin-top:16px;gap:14px">
+<h1>Nuova partita</h1><p class="mut" style="margin:6px 0 0">Imposta la serata e scegli chi gioca.</p>
+<div class="stack" style="margin-top:18px;gap:14px">
 <div class="card stack" style="gap:14px"><div class="lbl in">Serata</div>
-<label class="field"><span>Chi avvia la partita?</span><input class="in" id="ng-host" data-bind="ng.host" value="${esc(n.host)}" placeholder="Il tuo nome" autocomplete="given-name"><span class="xs">All'avvio verrà generato un PIN a 4 cifre: solo chi lo conosce potrà modificare la partita mentre è in corso.</span></label>
+<label class="field"><span>Chi avvia la partita?</span><input class="in" id="ng-host" data-bind="ng.host" value="${esc(n.host)}" placeholder="Il tuo nome" autocomplete="given-name"><span class="xs">All'avvio ricevi un PIN a 4 cifre: solo chi lo conosce può modificare la partita mentre è in corso.</span></label>
 <div class="two"><label class="field"><span>Data</span><input class="in" id="ng-date" type="date" data-bind="ng.date" data-ev="change" value="${esc(n.date)}"></label>
 <label class="field"><span>Ora</span><input class="in" id="ng-time" type="time" data-bind="ng.time" data-ev="change" value="${esc(n.time)}"></label></div>
-<label class="field"><span>Luogo / Host (opzionale)</span><input class="in" id="ng-loc" data-bind="ng.loc" value="${esc(n.loc)}" placeholder="Casa di Giovanni, via Roma 1"><span class="xs">Se vuoto, nell'invito compare il nome di chi avvia la partita.</span></label>
+<label class="field"><span>Luogo (opzionale)</span><input class="in" id="ng-loc" data-bind="ng.loc" value="${esc(n.loc)}" placeholder="Casa di Giovanni, via Roma 1"></label>
 <label class="field"><span>Posti al tavolo (opzionale)</span><input class="in" id="ng-seats" inputmode="numeric" data-bind="ng.seats" value="${esc(n.seats)}" placeholder="Da 2 a 50"></label></div>
 <div class="card stack" style="gap:14px"><div class="lbl in">Buy-in</div>
-<div class="field"><span>Valore buy-in</span><div class="chips">${[500,1000,2000,5000].map(c=>`<button class="chip ${!n.custom&&n.buy===c?'on':''}" data-act="nbuy" data-v="${c}">${c/100} €</button>`).join('')}<button class="chip ${n.custom?'on':''}" data-act="nbuy" data-v="custom">Altro…</button></div>
+<div class="field"><span>Valore buy-in</span><div class="chips">${[500,1000,2000,5000].map(c=>`<button class="chip t ${!n.custom&&n.buy===c?'on':''}" data-act="nbuy" data-v="${c}">${c/100} €</button>`).join('')}<button class="chip t ${n.custom?'on':''}" data-act="nbuy" data-v="custom">Altro…</button></div>
 ${n.custom?`<input class="in" id="ng-cv" inputmode="decimal" data-bind="ng.cv" value="${esc(n.cv)}" placeholder="Importo in euro, es. 15,50">`:''}</div>
 <label class="field"><span>Fiches per buy-in</span><input class="in" id="ng-chips" inputmode="numeric" data-bind="ng.chips" value="${esc(n.chips)}"><span class="xs num">${v.buy>0&&v.chips>0?`${eur(v.buy)} = ${fch(v.chips)} fiches`:'Inserisci importo e fiches validi'}</span></label></div>
-<div class="card stack" style="gap:14px"><div class="row sp"><div class="lbl in">Giocatori</div><span class="badge ${ts.length?'paid':'grey'}">${ts.length} al tavolo</span></div>
-<p class="mut sm" style="margin:0">Inserisci subito tutti quelli che giocano: ognuno parte con il suo primo buy-in. Puoi aggiungere altri giocatori anche dopo, dalla cassa live.</p>
-${rb.length?`<div class="field"><span>Dalla rubrica</span><div class="chips">${rb.map(p=>`<button class="chip ${n.sel[p.id]?'on':''}" data-act="nsel" data-id="${p.id}">${n.sel[p.id]?ico('check',16):''}${esc(p.name)}</button>`).join('')}</div></div>`:''}
-<label class="field"><span>${rb.length?'Nuovi nomi':'Nomi dei giocatori'} (separati da virgola o a capo)</span><textarea class="in" id="ng-names" data-bind="ng.names" placeholder="Marco, Luca, Anna">${esc(n.names)}</textarea></label>
-${ts.length?`<div class="chips">${ts.map(t=>`<span class="row" style="gap:8px;background:var(--card2);border:1px solid var(--line2);border-radius:999px;padding:4px 12px 4px 4px">${ava(t.name,'s')}<span class="sm">${esc(t.name)}</span></span>`).join('')}</div>
-<div class="field"><span>Come pagano il primo buy-in? (${eur(v.buy>0?v.buy:0)} a testa)</span><div class="pay2"><button class="big ${n.pstatus==='PAID'?'sel-g':''}" data-act="nst" data-s="PAID">Pagato subito</button><button class="big ${n.pstatus==='PENDING'?'sel-r':''}" data-act="nst" data-s="PENDING">Da pagare</button></div></div>
+<div class="card stack" style="gap:14px"><div class="row sp"><div class="lbl in">Giocatori</div><span class="badge ${ts.length>1?'paid':'grey'}">${ts.length} al tavolo</span></div>
+<p class="mut sm" style="margin:0">Possono giocare solo i giocatori registrati: ognuno parte con il suo primo buy-in.</p>
+${rb.length?`<div class="stack" style="gap:8px">${rb.map(p=>`<button class="pick ${n.sel[p.id]?'on':''}" data-act="nsel" data-id="${p.id}">${ava(p.name,'s')}<span style="font-weight:600">${esc(p.name)}${S.me&&p.id===S.me.id?' <span class="mut">(tu)</span>':''}</span><span class="tick">${ico('check',16)}</span></button>`).join('')}</div>`:''}
+${rb.length<2?`<div class="box o sm">Per giocare servono almeno 2 giocatori registrati. Ognuno si registra dal proprio telefono con nome utente e PIN.</div>`:''}
+<a class="btn-s" href="${inviteFriends()}" target="_blank" rel="noopener">${ico('share',18)} Invita gli amici a registrarsi</a>
+${ts.length?`<div class="hr"></div><div class="field"><span>Come pagano il primo buy-in? (${eur(v.buy>0?v.buy:0)} a testa)</span><div class="pay2"><button class="big ${n.pstatus==='PAID'?'sel-g':''}" data-act="nst" data-s="PAID">Pagato subito</button><button class="big ${n.pstatus==='PENDING'?'sel-r':''}" data-act="nst" data-s="PENDING">Da pagare</button></div></div>
 <div class="mut sm num">${ts.length} giocator${ts.length===1?'e':'i'} · ${v.buy>0?eur(v.buy*ts.length):'—'} di buy-in iniziali</div>`:''}</div>
-<button class="btn" data-act="creategame" ${v.ok&&canWrite?'':'disabled'}>Crea partita e apri la cassa</button></div></div>`;
+<button class="btn" data-act="creategame" ${v.ok&&ts.length>=2&&canWrite?'':'disabled'}>Crea partita e apri la cassa</button></div></div>`;
 }
 async function createGame(){
   const v=ngVals();if(!v.ok||!db)return;
@@ -594,7 +648,7 @@ const waHref=t=>'https://wa.me/?text='+encodeURIComponent(t);
 function resList(g,A){
   const L=resSorted();
   if(!L.length)return '<div class="mut sm">Nessuna prenotazione ancora.</div>';
-  return L.map((r,i)=>{const pr=i+1,wait=g.maxSeats&&pr>g.maxSeats;return `<div class="row" style="min-height:48px;border-top:${i?'1px solid var(--line2)':'0'}"><b class="gold num" style="width:22px;text-align:center">${pr}</b>${ava(r.playerName,'s')}<div class="grow">${esc(r.playerName)} ${wait?'<span class="badge grey">In attesa</span>':''}</div><span class="mut xs num">Ore ${tHM(r.reservedAt)}</span>${A?`<button class="x" data-act="delres" data-id="${r.id}" aria-label="Rimuovi prenotazione">${ico('close',16)}</button>`:''}</div>`}).join('');
+  return L.map((r,i)=>{const pr=i+1,wait=g.maxSeats&&pr>g.maxSeats;return `<div class="row" style="min-height:52px;border-top:${i?'1px solid var(--line2)':'0'}"><b class="gold num" style="width:22px;text-align:center">${pr}</b>${ava(r.playerName,'s')}<div class="grow">${esc(r.playerName)} ${wait?'<span class="badge grey">In attesa</span>':''}</div><span class="mut xs num">${tHM(r.reservedAt)}</span>${A?`<button class="x" data-act="delres" data-id="${r.id}" aria-label="Rimuovi prenotazione">${ico('close',16)}</button>`:''}</div>`}).join('');
 }
 async function renumber(list,skip){
   for(let i=0;i<list.length;i++){const x=list[i];if(x.id===skip)continue;if(x.priorityOrder!==i+1){try{await db.doc(`games/${V.gid||''}/reservations/${x.id}`).update({priorityOrder:i+1})}catch(e){}}}
@@ -629,36 +683,35 @@ async function unlockPin(gid){
 function closable(g){const L=plist(g);return L.length>=2&&L.every(p=>p.buyIns.length>=1)}
 function vLive(){
   const gid=V.gid,g=S.games[gid];if(!g)return notFound();
-  if(g.status==='closed')return `<div class="wrap">${topbar()}<h1 style="margin-top:28px">Partita già conclusa</h1><p class="mut">Questa serata è chiusa: trovi tutti i dati nel resoconto.</p><button class="btn" data-act="detail" data-gid="${gid}">Vai al resoconto</button></div>`;
+  if(g.status==='closed')return `<div class="wrap">${topbar()}<h1 style="margin-top:20px">Partita già conclusa</h1><p class="mut">Questa serata è chiusa: trovi tutti i dati nel resoconto.</p><button class="btn" data-act="detail" data-gid="${gid}">Vai al resoconto</button></div>`;
   const A=isAdmin(gid),L=plist(g),total=grossOf(g),paid=sum(L.map(p=>sum(p.buyIns.filter(b=>b.paymentStatus==='PAID').map(b=>b.amountCents)))),pend=sum(L.map(pendOf)),safe=sum(L.map(safeOf));
   const inPlay=Math.max(0,toChips(total-safe,g));
   const pin=(LS.get('pins',{}))[gid];
   const R=resSorted();
   return `<div class="wrap">${backBtn('home','Home')}
-<div class="row sp" style="align-items:flex-start"><div class="grow"><h1>Cassa Live</h1><div class="mut sm" style="margin-top:2px">${dLong(g.scheduledAt)}</div></div><span class="badge ${A?'paid':'grey'}" style="margin-top:6px">${A?'🔓 Admin':'👁 Lettura'}</span></div>
-<div class="stack" style="margin-top:14px">
-${A?`<button class="card tap tight row sp" data-act="showpin" style="min-height:56px"><span class="row" style="gap:8px"><span class="gold">${ico('lock',18)}</span>🔑 PIN Admin della partita</span><span class="row" style="gap:10px"><b class="num gold" style="letter-spacing:.24em;font-size:19px">${F.pinShow?esc(pin||'----'):'••••'}</b><span class="mut">${ico('eye',20)}</span></span></button>`:pinBox(gid,'Puoi guardare la cassa in tempo reale, ma per aggiungere giocatori, registrare re-buy, cash out o chiudere la partita serve il PIN Admin a 4 cifre.')}
-<div class="card cassa hero stack" style="gap:12px">
-<div class="row sp" style="align-items:flex-end"><div><div class="lbl in" style="margin-bottom:2px">Cassa</div><div class="big-n num">${eur(total)}</div><div class="mut xs">buy-in raccolti da ${L.length} giocator${L.length===1?'e':'i'}</div></div></div>
+<div class="row sp" style="align-items:flex-start"><div class="grow"><h1>Cassa live</h1><div class="mut sm" style="margin-top:2px">${dLong(g.scheduledAt)}</div></div><span class="badge ${A?'paid':'grey'}" style="margin-top:6px">${A?'Admin':'Sola lettura'}</span></div>
+<div class="stack" style="margin-top:16px">
+<div class="hero cassa stack" style="gap:14px">
+<div><div class="mut sm">Cassa</div><div class="bignum num">${eur(total)}</div><div class="mut sm" style="margin-top:6px">buy-in raccolti da ${L.length} giocator${L.length===1?'e':'i'}</div></div>
 ${total>0?`<div class="meter" role="img" aria-label="Incassato ${eur(paid)}, da pagare ${eur(pend)}"><i class="m-g" style="flex:${paid} 1 0"></i><i class="m-r" style="flex:${pend} 1 0"></i></div>`:''}
-<div class="kpis"><div class="kpi"><div class="k">INCASSATO</div><div class="v num green">${eur(paid)}</div></div>
-<div class="kpi"><div class="k">DA PAGARE</div><div class="v num" style="color:${pend>0?'var(--red)':'var(--mut)'}">${eur(pend)}</div></div>
-<div class="kpi"><div class="k">FICHES IN GIOCO</div><div class="v num gold">${fch(inPlay)}</div>${safe>0?`<div class="s num">💰 ${eur(safe)} al sicuro</div>`:''}</div></div></div>
-<div class="card stack" style="gap:12px"><div class="lbl in">Serata</div>
-<div class="ir"><span class="ic">📅</span><div>${dLong(g.scheduledAt)} · ore ${tHM(g.scheduledAt)}</div></div>
-<div class="ir"><span class="ic">📍</span><div>${esc(g.location||g.hostName)}</div></div>
-<div><div class="mut sm num" style="margin-bottom:6px">${seatsText(g,R.length)}</div>${g.maxSeats?`<div class="meter"><i class="m-o" style="flex:${Math.min(R.length,g.maxSeats)} 1 0"></i><i style="flex:${Math.max(g.maxSeats-R.length,0)} 1 0"></i></div>`:''}</div>
+<div class="kpis" style="margin-top:0"><div class="kpi"><div class="k">Incassato</div><div class="v num green">${eur(paid)}</div></div>
+<div class="kpi"><div class="k">Da pagare</div><div class="v num" style="color:${pend>0?'#FF6A60':'var(--mut)'}">${eur(pend)}</div></div>
+<div class="kpi"><div class="k">Fiches in gioco</div><div class="v num gold">${fch(inPlay)}</div>${safe>0?`<div class="s num">${eur(safe)} al sicuro</div>`:''}</div></div></div>
+${A?`<button class="card tap row sp" data-act="showpin" style="min-height:62px;display:flex"><span class="row" style="gap:12px"><span class="gold">${ico('lock',20)}</span><b>PIN Admin della partita</b></span><span class="row" style="gap:10px"><b class="num" style="letter-spacing:.24em;font-size:20px;font-family:var(--serif)">${F.pinShow?esc(pin||'----'):'••••'}</b><span class="mut">${ico('eye',20)}</span></span></button>`:pinBox(gid,'Puoi guardare la cassa in tempo reale. Per aggiungere giocatori, registrare re-buy, cash out o chiudere la partita serve il PIN Admin a 4 cifre.')}
+<div class="card stack" style="gap:14px"><div class="lbl in">Serata</div>
+<div class="ir"><span class="ic">${ico('cal',20)}</span><div>${dLong(g.scheduledAt)} · ore ${tHM(g.scheduledAt)}</div></div>
+<div class="ir"><span class="ic">${ico('pin',20)}</span><div>${esc(g.location||g.hostName)}</div></div>
+<div><div class="mut sm num" style="margin-bottom:8px">${seatsText(g,R.length)}</div>${g.maxSeats?`<div class="meter"><i class="m-o" style="flex:${Math.min(R.length,g.maxSeats)} 1 0"></i><i style="flex:${Math.max(g.maxSeats-R.length,0)} 1 0"></i></div>`:''}</div>
 <a class="btn wa" href="${waHref(inviteText(gid))}" target="_blank" rel="noopener">Invita su WhatsApp</a>
 <button class="row sp" data-act="resopen" style="min-height:48px"><b>Prenotazioni (${R.length})</b><span class="gold">${ico(F.resOpen?'chevu':'chev',20)}</span></button>
-${F.resOpen?`<div class="stack" style="gap:0">${resList(g,A)}</div>
-<form id="f-res" class="row" style="margin-top:6px"><input class="in" id="rname" data-bind="rname" value="${esc(F.rname)}" placeholder="Il tuo nome" autocomplete="given-name"><button class="btn-s go" type="submit" style="min-height:52px">Prenota</button></form>`:''}</div>
+${F.resOpen?`<div class="stack" style="gap:0">${resList(g,A)}</div>`:''}</div>
 </div>
-<div class="lbl">Al tavolo · ${L.length}</div>
+<div class="sec">Al tavolo <small>${L.length}</small></div>
 <div class="stack">${L.length?L.map(p=>livePlayer(g,p,A)).join(''):'<div class="card mut sm">Nessun giocatore al tavolo. Aggiungi i giocatori e registra il loro buy-in.</div>'}
 ${A?`<button class="btn dash" data-act="addpl">${ico('plus',18)} Aggiungi giocatori</button>`:''}</div></div>
-<div class="bar"><div class="bar-in">${A?`<button class="btn ghost" style="font-size:16px" data-act="startclose" ${closable(g)&&canWrite?'':'disabled'}>Chiudi partita · Conta le fiches</button>
-${closable(g)?'':'<div class="mut xs" style="padding-top:4px">Servono almeno 2 giocatori per chiudere la partita.</div>'}
-<button class="link" data-act="delgame" style="min-height:44px">${armed.delgame?'Confermi? Tocca di nuovo':'Elimina partita'}</button>`:'<div class="mut sm" style="text-align:center;padding:6px 0">🔒 Modalità Lettura: inserisci il PIN Admin per chiudere o modificare questa partita.</div>'}</div></div>`;
+<div class="bar"><div class="bar-in">${A?`<button class="btn" data-act="startclose" ${closable(g)&&canWrite?'':'disabled'}>Chiudi partita · Conta le fiches</button>
+${closable(g)?'':'<div class="mut xs" style="padding-top:6px">Servono almeno 2 giocatori per chiudere la partita.</div>'}
+<button class="link" data-act="delgame" style="min-height:44px">${armed.delgame?'Confermi? Tocca di nuovo':'Elimina partita'}</button>`:'<div class="mut sm" style="text-align:center;padding:6px 0">Sola lettura: inserisci il PIN Admin per chiudere o modificare questa partita.</div>'}</div></div>`;
 }
 function livePlayer(g,p,A){
   const i=inv(p),s=safeOf(p),pe=pendOf(p),stack=Math.max(0,toChips(i-s,g)),open=!!F.open[p.playerId];
@@ -760,13 +813,13 @@ function vDetail(){
   return `<div class="wrap">${backBtn('home','Home')}
 <div class="row sp" style="align-items:flex-start"><div class="grow"><h1>Partita del ${dShort(g.scheduledAt)}</h1><div class="mut sm" style="margin-top:4px">${dLong(g.scheduledAt)} · avviata da ${esc(g.hostName)}</div></div><span style="margin-top:6px">${closed?'<span class="badge grey">Conclusa</span>':'<span class="badge live"><i class="dot"></i>In corso</span>'}</span></div>
 ${closed?'':`<button class="btn" style="margin-top:14px" data-act="live" data-gid="${gid}">▶ Torna alla cassa live</button>`}
-<div class="kpis two-c" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-top:16px">${tile('GIOCATORI',L.length)}${tile('MONTEPREMI',eur(netPot(g)),'gold')}${tile('BUY-IN',eur(grossOf(g)))}${(g.dealerChips||0)>0?tile('MANCE DEALER',eur(g.dealerChips)):''}${tile('CASSA',cassa,hole===0?'green':'gold')}</div>
+<div class="kpis two-c" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-top:16px">${tile('Giocatori',L.length)}${tile('Montepremi',eur(netPot(g)),'gold')}${tile('Buy-in',eur(grossOf(g)))}${(g.dealerChips||0)>0?tile('Mance dealer',eur(g.dealerChips)):''}${tile('Cassa',cassa,hole===0?'green':'gold')}</div>
 <div class="lbl">Risultati</div>
 <div class="stack">${L.map(p=>`<div class="card"><div class="row" style="align-items:flex-start">${ava(p.playerName)}<div class="grow"><div class="pl-name">${esc(p.playerName)}</div>
 <div class="mut sm num">${p.buyIns.length} ingress${p.buyIns.length===1?'o':'i'} · ${eur(inv(p))} investiti${closed?` · incassate ${eur(p.cashOutCents||0)}`:''}</div>
 ${safeOf(p)>0?`<div class="gold sm num">💰 ${eur(safeOf(p))} messi al sicuro durante la partita</div>`:''}</div>
 ${closed?`<b class="num ${(p.netCents||0)>=0?'green':'red'}" style="font-family:var(--serif);font-size:21px">${sgn(p.netCents||0)}</b>`:''}</div>
-<div class="chips" style="margin-top:10px;gap:6px">${p.buyIns.map(b=>`<span class="badge ${b.paymentStatus==='PAID'?'paid':'pend'} num" style="text-transform:none;letter-spacing:0">${b.paymentStatus==='PAID'?'PAGATO':'DA PAGARE'} ${eur(b.amountCents)} · Ore ${tHM(b.timestamp)}</span>`).join('')}</div>
+<div class="chips" style="margin-top:10px;gap:6px">${p.buyIns.map(b=>`<span class="badge ${b.paymentStatus==='PAID'?'paid':'pend'} num">${b.paymentStatus==='PAID'?'Pagato':'Da pagare'} ${eur(b.amountCents)} · Ore ${tHM(b.timestamp)}</span>`).join('')}</div>
 ${pendOf(p)>0?`<div class="red sm num" style="margin-top:8px">⏳ deve ancora saldare ${eur(pendOf(p))} di buy-in</div>`:''}</div>`).join('')}</div>
 ${closed?`<div class="lbl">Saldi da fare</div><div class="stack">
 ${!A&&(g.debts||[]).some(d=>!debtPerm(gid,d).needPin)?pinBox(gid,'I saldi verso il Dealer li registra chi ha avviato la partita: serve il suo PIN Admin a 4 cifre.'):''}
@@ -779,7 +832,7 @@ ${A?`<div style="text-align:center;margin-top:18px"><button class="link" data-ac
 }
 function debtCard(d,perm){
   const A=perm.can;const done=d.remainingAmount===0;
-  return `<div class="card stack" style="gap:10px"><div class="row sp" style="align-items:flex-start"><div class="grow num" style="font-size:16px"><b>${esc(d.fromPlayerName)}</b> dà <b class="gold">${eur(d.totalAmount)}</b> a <b>${esc(d.toPlayerName)}</b></div>${done?'<span class="badge paid">PAGATO</span>':'<span class="badge pend">DA PAGARE</span>'}</div>
+  return `<div class="card stack" style="gap:10px"><div class="row sp" style="align-items:flex-start"><div class="grow num" style="font-size:16px"><b>${esc(d.fromPlayerName)}</b> dà <b class="gold">${eur(d.totalAmount)}</b> a <b>${esc(d.toPlayerName)}</b></div>${done?'<span class="badge paid">Pagato</span>':'<span class="badge pend">Da pagare</span>'}</div>
 ${d.paidAmount>0?`<div class="meter"><i class="m-g" style="flex:${d.paidAmount} 1 0"></i><i class="m-r" style="flex:${d.remainingAmount} 1 0"></i></div><div class="sm num">Pagati <b class="green">${eur(d.paidAmount)}</b> · restano <b class="red">${eur(d.remainingAmount)}</b></div>`:''}
 ${d.transactions.map(t=>{const inner=`<div class="row sp"><b class="num">${eur(t.amount)}</b>${stBadge(t.status)}</div><div class="mut xs num">Ultima modifica: ${dShort(t.lastUpdated)} alle ${tHM(t.lastUpdated)}</div>`;const cls='tr '+(t.status==='PAID'?'paid':'pend');return A?`<button class="${cls}" data-act="subtap" data-did="${d.debtId}" data-sid="${t.subId}">${inner}</button>`:`<div class="${cls}">${inner}</div>`}).join('')}${!A&&!done?`<div class="mut xs">🔒 Solo ${esc(perm.who)} può registrare i pagamenti${perm.needPin?' con il suo PIN':''}.</div>`:''}</div>`;
 }
@@ -796,42 +849,48 @@ async function deleteGame(gid){
 /* --- Prenotazione (da invito) --- */
 function vBook(){
   const gid=V.gid,g=S.games[gid];if(!g)return notFound();
-  const R=resSorted(),closed=g.status==='closed',name=F.rname!==''?F.rname:(LS.get('name','')||'');
+  const R=resSorted(),closed=g.status==='closed';
+  const mine=R.find(r=>(r.playerId&&r.playerId===S.me.id)||String(r.playerName).toLowerCase()===S.me.name.toLowerCase());
+  const rank=mine?R.indexOf(mine)+1:0;
   return `<div class="wrap">${topbar()}
-<div class="card hero stack" style="margin-top:12px;gap:14px"><div><h1>Poker Night ♠️♥️</h1><p class="mut" style="margin:6px 0 0">Prenota il tuo posto al tavolo</p></div>
-<div class="ir"><span class="ic">📅</span><div>${dLong(g.scheduledAt)} · ore ${tHM(g.scheduledAt)}</div></div><div class="ir"><span class="ic">📍</span><div>${esc(g.location||g.hostName)}</div></div>
-<div><div class="mut sm num" style="margin-bottom:6px">Organizza ${esc(g.hostName)} · ${seatsText(g,R.length)}</div>${g.maxSeats?`<div class="meter"><i class="m-o" style="flex:${Math.min(R.length,g.maxSeats)} 1 0"></i><i style="flex:${Math.max(g.maxSeats-R.length,0)} 1 0"></i></div>`:''}</div></div>
+<div class="hero stack" style="margin-top:8px;gap:16px"><div><h1>Poker night</h1><p class="mut" style="margin:6px 0 0">Prenota il tuo posto al tavolo</p></div>
+<div class="ir"><span class="ic">${ico('cal',20)}</span><div>${dLong(g.scheduledAt)} · ore ${tHM(g.scheduledAt)}</div></div><div class="ir"><span class="ic">${ico('pin',20)}</span><div>${esc(g.location||g.hostName)}</div></div>
+<div><div class="mut sm num" style="margin-bottom:8px">Organizza ${esc(g.hostName)} · ${seatsText(g,R.length)}</div>${g.maxSeats?`<div class="meter"><i class="m-o" style="flex:${Math.min(R.length,g.maxSeats)} 1 0"></i><i style="flex:${Math.max(g.maxSeats-R.length,0)} 1 0"></i></div>`:''}</div></div>
 <div class="stack" style="margin-top:14px">
-${closed?'<div class="box o">Questa serata è conclusa: le prenotazioni sono chiuse.</div>':`<div class="card"><div class="lbl in" style="margin-bottom:10px">Prenotati</div><form id="f-res" class="stack"><input class="in" id="rname" data-bind="rname" value="${esc(name)}" placeholder="Il tuo nome" autocomplete="given-name"><button class="btn" type="submit" ${canWrite?'':'disabled'}>Prenota</button></form></div>`}
+${closed?'<div class="box o">Questa serata è conclusa: le prenotazioni sono chiuse.</div>':mine?`<div class="card stack"><div class="row">${ava(S.me.name)}<div class="grow"><b>Sei prenotato, ${esc(S.me.name)}</b><div class="mut sm">${g.maxSeats&&rank>g.maxSeats?`Sei n° ${rank}: in lista d'attesa`:`Il tuo posto è il n° ${rank}`}</div></div></div><button class="btn ghost" data-act="unbook" data-id="${mine.id}">Annulla prenotazione</button></div>`:`<button class="btn" data-act="bookme" ${canWrite?'':'disabled'}>Prenota il mio posto</button>`}
 <div class="card stack" style="gap:6px"><div class="lbl in">Iscritti · ${R.length}</div>${resList(g,false)}</div>
 <a class="btn wa" href="${waHref(inviteText(gid))}" target="_blank" rel="noopener">Invita su WhatsApp</a>
-<button class="btn ghost" data-act="live" data-gid="${gid}">Apri la cassa</button></div></div>`;
+<button class="btn ghost" data-act="live" data-gid="${gid}">Apri la cassa</button>
+<button class="link" data-act="home" style="align-self:center">Vai alla home</button></div></div>`;
 }
 
 /* ===== Sheets ===== */
 function buyForm(g,btnLabel,count){
   const b=F.bi,amts=[...new Set([g.buyInCents,500,1000,2000])];
   const amt=b.custom?parseEur(b.cv):b.amt;
-  return `<div class="field"><span>IMPORTO${count>1?' (a testa)':''}</span><div class="chips">${amts.map(c=>`<button class="chip ${!b.custom&&b.amt===c?'on':''}" data-act="bamt" data-v="${c}">${c/100} €</button>`).join('')}<button class="chip ${b.custom?'on':''}" data-act="bamt" data-v="custom">Altro…</button></div>
+  return `<div class="field"><span>Importo${count>1?' (a testa)':''}</span><div class="chips">${amts.map(c=>`<button class="chip ${!b.custom&&b.amt===c?'on':''}" data-act="bamt" data-v="${c}">${c/100} €</button>`).join('')}<button class="chip ${b.custom?'on':''}" data-act="bamt" data-v="custom">Altro…</button></div>
 ${b.custom?`<input class="in" id="bi-cv" inputmode="decimal" data-bind="bi.cv" value="${esc(b.cv)}" placeholder="Importo in euro">`:''}</div>
-<div class="field"><span>COME PAGA?</span><div class="pay2"><button class="big ${b.status==='PAID'?'sel-g':''}" data-act="bst" data-s="PAID">Pagato subito</button><button class="big ${b.status==='PENDING'?'sel-r':''}" data-act="bst" data-s="PENDING">Da pagare</button></div></div>
+<div class="field"><span>Come paga?</span><div class="pay2"><button class="big ${b.status==='PAID'?'sel-g':''}" data-act="bst" data-s="PAID">Pagato subito</button><button class="big ${b.status==='PENDING'?'sel-r':''}" data-act="bst" data-s="PENDING">Da pagare</button></div></div>
 <button class="btn" data-act="bsave" ${amt>0?'':'disabled'}>${btnLabel} · ${amt>0?eur(amt*(count||1)):'—'}</button>`;
 }
 function freshBi(g){F.bi={amt:g.buyInCents,custom:false,cv:'',status:'PENDING'}}
 function sheetHtml(){
   const g=V.gid?S.games[V.gid]:null,s=SH;let title='',body='';
   if(s.type==='add'&&g){
-    const rb=rubrica(),at=new Set(plist(g).map(p=>p.playerId)),ts=targetsFrom(F.ap.sel,F.ap.names);
+    const rb=rubrica().filter(p=>p.reg),at=new Set(plist(g).map(p=>p.playerId)),ts=targetsFrom(F.ap.sel);
     const atNames=new Set(plist(g).map(p=>p.playerName.toLowerCase()));
     const isAt=t=>(t.id&&at.has(t.id))||atNames.has(t.name.toLowerCase());
     const nre=ts.filter(isAt).length;
     title='Aggiungi giocatori';
-    body=`<p class="mut sm" style="margin:0">Scegli dalla rubrica o scrivi più nomi insieme, poi registra il buy-in: vale per tutti i selezionati.</p>
-<div class="field"><span>RUBRICA</span><div class="chips">${rb.length?rb.map(p=>`<span class="chipx"><button class="chip ${F.ap.sel[p.id]?'on':''}" data-act="selpl" data-id="${p.id}">${F.ap.sel[p.id]?ico('check',16):''}${esc(p.name)}${at.has(p.id)?' <span class="xs">(già al tavolo → re-buy)</span>':''}</button>${p.reg?'':`<button class="trash" data-act="delpl" data-id="${p.id}" aria-label="Elimina dalla rubrica">${ico('trash',18)}</button>`}</span>`).join(''):'<span class="mut sm">Nessun nome salvato.</span>'}</div></div>
-<label class="field"><span>NUOVI NOMI (separati da virgola o a capo)</span><textarea class="in" id="ap-names" data-bind="ap.names" placeholder="Marco, Luca, Anna">${esc(F.ap.names||'')}</textarea></label>
+    body=`<p class="mut sm" style="margin:0">Possono sedersi solo i giocatori registrati. Scegli chi entra, poi registra il buy-in: vale per tutti i selezionati.</p>
+${rb.length?`<div class="stack" style="gap:8px">${rb.map(p=>`<button class="pick ${F.ap.sel[p.id]?'on':''}" data-act="selpl" data-id="${p.id}">${ava(p.name,'s')}<span class="grow" style="font-weight:600">${esc(p.name)}${at.has(p.id)?'<span class="mut xs" style="display:block;font-weight:500">Già al tavolo · re-buy</span>':''}</span><span class="tick">${ico('check',16)}</span></button>`).join('')}</div>`:'<div class="mut sm">Nessun giocatore registrato.</div>'}
+<a class="btn-s" href="${inviteFriends()}" target="_blank" rel="noopener">${ico('share',18)} Invita gli amici a registrarsi</a>
 ${ts.length?`<div class="hr"></div><div class="row sp"><b>${ts.length} giocator${ts.length===1?'e':'i'} selezionat${ts.length===1?'o':'i'}</b>${nre?`<span class="gold xs">${nre} già al tavolo → re-buy</span>`:''}</div>
-<div class="chips">${ts.map(t=>`<span class="row" style="gap:8px;background:var(--card2);border:1px solid var(--line2);border-radius:999px;padding:4px 12px 4px 4px">${ava(t.name,'s')}<span class="sm">${esc(t.name)}</span></span>`).join('')}</div>
 ${buyForm(g,nre===ts.length?'Registra re-buy':'Siedi al tavolo',ts.length)}`:''}`;
+  }else if(s.type==='me'&&S.me){
+    title='Il mio profilo';
+    body=`<div class="row" style="gap:14px">${ava(S.me.name,'l')}<div class="grow"><div class="pl-name">${esc(S.me.name)}</div><div class="mut sm">Giocatore registrato</div></div></div>
+<button class="btn ghost" data-act="chpin">Cambia PIN</button><button class="btn redb" data-act="logout">Esci</button>`;
   }else if(s.type==='rebuy'&&g&&g.players[s.pid]){
     title='Re-buy · '+g.players[s.pid].playerName;
     body=`<p class="mut sm" style="margin:0">Registra importo e stato del pagamento.</p>${buyForm(g,'Registra re-buy',1)}`;
@@ -841,8 +900,8 @@ ${buyForm(g,nre===ts.length?'Registra re-buy':'Siedi al tavolo',ts.length)}`:''}
     const activeE=toEuro(stack,g);
     title='Cash Out · '+p.playerName;
     body=`<p class="mut sm" style="margin:0">Le fiches ritirate vengono accreditate nel saldo assicurato: non sono più a rischio nelle giocate successive.</p>
-<div class="two"><div class="card tight"><div class="xs mut">STACK ATTIVO</div><b class="num">${fch(stack)} fiches</b><div class="xs mut num">≈ ${eur(activeE)}</div></div><div class="card tight" style="border-color:var(--gold)"><div class="xs gold">GIÀ AL SICURO</div><b class="num gold">${eur(safe)}</b><div class="xs mut">non più a rischio</div></div></div>
-<div class="field"><span>QUANTO RITIRI?</span><div class="chips"><button class="chip" data-act="copct" data-p="25">25%</button><button class="chip" data-act="copct" data-p="50">50%</button><button class="chip" data-act="copct" data-p="100">Tutto</button></div></div>
+<div class="two"><div class="card tight"><div class="xs mut">Stack attivo</div><b class="num">${fch(stack)} fiches</b><div class="xs mut num">≈ ${eur(activeE)}</div></div><div class="card tight" style="border-color:var(--gold)"><div class="xs gold">Già al sicuro</div><b class="num gold">${eur(safe)}</b><div class="xs mut">non più a rischio</div></div></div>
+<div class="field"><span>Quanto ritiri?</span><div class="chips"><button class="chip" data-act="copct" data-p="25">25%</button><button class="chip" data-act="copct" data-p="50">50%</button><button class="chip" data-act="copct" data-p="100">Tutto</button></div></div>
 <div class="row"><input class="in big-n" id="co-v" inputmode="decimal" data-bind="co.v" value="${esc(co.v)}" placeholder="${co.mode==='chips'?'Fiches':'Euro'}"><div class="seg"><button class="${co.mode==='chips'?'on':''}" data-act="comode" data-m="chips">Fiches</button><button class="${co.mode==='eur'?'on':''}" data-act="comode" data-m="eur">€</button></div></div>
 <div class="sm num">${cents>0?`Verranno messi al sicuro <b class="gold">${eur(cents)}</b>${cents>activeE?' <span class="mut">(più dello stack iniziale: include eventuali vincite)</span>':''}`:'Inserisci quanto ritiri'}</div>
 <button class="btn" data-act="cosave" ${cents>0?'':'disabled'}>Incassa e metti al sicuro · ${cents>0?eur(cents):'—'}</button>`;
@@ -959,7 +1018,7 @@ const H={
   clmode(d){F.cl.vals[d.pid].mode=d.m;F.cl.vals[d.pid].v='';render()},
   lost(d){F.cl.vals[d.pid].v='0';render()},
   clnext(){F.cl.step=Math.min(3,F.cl.step+1);ENTER=true;render();window.scrollTo(0,0)},
-  clback(){F.cl.step=Math.max(1,F.cl.step-1);ENTER=true;render();window.scrollTo(0,0)},
+  clback(){F.cl.step=Math.max(1,F.cl.step-1);ENTER='back';render();window.scrollTo(0,0)},
   hole(d){F.cl.holeMode=d.m;render()},
   clsave(){saveClose()},
   delgame(){if(!arm('delgame'))return;deleteGame(V.gid)},
@@ -971,6 +1030,10 @@ const H={
   async restore(){const s=SH;if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dRestore(g.debts.find(x=>x.debtId===s.did),s.sid,new Date().toISOString()));if(ok){SH=null;render();toast('Ripristinato a Da pagare','ok')}},
   copyjson(d){copyText(JSON.stringify(jsonFor(d.gid),null,2))},
   copytxt(d){copyText(waText(d.gid))},
+  tab(d){LS.set('tab',d.t);ENTER='fade';render();window.scrollTo(0,0)},
+  meopen(){openSheet({type:'me'})},
+  bookme(){reserve(V.gid,S.me.name)},
+  unbook(d){removeRes(d.id)},
   rk(d){F.open['rk:'+d.k]=!F.open['rk:'+d.k];render()},
   authmode(d){F.auth.mode=d.m;F.auth.err='';F.auth.pin='';F.auth.pin2='';render()},
   authpick(d){F.auth.name=d.n;render()},
@@ -1009,7 +1072,7 @@ function render(){
   try{ss=ae.selectionStart;se=ae.selectionEnd}catch(e){}
   const sb=document.querySelector('.sheet-body'),st=sb?sb.scrollTop:0;
   const app=$('#app');app.innerHTML=view();
-  if(ENTER){ENTER=false;if(app.firstElementChild)app.firstElementChild.classList.add('enter')}
+  if(ENTER){const k=ENTER===true?'push':ENTER;ENTER=false;if(app.firstElementChild)app.firstElementChild.classList.add('enter-'+k)}
   $('#sheet').innerHTML=(SH&&db&&unlocked())?sheetHtml():'';
   if(SH){const n=document.querySelector('.sheet-body');if(n)n.scrollTop=st;SH.anim=false}
   if(fid){const el=document.getElementById(fid);if(el){el.focus();try{if(ss!=null)el.setSelectionRange(ss,se)}catch(e){}}}
