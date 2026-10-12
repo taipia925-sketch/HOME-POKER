@@ -1575,7 +1575,7 @@ async function doTable(){
 
 /* ===== Account unico: prima chi sei, poi in quale tavolo entri ===== */
 Object.assign(S,{acct:null,acctReady:false,locked:false,linking:false});
-Object.assign(F,{ac:{mode:null,name:'',pin:'',pin2:'',err:'',busy:false},ul:{pin:'',err:'',show:false},cl:{pin:'',name:'',err:'',busy:false,other:false},tbOpen:false});
+Object.assign(F,{ac:{mode:null,name:'',pin:'',pin2:'',err:'',busy:false},ul:{pin:'',err:'',show:false},clm:{pin:'',name:'',err:'',busy:false,other:false,pick:null},tbOpen:false});
 const acctBio=()=>{const b=LS.get('bio',null);return b&&S.acct&&b.acct===S.acct.id?b:null};
 async function refreshMe(){const r=await BASE.rpc('hpl_me');S.acct=r&&r.id?r:null;S.acctReady=true;return S.acct}
 const firstName=n=>String(n||'').split(/\s+/)[0];
@@ -1604,6 +1604,7 @@ async function syncMe(){
   S.me=null;if(S.linking)return;
   const lk=S.acct.name.toLowerCase(),ex=Object.entries(S.players).find(([id,p])=>String(p.name).toLowerCase()===lk);
   if(ex&&(ex[1].pinHash||(ex[1].acct&&ex[1].acct!==S.acct.id)))return; // serve il vecchio PIN o un altro nome: vClaim
+  if(!ex&&legacyProfiles().length)return; // può essere uno dei vecchi profili: vClaim
   await linkAs(ex?ex[0]:null,S.acct.name,null);
 }
 async function linkAs(pid,name,oldPin){
@@ -1672,17 +1673,28 @@ ${t.err?`<div class="red sm">${esc(t.err)}</div>`:''}
 <button class="btn" type="submit" ${t.busy?'disabled':''}>${t.busy?'Un attimo…':create?'Crea il tavolo':'Entra nel tavolo'}</button></form>`:`<div class="stack" style="margin-top:8px"><button class="btn ghost" data-act="tbshow" data-m="join">Entra in un tavolo</button><button class="btn ghost" data-act="tbshow" data-m="create">Crea un tavolo</button></div>`}
 </main></div>`;
 }
+const legacyProfiles=()=>Object.entries(S.players).filter(([id,p])=>p.pinHash&&!p.acct).map(([id,p])=>({id,name:p.name})).sort((x,y)=>x.name.localeCompare(y.name,'it'));
 function vClaim(){
-  const c=F.cl,lk=S.acct.name.toLowerCase(),ex=Object.entries(S.players).find(([id,p])=>String(p.name).toLowerCase()===lk);
-  const taken=ex&&ex[1].acct&&ex[1].acct!==S.acct.id,needPin=ex&&ex[1].pinHash&&!c.other;
-  if(S.linking||(!taken&&!needPin&&!c.other))return skeleton();
-  return `<div class="wrap">${backBtn('tables','I miei tavoli')}
-<div class="hero stack" style="margin-top:8px;gap:16px"><div><h1>${esc(S.table.name)}</h1>
-<p class="mut" style="margin:8px 0 0">${needPin?`In questo tavolo c'è già il giocatore <b>${esc(ex[1].name)}</b>. Se sei tu, scrivi il PIN che usavi qui: ritrovi partite, saldi e statistiche.`:`Il nome <b>${esc(S.acct.name)}</b> qui è già usato da un altro giocatore. Scegli come vuoi comparire in questo tavolo.`}</p></div>
-${needPin?`<form id="f-claim" class="stack" style="gap:12px"><label class="field"><span>Il tuo vecchio PIN di questo tavolo</span><input class="in" id="cl-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="cl.pin" value="${esc(c.pin)}" autocomplete="off"></label>
+  const c=F.clm,relink=V.name==='claim',lk=S.acct.name.toLowerCase(),L=legacyProfiles();
+  const ex=Object.entries(S.players).find(([id,p])=>String(p.name).toLowerCase()===lk);
+  const taken=!!(ex&&ex[1].acct&&ex[1].acct!==S.acct.id)||!!(ex&&ex[1].acct&&relink);
+  const target=c.pick?L.find(x=>x.id===c.pick):(!c.other&&ex&&ex[1].pinHash&&!ex[1].acct?{id:ex[0],name:ex[1].name}:null);
+  if(S.linking)return skeleton();
+  if(!relink&&!target&&!c.other&&!taken&&!L.length)return skeleton();
+  const back=relink?backBtn('home','Indietro'):backBtn('tables','I miei tavoli');
+  if(target)return `<div class="wrap">${back}
+<div class="hero stack" style="margin-top:8px;gap:16px"><div class="row" style="gap:14px">${ava(target.name,'l')}<div><h1>${esc(target.name)}</h1><div class="mut sm">${esc(S.table.name)}</div></div></div>
+<p class="mut" style="margin:0">Se sei tu, scrivi il PIN che usavi in questo tavolo prima dell'aggiornamento: ritrovi partite, saldi e statistiche.</p>
+<form id="f-claim" class="stack" style="gap:12px"><label class="field"><span>Il tuo vecchio PIN di questo tavolo</span><input class="in" id="cl-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="clm.pin" value="${esc(c.pin)}" autocomplete="off"></label>
 ${c.err?`<div class="red sm">${esc(c.err)}</div>`:''}<button class="btn" type="submit" ${c.busy?'disabled':''}>Sono io, collega il profilo</button></form>
-<button class="link" style="align-self:center" data-act="clother">Non sono io</button>`:`<form id="f-claim" class="stack" style="gap:12px"><label class="field"><span>Nome in questo tavolo</span><input class="in" id="cl-name" data-bind="cl.name" value="${esc(c.name)}" maxlength="24" autocapitalize="words"></label>
-${c.err?`<div class="red sm">${esc(c.err)}</div>`:''}<button class="btn" type="submit" ${c.busy?'disabled':''}>Entra con questo nome</button></form>`}</div></div>`;
+<button class="link" style="align-self:center" data-act="clother">Non sono io</button></div></div>`;
+  const nameFree=!Object.values(S.players).some(p=>String(p.name).toLowerCase()===lk);
+  return `<div class="wrap">${back}
+<div class="hero stack" style="margin-top:8px;gap:14px"><div><h1>${esc(S.table.name)}</h1><p class="mut" style="margin:8px 0 0">${L.length?'Avevi già un profilo in questo tavolo? Toccalo per ritrovare partite, saldi e statistiche.':'Scegli come vuoi comparire in questo tavolo.'}</p></div>
+${L.length?`<div class="stack" style="gap:8px">${L.map(p=>`<button class="pick" data-act="clpick" data-id="${esc(p.id)}">${ava(p.name,'s')}<span class="grow" style="font-weight:600">${esc(p.name)}</span><span class="mut">${ico('chevr',18)}</span></button>`).join('')}</div>`:''}
+${relink?'':`<div class="hr"></div><div class="mut sm" style="font-weight:600">${L.length?'Sono nuovo in questo tavolo':'Il tuo nome nel tavolo'}</div>
+${nameFree&&!c.other?`<button class="btn ghost" data-act="clnew">Entra come ${esc(S.acct.name)}</button>`:`<form id="f-claim" class="stack" style="gap:12px"><label class="field"><span>Nome in questo tavolo</span><input class="in" id="cl-name" data-bind="clm.name" value="${esc(c.name)}" maxlength="24" autocapitalize="words"></label>
+${c.err?`<div class="red sm">${esc(c.err)}</div>`:''}<button class="btn" type="submit" ${c.busy?'disabled':''}>Entra con questo nome</button></form>`}`}</div></div>`;
 }
 const _view0=view;
 view=function(){
@@ -1692,7 +1704,7 @@ view=function(){
   if(S.locked)return vLock();
   if(!S.table)return vTables();
   if(!db||!(S.loaded.games&&S.loaded.players))return skeleton();
-  if(!S.me)return vClaim();
+  if(!S.me||V.name==='claim')return vClaim();
   return _view0();
 };
 /* ---- fogli: profilo nel tavolo e account ---- */
@@ -1706,6 +1718,7 @@ sheetHtml=function(){
 <button class="btn" data-act="tables">${ico('chip',18)} I miei tavoli</button>
 <button class="btn ghost" data-act="pstats" data-k="${esc(S.me.name.trim().toLowerCase())}">${ico('bars',18)} Le mie statistiche</button>
 <button class="btn ghost" data-act="paym">${ico('coins',18)} Come vuoi essere pagato</button>
+${legacyProfiles().length?`<button class="btn ghost" data-act="relink">Collega il mio vecchio profilo</button>`:''}
 <button class="btn ghost" data-act="settings">Impostazioni tavolo</button>
 <button class="btn ghost" data-act="export">${ico('share',18)} Esporta i dati</button>
 ${bioRow()}<button class="btn ghost" data-act="chpin">Cambia PIN</button><button class="btn redb" data-act="logout">${acctBio()?'Blocca':'Esci'}</button>
@@ -1797,13 +1810,13 @@ doTable=async function(){
   }catch(e){fail(errMsg(e))}
 };
 async function doClaim(){
-  const c=F.cl;c.err='';c.busy=true;render();
-  const lk=S.acct.name.toLowerCase(),ex=Object.entries(S.players).find(([id,p])=>String(p.name).toLowerCase()===lk);
-  const needPin=ex&&ex[1].pinHash&&!c.other&&!(ex[1].acct&&ex[1].acct!==S.acct.id);
-  let r;
-  if(needPin){
+  const c=F.clm;c.err='';c.busy=true;render();
+  const lk=S.acct.name.toLowerCase(),L=legacyProfiles(),ex=Object.entries(S.players).find(([id,p])=>String(p.name).toLowerCase()===lk);
+  const target=c.pick?L.find(x=>x.id===c.pick):(!c.other&&ex&&ex[1].pinHash&&!ex[1].acct?{id:ex[0],name:ex[1].name}:null);
+  const prev=S.me&&S.me.id,relink=V.name==='claim';let r;
+  if(target){
     if(!PIN_RE.test(c.pin)){c.err='Scrivi il PIN che usavi in questo tavolo.';c.busy=false;return render()}
-    r=await linkAs(ex[0],ex[1].name,c.pin);
+    r=await linkAs(target.id,target.name,c.pin);
     if(r==='bad_pin')c.err='PIN errato.';else if(r==='too_many')c.err='Troppi tentativi: riprova tra qualche minuto.';else if(r==='taken')c.err='Questo profilo è già collegato a un altro account.';
   }else{
     const n=c.name.trim().replace(/\s+/g,' ');
@@ -1811,7 +1824,13 @@ async function doClaim(){
     if(Object.values(S.players).some(p=>String(p.name).toLowerCase()===n.toLowerCase())){c.err='Anche questo nome è già usato in questo tavolo.';c.busy=false;return render()}
     r=await linkAs(null,n,null);
   }
-  c.busy=false;if(r==='ok')F.cl={pin:'',name:'',err:'',busy:false,other:false};render();
+  c.busy=false;
+  if(r==='ok'){
+    F.clm={pin:'',name:'',err:'',busy:false,other:false,pick:null};
+    if(relink&&prev&&target&&prev!==target.id&&!Object.values(S.games).some(g=>Object.values(g.players||{}).some(p=>p.playerId===prev))){try{await db.doc('players/'+prev).delete()}catch(e){}}
+    if(relink){V={name:'home'};toast('Profilo collegato: bentornato '+target.name,'ok')}
+  }
+  render();
 }
 document.addEventListener('submit',e=>{
   const id=e.target.id;
@@ -1834,7 +1853,10 @@ Object.assign(H,{
   acctopen(){openSheet({type:'acct'})},
   opentable(d){const t=(S.acct.tables||[]).find(x=>x.id===d.id);if(t)openTable(t)},
   tbshow(d){F.tbOpen=true;F.tb.mode=d.m;F.tb.err='';render()},
-  clother(){F.cl.other=true;F.cl.err='';render()},
+  clother(){F.clm.other=true;F.clm.pick=null;F.clm.err='';F.clm.pin='';render()},
+  clpick(d){F.clm.pick=d.id;F.clm.other=false;F.clm.err='';F.clm.pin='';render()},
+  async clnew(){F.clm.busy=true;render();await linkAs(null,S.acct.name,null);F.clm.busy=false;render()},
+  relink(){SH=null;F.clm={pin:'',name:'',err:'',busy:false,other:false,pick:null};go('claim')},
   bioask(){F.bpin='';openSheet({type:'bio'})},
   async bioon(){
     const ok=await checkMyPin(F.bpin);if(ok===null)return;if(!ok){toast('PIN errato','err');return}
@@ -1888,7 +1910,7 @@ render=function(){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791809279497';
+const APP_VERSION='1791810112566';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
