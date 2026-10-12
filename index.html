@@ -25,8 +25,8 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:hidden;background:var(--bg)}
-body{margin:0;background:radial-gradient(120% 38% at 50% -8%,rgba(142,156,255,.16),transparent 62%) fixed,var(--bg);color:var(--ivory);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip;background:var(--bg)}
+body{margin:0;background:radial-gradient(120% 38% at 50% -8%,rgba(142,156,255,.16),transparent 62%) fixed,var(--bg);color:var(--ivory);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;overflow-x:clip}
 body.noscroll{overflow:hidden}
 button,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none;padding:0;touch-action:manipulation;transition:transform .12s var(--ease),background-color .2s,border-color .2s,opacity .2s}
@@ -62,9 +62,9 @@ h2{font-size:22px}
 .note{margin:0 16px 4px;padding:12px 14px;border-radius:16px;background:rgba(142,156,255,.12);color:var(--gold-l);font-size:14.5px}
 
 /* transizioni tra schermate */
-.enter-push{animation:pushIn .36s var(--ease) both}
-.enter-back{animation:backIn .36s var(--ease) both}
-.enter-fade{animation:fadeIn .26s ease-out both}
+.enter-push{animation:pushIn .34s var(--ease) backwards}
+.enter-back{animation:backIn .34s var(--ease) backwards}
+.enter-fade{animation:fadeIn .26s ease-out backwards}
 @keyframes pushIn{from{opacity:0;transform:translateX(34px)}}
 @keyframes backIn{from{opacity:0;transform:translateX(-34px)}}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}}
@@ -658,6 +658,76 @@ body.noscroll #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))}
 .v2-tbl{max-height:none}
 .st.heroseat{transform:translate(-50%,-46%)}
 .v2-brand{bottom:auto;top:58%}
+/* ===== chat, rientro, musica ===== */
+.v2-ib{position:relative}
+.v2-ib.sm{width:34px;height:34px}
+.v2-dot{position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#E2B65B;color:#1A1300;font-size:11px;font-weight:800;display:grid;place-items:center;font-style:normal}
+.v2-chat{position:fixed;left:50%;transform:translateX(-50%);width:100%;max-width:560px;bottom:0;z-index:40;pointer-events:none}
+.v2-cpanel{pointer-events:auto;background:rgba(10,14,22,.97);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.1);border-radius:22px 22px 0 0;display:flex;flex-direction:column;max-height:62dvh;animation:cup .22s var(--ease);box-shadow:0 -14px 40px rgba(0,0,0,.5)}
+@keyframes cup{from{transform:translateY(100%)}to{transform:none}}
+.v2-chead{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 6px}
+.v2-chead b{font-family:var(--serif);font-size:17px}
+.v2-chatlog{overflow-y:auto;padding:4px 12px;display:flex;flex-direction:column;gap:7px;min-height:120px;max-height:34dvh;-webkit-overflow-scrolling:touch}
+.cmsg{align-self:flex-start;max-width:86%;background:#1C2230;border-radius:14px 14px 14px 4px;padding:6px 10px;font-size:14.5px;line-height:1.3;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px}
+.cmsg.me{align-self:flex-end;background:#2F3A68;border-radius:14px 14px 4px 14px}
+.cwho{font-size:12px;font-weight:800;color:#C9D0FF;width:100%}
+.ctxt{word-break:break-word}
+.cat{font-size:10.5px;color:var(--mut);margin-left:auto}
+.cempty{color:var(--mut);font-size:13.5px;text-align:center;padding:18px 10px;line-height:1.4}
+.v2-quick{display:flex;gap:6px;overflow-x:auto;padding:8px 12px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.v2-quick::-webkit-scrollbar{display:none}
+.v2-quick button{flex:none;background:#1C2230;border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:600;white-space:nowrap}
+.v2-cin{display:flex;gap:8px;padding:8px 12px calc(env(safe-area-inset-bottom) + 10px)}
+.v2-cin input{flex:1;min-width:0;background:#171C28;border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:12px 16px;font-size:16px;outline:none}
+.v2-cin input:focus{border-color:#8E9CFF}
+.v2-csend{width:46px;height:46px;border-radius:50%;background:var(--gold);color:var(--on-acc);display:grid;place-items:center;flex:none}
+.v2-bubble{position:absolute;transform:translate(-50%,-100%);background:#FBF8F1;color:#15171D;font-size:12.5px;font-weight:600;padding:6px 10px;border-radius:12px;max-width:150px;line-height:1.25;z-index:30;animation:bub .3s var(--ease);box-shadow:0 6px 18px rgba(0,0,0,.45)}
+.v2-bubble::after{content:'';position:absolute;left:14px;bottom:-5px;width:10px;height:10px;background:#FBF8F1;transform:rotate(45deg)}
+.v2-bubble.l::after{left:auto;right:14px}
+@keyframes bub{from{transform:translate(-50%,-85%) scale(.85);opacity:0}to{transform:translate(-50%,-100%) scale(1);opacity:1}}
+.vr-back{font-size:11px;font-weight:800;color:#1A1300;background:#5BE07D;padding:2px 8px;border-radius:999px;align-self:center;margin-right:6px;white-space:nowrap}
+.v2-chat:empty{display:none}
+.me-btn.chatb{position:relative;display:grid;place-items:center;background:rgba(255,255,255,.07);border-radius:50%;color:var(--ivory)}
+.me-btn.chatb.on{background:#E2B65B;color:#1A1300}
+.lobby-sub{padding-bottom:86px}
+/* ===== scelta Reale / Virtuale ===== */
+.cas{min-height:100dvh;display:flex;flex-direction:column;max-width:520px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 14px);position:relative;overflow:clip}
+.cas::before{content:'';position:absolute;inset:0;background:radial-gradient(120% 52% at 50% 0%,rgba(30,122,87,.30),transparent 60%),radial-gradient(90% 42% at 50% 100%,rgba(226,182,91,.09),transparent 70%);pointer-events:none}
+.cas>*{position:relative;z-index:1}
+.cas-hd{padding:12px 2px 18px;text-align:center}
+.cas-orn{display:flex;justify-content:center;gap:10px;margin-bottom:10px}
+.cas-orn i{font-style:normal;font-size:15px;color:rgba(226,182,91,.75)}
+.cas-orn i.r{color:rgba(200,40,62,.85)}
+.cas-hd h1{font-size:38px;line-height:1.02;letter-spacing:-.03em}
+.cas-hd p{margin:7px 0 0;color:var(--mut);font-size:15px}
+.cas-me{position:absolute;right:0;top:calc(env(safe-area-inset-top) + 12px)}
+.cas-main{flex:1;display:flex;flex-direction:column;gap:14px;justify-content:center;padding-bottom:8px}
+.cas-card{position:relative;display:flex;flex-direction:column;justify-content:center;width:100%;text-align:left;padding:20px 18px 18px;border-radius:26px;overflow:hidden;color:var(--ivory);box-shadow:0 18px 40px rgba(0,0,0,.45);min-height:clamp(168px,22vh,214px)}
+.cas-card::after{content:'';position:absolute;inset:0;border-radius:26px;border:1px solid rgba(226,182,91,.26);pointer-events:none}
+.cas-card:active{transform:scale(.985)}
+.cas-card.real{background:linear-gradient(135deg,#333C78 0%,#1C2140 48%,#14161F 100%)}
+.cas-card.virt{background:linear-gradient(135deg,#1F8A60 0%,#115239 50%,#0B3023 100%)}
+.cas-tx{position:relative;z-index:2;display:flex;flex-direction:column;gap:3px;max-width:63%}
+.cas-k{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(226,182,91,.92)}
+.cas-tx b{font-family:var(--serif);font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1;margin:1px 0 3px}
+.cas-d{font-size:13.5px;color:rgba(255,255,255,.76);line-height:1.35}
+.cas-st{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:rgba(255,255,255,.6);margin-top:8px}
+.cas-st.live{color:#8FF0B4}
+.cas-st.live::before{content:'';width:7px;height:7px;border-radius:50%;background:#34C759;box-shadow:0 0 0 0 rgba(52,199,89,.6);animation:casp 1.8s infinite}
+@keyframes casp{70%{box-shadow:0 0 0 7px rgba(52,199,89,0)}100%{box-shadow:0 0 0 0 rgba(52,199,89,0)}}
+.cas-art{position:absolute;right:-6px;bottom:-10px;width:150px;height:132px;z-index:1;pointer-events:none}
+.cs-chip{position:absolute;width:44px;height:44px;border-radius:50%;background:var(--c);border:5px dashed rgba(255,255,255,.85);box-sizing:border-box;transform:rotate(var(--r));box-shadow:0 5px 12px rgba(0,0,0,.5),inset 0 0 0 5px rgba(0,0,0,.14)}
+.cs-note{position:absolute;right:10px;bottom:16px;width:62px;height:38px;border-radius:5px;background:linear-gradient(#F0E8D0,#D7CBA6);display:grid;place-items:center;transform:rotate(-8deg);box-shadow:0 5px 12px rgba(0,0,0,.45)}
+.cs-note b{color:#2B4A32;font-family:var(--serif);font-size:20px}
+.cas-art.casfelt .cs-oval{position:absolute;left:8px;top:14px;right:4px;bottom:16px;border-radius:999px;background:radial-gradient(ellipse at 50% 40%,#2FAE78,#0F5B46);box-shadow:inset 0 0 0 5px #45291A,inset 0 0 18px rgba(0,0,0,.45),0 6px 16px rgba(0,0,0,.4)}
+.cs-cd{position:absolute;width:34px;height:47px;border-radius:5px;background:linear-gradient(#FFFDF8,#F0EADC);color:#15171D;font-family:var(--serif);font-weight:800;font-size:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;box-shadow:0 5px 12px rgba(0,0,0,.5)}
+.cs-cd i{font-style:normal;font-size:14px}
+.cs-cd .r{color:#C8283E}
+.cs-cd.a{left:22px;top:26px;transform:rotate(-12deg)}
+.cs-cd.b{left:56px;top:20px;transform:rotate(10deg)}
+.cas-ft{text-align:center;padding-top:4px}
+@media (max-height:720px){.cas-hd h1{font-size:31px}.cas-hd{padding-bottom:12px}.cas-card{min-height:146px;padding:16px 16px 14px}.cas-tx b{font-size:29px}.cas-art{width:126px;height:112px}.cs-chip{width:38px;height:38px;border-width:4px}.cs-note{width:52px;height:32px}.cs-cd{width:29px;height:40px;font-size:14px}}
+@media (max-width:360px){.cas-tx{max-width:70%}.cas-art{opacity:.85}}
 </style>
 
 <div id="app"></div>
@@ -2946,6 +3016,7 @@ setTimeout(async()=>{S.pushOn=await pushState()},1500);
    ===================================================================== */
 const HE=(()=>{
 const RANKS='23456789TJQKA',SUITS='shdc',NS=9,NEXT_DELAY=4000,HIST=25;
+const LONELY_MS=150000,AWAY_MS=420000;
 const LV=[1,1.5,2,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200];
 const rv=c=>RANKS.indexOf(c[0])+2;
 const RN={11:'J',12:'Q',13:'K',14:'A'};const rn=v=>RN[v]||String(v);
@@ -2986,7 +3057,7 @@ function best5(cards){
 }
 
 /* ---- stato ---- */
-function initState(room){return {room:room||null,closed:false,v:0,cfg:{sb:5,bb:10,stack:1000,turnSec:30,mode:'cash',lvlMin:8},seats:Array(NS).fill(null),running:false,handNo:0,dealer:-1,hand:null,hist:[],sng:null}}
+function initState(room){return {room:room||null,closed:false,v:0,busted:{},cfg:{sb:5,bb:10,stack:1000,turnSec:30,mode:'cash',lvlMin:8,maxRebuys:2},seats:Array(NS).fill(null),running:false,handNo:0,dealer:-1,hand:null,hist:[],sng:null}}
 const E=c=>{const e=new Error(c);e.code=c;throw e};
 const seatOf=(st,acct)=>st.seats.findIndex(s=>s&&s.acct===acct);
 const nextIdx=(from,ok)=>{for(let k=1;k<=NS;k++){const i=((from+k)%NS+NS)%NS;if(ok(i))return i}return -1};
@@ -3005,7 +3076,10 @@ function sit(st,who,seat){
   const mx=maxSeats(st);
   if(seat==null||seat<0)seat=st.seats.findIndex((s,i)=>!s&&i<mx);
   if(seat<0||seat>=mx)E('full');if(st.seats[seat])E('seat_taken');
-  st.seats[seat]={acct:who.acct,pid:who.pid||null,name:String(who.name||'?').slice(0,24),stack:st.cfg.stack,away:false,rebuys:0};
+  const used=(st.busted||{})[who.acct]||0,mr=rebuyMax(st);
+  if(used>mr)E('no_rebuys');
+  st.seats[seat]={acct:who.acct,pid:who.pid||null,name:String(who.name||'?').slice(0,24),stack:st.cfg.stack,away:false,rebuys:used};
+  st.lonelyAt=null;
   return true;
 }
 function leave(st,priv,who,now){
@@ -3013,7 +3087,7 @@ function leave(st,priv,who,now){
   if(inLive(st,i)){
     const h=st.hand;
     if(h.toAct===i)apply(st,priv,i,{type:'fold'},now);
-    else{h.p[i].folded=true;h.p[i].la='Lascia';h.last=h.p[i].name+' lascia';progress(st,priv,now,null)}
+    else{h.p[i].folded=true;h.p[i].la='Fold';h.last=h.p[i].name+': fold';progress(st,priv,now,null)}
   }
   const s=st.seats[i];
   if(sngOn(st)&&!s.out){const alive=st.seats.filter(x=>x&&!x.out&&(x.stack>0||x===s)).length;st.sng.out.push({name:s.name,acct:s.acct,pos:alive});st.seats[i]=null;sngCheckEnd(st,now)}
@@ -3033,8 +3107,9 @@ function config(st,c){
   const n=(x,lo,hi)=>{x=Math.round(+x);if(!(x>=lo&&x<=hi))E('bad_config');return x};
   const sb=n(c.sb,1,100000),bb=n(c.bb,2,200000),stack=n(c.stack,10,10000000),t=n(c.turnSec||st.cfg.turnSec,10,120);
   const mode=c.mode==='sng'?'sng':'cash',lvlMin=n(c.lvlMin||st.cfg.lvlMin||8,2,60);
+  const mr=c.maxRebuys==null?(st.cfg.maxRebuys==null?2:st.cfg.maxRebuys):n(c.maxRebuys,0,99);
   if(bb<sb||stack<bb*2)E('bad_config');
-  st.cfg={sb,bb,stack,turnSec:t,mode,lvlMin};
+  st.cfg={sb,bb,stack,turnSec:t,mode,lvlMin,maxRebuys:mr};
   if(mode==='cash')st.sng=null;
   return true;
 }
@@ -3046,6 +3121,8 @@ function start(st,priv,now){
   }
   st.running=true;tick(st,priv,now);return true;
 }
+const rebuyMax=st=>{const m=st.cfg.maxRebuys;return m==null?2:m};
+const rebuysLeft=(st,acct)=>{const m=rebuyMax(st);return m>=99?99:Math.max(0,m-(((st.busted||{})[acct])||0))};
 const maxSeats=st=>Math.min(NS,Math.max(2,(st.room&&st.room.maxSeats)||NS));
 const eligible=st=>st.seats.map((s,i)=>s&&s.stack>0&&!s.out&&(sngOn(st)||!s.away)?i:-1).filter(i=>i>=0);
 
@@ -3077,9 +3154,9 @@ function act(st,priv,who,a,now){
 function apply(st,priv,i,a,now){
   const h=st.hand,P=h.p[i],S=st.seats[i],toCall=h.curBet-P.bet,nm=P.name;
   const t=a&&a.type;
-  if(t==='fold'){P.folded=true;P.la='Lascia';h.last=nm+' lascia'}
-  else if(t==='check'){if(toCall>0)E('cannot_check');P.la='Passa';h.last=nm+' passa'}
-  else if(t==='call'){if(toCall<=0){P.la='Passa';h.last=nm+' passa'}else{const x=put(st,i,toCall);P.la=P.allin?'All-in':'Chiama';h.last=nm+(P.allin?' va all-in con '+P.bet:' chiama '+x)}}
+  if(t==='fold'){P.folded=true;P.la='Fold';h.last=nm+': fold'}
+  else if(t==='check'){if(toCall>0)E('cannot_check');P.la='Check';h.last=nm+': check'}
+  else if(t==='call'){if(toCall<=0){P.la='Check';h.last=nm+': check'}else{const x=put(st,i,toCall);P.la=P.allin?'All-in':'Call';h.last=nm+(P.allin?': all-in '+P.bet:': call '+x)}}
   else if(t==='raise'||t==='allin'){
     const maxTo=P.bet+S.stack;let to=t==='allin'?maxTo:Math.round(+a.amount);
     if(!(to>0))E('bad_amount');if(to>maxTo)to=maxTo;
@@ -3089,8 +3166,8 @@ function apply(st,priv,i,a,now){
     const wasBet=h.curBet>0;put(st,i,to-P.bet);
     if(inc>=h.minRaise)h.minRaise=inc;
     h.curBet=to;Object.keys(h.p).forEach(k=>{if(+k!==i&&canAct(h,+k))h.p[k].acted=false});
-    P.la=P.allin?'All-in':wasBet?'Rilancia':'Punta';
-    h.last=nm+(P.allin?' va all-in con '+to:wasBet?' rilancia a '+to:' punta '+to);
+    P.la=P.allin?'All-in':wasBet?'Raise':'Bet';
+    h.last=nm+(P.allin?': all-in '+to:wasBet?': raise a '+to:': bet '+to);
   }else E('bad_action');
   P.acted=true;
   progress(st,priv,now,i);
@@ -3153,6 +3230,16 @@ function endHand(st,now){
   const shown={};Object.keys(h.reveal||{}).forEach(k=>{shown[k]={name:h.p[k].name,cards:h.reveal[k]}});
   st.hist=(st.hist||[]).concat([{no:h.no,at:now,board:h.board.slice(),pot:h.pot,w:(h.results||[]).filter(r=>r.win>0).map(r=>({seat:r.seat,name:r.name,win:r.win,hand:r.hand})),shown,
     res:Object.keys(h.p).map(k=>({seat:+k,name:h.p[k].name,acct:h.p[k].acct,net:((h.results||[]).find(r=>r.seat===+k)||{win:0}).win-h.p[k].contrib}))}]).slice(-HIST);
+  if(st.cfg.mode!=='sng'){
+    st.busted=st.busted||{};st.outNow=[];
+    st.seats.forEach((sx,k)=>{
+      if(!sx||sx.stack>0)return;
+      if(!h.p[k]||h.p[k].acct!==sx.acct)return;
+      st.busted[sx.acct]=(st.busted[sx.acct]||0)+1;
+      st.outNow.push({name:sx.name,acct:sx.acct,left:rebuysLeft(st,sx.acct)});
+      st.seats[k]=null;
+    });
+  }
   if(sngOn(st)){
     const bust=Object.keys(h.p).map(Number).filter(k=>{const s=st.seats[k];return s&&s.acct===h.p[k].acct&&s.stack===0&&!s.out});
     const alive=st.seats.filter(s=>s&&!s.out&&s.stack>0).length;
@@ -3181,7 +3268,13 @@ function roomCheck(st,now){
   if(st.closed)return false;
   const sat=st.seats.filter(Boolean),alive=sat.filter(s=>!s.out);
   if(handLive(st))return false;
-  if(!sat.length||(st.room&&st.room.started&&alive.length<=1)){
+  const started=!!(st.room&&st.room.started);
+  if(sat.length&&st.cfg.mode!=='sng'&&started&&alive.length<=1){
+    // nel cash si aspetta: chi è a 0 può rientrare
+    if(!st.lonelyAt){st.lonelyAt=now;return true}
+    if(now-st.lonelyAt<LONELY_MS)return false;
+  }else if(alive.length>1&&st.lonelyAt){st.lonelyAt=null;return true}
+  if(!sat.length||(started&&alive.length<=1)){
     st.closed=true;st.closedAt=now;st.running=false;
     st.final=sat.concat(st.sng&&st.sng.out?[]:[]).map(s=>({name:s.name,acct:s.acct,stack:s.stack,out:!!s.out,net:s.stack-st.cfg.stack*(1+(s.rebuys||0))})).sort((a,b)=>b.stack-a.stack);
     return true;
@@ -3200,10 +3293,23 @@ function tick(st,priv,now){
     }
     return false;
   }
-  if(st.running&&(!h||now>=(h.endedAt||0)+NEXT_DELAY))return newHand(st,priv,now);
-  return false;
+  let ch=false;
+  // chi è in pausa da troppo tempo libera il posto
+  if(!handLive(st))st.seats.forEach((sx,k)=>{
+    if(!sx||!sx.away||sx.out)return;
+    if(!sx.awayAt){sx.awayAt=now;ch=true;return}
+    if(now-sx.awayAt>AWAY_MS&&st.cfg.mode!=='sng'){st.seats[k]=null;ch=true}
+  });
+  st.seats.forEach(sx=>{if(sx&&!sx.away&&sx.awayAt){delete sx.awayAt;ch=true}});
+  if(st.running&&(!h||now>=(h.endedAt||0)+NEXT_DELAY)){
+    if(newHand(st,priv,now))return true;
+    // non si può ripartire: si sparecchia il tavolo
+    if(h&&now>=(h.endedAt||0)+NEXT_DELAY+2500){st.hand=null;ch=true}
+  }
+  if(roomCheck(st,now))ch=true;
+  return ch;
 }
-return {roomCheck,maxSeats,initState,sit,leave,rebuy,setAway,config,start,act,show,tick,newHand,evalHand,best5,cmp,seatOf,eligible,blinds,sngOn,NEXT_DELAY,NS,LV};
+return {roomCheck,maxSeats,rebuysLeft,rebuyMax,LONELY_MS,initState,sit,leave,rebuy,setAway,config,start,act,show,tick,newHand,evalHand,best5,cmp,seatOf,eligible,blinds,sngOn,NEXT_DELAY,NS,LV};
 })();
 
 /* =====================================================================
@@ -3273,7 +3379,7 @@ setInterval(()=>{
   if(!inVt){if(S.vt.awake&&V.name!=='live'){S.vt.awake=false;keepAwake(false)}return}
   if(!S.vt.awake&&vtSeat()>=0){S.vt.awake=true;keepAwake(true)}
   const st=S.vt.st,h=st&&st.hand,sn=vtNow();
-  document.querySelectorAll('[data-dl]').forEach(el=>{const dl=+el.dataset.dl,tot=(st?st.cfg.turnSec:30)*1000,left=Math.max(0,dl-sn);el.style.setProperty('--p',(left/tot).toFixed(3));const t=el.querySelector('.tsec');if(t)t.textContent=Math.ceil(left/1000)+'s';el.classList.toggle('late',left<8000)});
+  document.querySelectorAll('[data-dl]').forEach(el=>{const dl=+el.dataset.dl,tot=(st?st.cfg.turnSec:30)*1000,left=Math.max(0,dl-sn);el.style.setProperty('--p',(left/tot).toFixed(3));const t=el.querySelector('.tsec');if(t){const sc=Math.ceil(left/1000);t.textContent=sc>=100?Math.floor(sc/60)+':'+String(sc%60).padStart(2,'0'):sc+'s'}el.classList.toggle('late',left<8000)});
   if(!st)return;
   let need=false;
   if(h&&h.stage!=='done'&&h.toAct!=null&&sn>h.deadline+400)need=true;
@@ -3589,7 +3695,8 @@ function vtPaint(){
     const hero=me>=0&&i===me,bt=$$id('vb'+i),bx=x+(50-x)*(hero?.08:.40),by=y+(50-y)*(hero?.62:.36);
     if(bt.__pos!==bx+','+by){bt.style.left=bx+'%';bt.style.top=by+'%';bt.__pos=bx+','+by}
     if(!s){
-      if(me<0){setCl(el,'st empty');el.dataset.act='vtsit';el.dataset.seat=i;setH(el.querySelector('.st-ava'),`<span class="st-plus">${ico('plus',20)}</span>`);setH(el.querySelector('.st-plate'),'<b>Siediti</b>');}
+      const canSit=me<0&&st&&!st.closed&&!HE.sngOn(st)&&(!st.busted||!st.busted[myAcct()]||HE.rebuysLeft(st,myAcct())>0);
+      if(canSit){setCl(el,'st empty');el.dataset.act='vtsit';el.dataset.seat=i;setH(el.querySelector('.st-ava'),`<span class="st-plus">${ico('plus',20)}</span>`);setH(el.querySelector('.st-plate'),'<b>Siediti</b>');}
       else{setCl(el,'st off');delete el.dataset.act;setH(el.querySelector('.st-ava'),'');setH(el.querySelector('.st-plate'),'')}
       setH(el.querySelector('.st-cards'),'');setH(el.querySelector('.st-act'),'');setH(bt,'');setCl(bt,'v2-bet');continue;
     }
@@ -3616,7 +3723,7 @@ function vtPaint(){
       la=won[i]?`<span class="la win num">+${fchip(won[i].win)}${won[i].hand?' · '+esc(won[i].hand):''}</span>`:P.folded?'<span class="la la-fold">Hai lasciato</span>':ev?`<span class="la la-hand">${esc(ev.n)}</span>`:''}
     else if(isMe){const nt=out?'Sei fuori dal torneo':s.away?'Sei in pausa':s.stack===0?'Hai finito le fiches':live?'Entri dalla prossima mano':'';la=nt?`<span class="la la-blind">${nt}</span>`:''}
     else if(won[i])la=`<span class="la win num">+${fchip(won[i].win)}</span>`;
-    else if(P&&P.la&&!(h.stage==='done'&&P.la!=='Lascia'))la=`<span class="la la-${P.la==='All-in'?'allin':P.la==='Lascia'?'fold':P.la==='Passa'?'check':P.la==='Chiama'?'call':'raise'}">${P.la}</span>`;
+    else if(P&&P.la&&!(h.stage==='done'&&P.la!=='Fold'))la=`<span class="la la-${P.la==='All-in'?'allin':P.la==='Fold'?'fold':P.la==='Check'?'check':P.la==='Call'?'call':'raise'}">${P.la}</span>`;
     else if(h&&live&&i===h.sb&&P&&!P.la&&h.stage==='preflop')la='<span class="la la-blind">SB</span>';
     else if(h&&live&&i===h.bb&&P&&!P.la&&h.stage==='preflop')la='<span class="la la-blind">BB</span>';
     setH(el.querySelector('.st-act'),la);
@@ -4082,8 +4189,383 @@ Object.assign(H,{
     F.vinv={};SH=null;render();toast(ids.length>1?'Invito inviato a '+ids.length+' giocatori':'Invito inviato','ok')}
 });
 
+/* =====================================================================
+   Tavolo virtuale: chat, rientro dopo le fiches finite, limite ricariche,
+   termini di gioco in inglese, chiusura con preavviso
+   ===================================================================== */
+Object.assign(IP,{chat:'M21 12a8 8 0 01-8 8H7l-4 3V12a8 8 0 018-8h2a8 8 0 018 8z',send:'M4 12l16-8-5 16-3.5-6L4 12z'});
+Object.assign(S.vt,{chat:[],unread:0,cch:null,cchKey:null,lastOut:null});
+Object.assign(F.vt,{chatOpen:false,draft:''});
+Object.assign(VT_ERR,{no_rebuys:'Hai finito le ricariche su questo tavolo',sng_running:'Il torneo è già iniziato'});
+const QUICK=['Bella mano!','gg 👏','Vai tranquillo…','Tocca a te!','Che fortuna 😤','Bluff? 🤔'];
+
+/* ---------- chat del tavolo ---------- */
+function vtChatSub(){
+  if(!S.table||!BASE)return;const key=S.table.id;
+  if(S.vt.cch&&S.vt.cchKey===key)return;
+  vtChatUnsub();
+  try{
+    S.vt.cch=BASE.sb.channel('vtc-'+key,{config:{broadcast:{self:true}}}).on('broadcast',{event:'m'},m=>{
+      const p=m&&m.payload;if(!p||!S.table||S.table.id!==key)return;vtChatIn(p);
+    }).subscribe();
+    S.vt.cchKey=key;
+  }catch(e){}
+}
+function vtChatUnsub(){if(S.vt.cch){try{BASE.sb.removeChannel(S.vt.cch)}catch(e){}S.vt.cch=null;S.vt.cchKey=null}}
+function vtChatIn(p){
+  const txt=String(p.txt||'').slice(0,160);if(!txt)return;
+  const mine=p.acct===myAcct();
+  S.vt.chat=S.vt.chat.concat([{name:String(p.name||'?').slice(0,24),acct:p.acct,txt,at:Date.now(),mine}]).slice(-80);
+  if(F.vt.chatOpen&&V&&(V.name==='vt'||V.name==='vlobby')){vtChatPaint();vtChatScroll()}
+  else{if(!mine){S.vt.unread=Math.min(99,S.vt.unread+1);if(V&&V.name==='vt')vtChatBubble(p)}if(V&&V.name==='vt')vtPaint();else if(V&&V.name==='vlobby')render()}
+}
+function vtChatBubble(p){
+  const st=S.vt.st;if(!st)return;
+  const i=st.seats.findIndex(s=>s&&s.acct===p.acct);
+  const fx=$$id('v2-fx'),at=i>=0?$$id('vs'+i):null,tb=$$id('v2-tbl');if(!fx||!tb)return;
+  const r=at?relRect(at):{x:tb.clientWidth/2,y:tb.clientHeight*.14,w:0,h:0},b=document.createElement('div');
+  b.className='v2-bubble'+(r.x>55*$$id('v2-tbl').clientWidth/100?' l':'');
+  b.textContent=p.txt.slice(0,70);
+  b.style.left=Math.min(Math.max(r.x+r.w/2,60),$$id('v2-tbl').clientWidth-60)+'px';b.style.top=(r.y-6)+'px';
+  fx.appendChild(b);setTimeout(()=>b.remove(),4200);
+}
+function vtChatSend(txt){
+  txt=String(txt||'').trim().slice(0,160);if(!txt||!S.vt.cch)return;
+  try{S.vt.cch.send({type:'broadcast',event:'m',payload:{acct:myAcct(),name:S.me?S.me.name:'?',txt}})}catch(e){}
+  F.vt.draft='';const i=$$id('v2-cin');if(i){i.value='';i.focus()}
+  vtChatPaint();
+}
+const chatTime=t=>new Date(t).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+function vtChatPaint(){
+  const log=$$id('v2-chatlog');if(!log)return;
+  const C=S.vt.chat;
+  setH(log,C.length?C.map(m=>`<div class="cmsg ${m.mine?'me':''}">${m.mine?'':`<span class="cwho">${esc(firstName(m.name))}</span>`}<span class="ctxt">${esc(m.txt)}</span><span class="cat">${chatTime(m.at)}</span></div>`).join(''):`<div class="cempty">Scrivete qui durante la partita: i messaggi li vedono solo i giocatori di questo tavolo.</div>`);
+}
+function vtChatScroll(){const l=$$id('v2-chatlog');if(l)l.scrollTop=l.scrollHeight}
+function chatRoot(){
+  let w=$$id('v2-chatroot');
+  if(!w){w=document.createElement('div');w.id='v2-chatroot';w.className='v2-chat';document.body.appendChild(w)}
+  return w;
+}
+function vtChatPanel(){
+  const wrap=chatRoot(),on=F.vt.chatOpen&&V&&(V.name==='vt'||V.name==='vlobby')&&S.table;
+  if(!on){if(wrap.__open){wrap.innerHTML='';wrap.__open=false}return}
+  if(!wrap.__open){
+    wrap.innerHTML=`<div class="v2-cpanel"><div class="v2-chead"><b>Chat di ${esc(S.table.name)}</b><button class="v2-ib sm" data-act="vtchat" aria-label="Chiudi">${ico('close',18)}</button></div>
+<div class="v2-chatlog" id="v2-chatlog"></div>
+<div class="v2-quick">${QUICK.map(q=>`<button data-act="vtquick" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>
+<form class="v2-cin" id="v2-cform" autocomplete="off"><input id="v2-cin" maxlength="160" placeholder="Scrivi un messaggio…" aria-label="Messaggio"><button class="v2-csend" type="submit" aria-label="Invia">${ico('send',19)}</button></form></div>`;
+    wrap.__open=true;
+    const f=$$id('v2-cform');if(f)f.addEventListener('submit',e=>{e.preventDefault();vtChatSend($$id('v2-cin').value)});
+    vtChatPaint();vtChatScroll();setTimeout(()=>{const i=$$id('v2-cin');if(i)i.focus()},60);
+  }else vtChatPaint();
+}
+
+/* ---------- comandi e messaggi di chi esce ---------- */
+function vtOutToast(st){
+  const key=st&&st.outNow&&st.outNow.length?st.handNo+':'+st.outNow.map(o=>o.acct).join(','):null;
+  if(!key||key===S.vt.lastOut)return;S.vt.lastOut=key;
+  const me=myAcct();
+  st.outNow.forEach(o=>{
+    if(o.acct===me)return;
+    toast(firstName(o.name)+' ha finito le fiches'+(o.left>0?': può rientrare':''),'ok');
+  });
+}
+
+/* ---------- comandi ---------- */
+const vtBusted=st=>(st&&st.busted&&myAcct()&&st.busted[myAcct()])||0;
+const vtLeft=st=>st?HE.rebuysLeft(st,myAcct()):0;
+ctlHtml=function(st,me){
+  if(!st)return `<button class="btn" data-act="vtsit" data-seat="-1">Siediti al tavolo</button>`;
+  if(st.closed)return `<button class="btn" data-act="vtlobby">Torna alla lobby</button>`;
+  if(S.vt.optPending&&st.hand&&st.hand.toAct==null&&st.hand.stage!=='done')return `<div class="v2-turn wide"><span class="mut">Fatto</span></div>`;
+  const h=st.hand,live=vtLive(),s=me>=0&&st.seats[me],P=h&&me>=0&&h.p[me];
+  /* non sei seduto */
+  if(me<0){
+    const was=vtBusted(st),left=vtLeft(st),free=st.seats.some((x,i)=>!x&&i<HE.maxSeats(st));
+    if(HE.sngOn(st))return `<div class="v2-wait">Torneo in corso: puoi guardare, oppure apri un altro tavolo dalla lobby</div>`;
+    if(was&&!left)return `<div class="v2-away"><span>Hai finito le ${was===1?'fiches e la ricarica':'ricariche'} su questo tavolo.</span><button class="btn ghost" data-act="vtlobby">Apri un altro tavolo</button></div>`;
+    if(!free)return `<div class="v2-wait">Il tavolo è pieno: guardi la partita</div>`;
+    return `<button class="btn v2-start" data-act="vtsit" data-seat="-1">${was?`Rientra con ${fchip(st.cfg.stack)} fiches`:'Siediti al tavolo'}${was&&left<99?` · ${left} ricaric${left===1?'a':'he'}`:''}</button>`;
+  }
+  if(s.away)return `<div class="v2-away"><span>Sei in pausa: le tue mani vengono saltate${HE.sngOn(st)?' (i bui li paghi lo stesso)':''}.</span><button class="btn" data-act="vtback">Torno a giocare</button></div>`;
+  /* tocca a te */
+  if(live&&h.toAct===me){
+    const toCall=Math.max(0,h.curBet-P.bet),maxTo=P.bet+s.stack,bb=h.bbAmt||st.cfg.bb,minTo=Math.min(maxTo,h.curBet>0?h.curBet+h.minRaise:bb),canRaise=s.stack>toCall;
+    const tbar=`<div class="v2-tbar" data-dl="${h.deadline}"><i></i><span class="tsec"></span></div>`;
+    if(F.vt.raise!=null&&canRaise){
+      const pot=potOf(h),step=Math.max(1,Math.round((st.cfg.sb||1))),cl=v=>Math.max(minTo,Math.min(maxTo,Math.round(v/step)*step));
+      const pre=h.stage==='preflop'&&h.curBet<=bb?[['2,5×',cl(bb*2.5)],['3×',cl(bb*3)],['4×',cl(bb*4)],['All-in',maxTo]]:h.stage==='preflop'?[['2×',cl(h.curBet*2)],['2,5×',cl(h.curBet*2.5)],['3×',cl(h.curBet*3)],['All-in',maxTo]]:[['⅓',cl(h.curBet+(pot+toCall)/3)],['½',cl(h.curBet+(pot+toCall)/2)],['¾',cl(h.curBet+(pot+toCall)*.75)],['Pot',cl(h.curBet+pot+toCall)],['All-in',maxTo]];
+      const val=Math.max(minTo,Math.min(maxTo,F.vt.raise));
+      return `${tbar}<div class="v2-raise"><div class="v2-rtop"><button class="v2-rx" data-act="vtraisex" aria-label="Chiudi">${ico('close',20)}</button><div class="v2-ramt"><small>${h.curBet?'Raise a':'Bet'}</small><b class="num" id="vt-rv">${fchip(val)}</b></div><span class="v2-rmax num">max ${fchip(maxTo)}</span></div>
+<div class="v2-rrow"><button class="rstep" data-act="vtstep" data-d="-1" aria-label="Meno">−</button><input type="range" id="vt-range" min="${minTo}" max="${maxTo}" step="${step}" value="${val}"><button class="rstep" data-act="vtstep" data-d="1" aria-label="Più">+</button></div>
+<div class="v2-pres" style="grid-template-columns:repeat(${pre.length},minmax(0,1fr))">${pre.map(([l,v])=>`<button class="${v===val?'on':''}" data-act="vtpre" data-v="${v}">${l}</button>`).join('')}</div>
+<button class="v2-go raise" data-act="vtraiseok" ${S.vt.busy?'disabled':''}>${val>=maxTo?'ALL-IN '+fchip(maxTo):(h.curBet?'RAISE ':'BET ')+fchip(val)}</button></div>`;
+    }
+    return `${tbar}<div class="v2-acts"><button class="v2-go fold" data-act="vtmove" data-m="fold" ${S.vt.busy?'disabled':''}>FOLD</button>
+<button class="v2-go call" data-act="vtmove" data-m="${toCall?'call':'check'}" ${S.vt.busy?'disabled':''}>${toCall?(toCall>=s.stack?`ALL-IN<small class="num">${fchip(s.stack)}</small>`:`CALL<small class="num">${fchip(toCall)}</small>`):'CHECK'}</button>
+${canRaise?`<button class="v2-go raise" data-act="vtraise" ${S.vt.busy?'disabled':''}>${h.curBet?'RAISE':'BET'}<small class="num">min ${fchip(minTo)}</small></button>`:''}</div>`;
+  }
+  /* pre-azioni mentre giocano gli altri */
+  if(live&&P&&!P.folded&&!P.allin){
+    const toCall=Math.max(0,h.curBet-P.bet),pre=F.vt.pre&&F.vt.pre.no===h.no&&F.vt.pre.stage===h.stage?F.vt.pre:null;
+    const opts=[['cf',toCall?'Fold':'Check / Fold'],toCall?['cl','Call '+fchip(Math.min(toCall,s.stack))]:['ck','Check'],['ca','Call any']];
+    const t=h.toAct!=null&&st.seats[h.toAct];
+    return `<div class="v2-turn">${t?`<span>Tocca a <b>${esc(firstName(t.name))}</b></span><span class="tsec-w" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span>…</span>'}</div>
+<div class="v2-preacts">${opts.map(([k,l])=>`<button class="${pre&&pre.k===k?'on':''}" data-act="vtpreact" data-k="${k}"><span class="pchk">${ico('check',13)}</span>${l}</button>`).join('')}</div>`;
+  }
+  if(live){const t=h.toAct!=null&&st.seats[h.toAct];return `<div class="v2-turn wide">${t?`<span>Tocca a <b>${esc(firstName(t.name))}</b></span><span class="tsec-w" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span>Si girano le carte…</span>'}</div>`}
+  /* mano finita */
+  if(h&&h.stage==='done'&&P&&!(h.reveal&&h.reveal[me])&&S.vt.cardsHand===h.no&&S.vt.cards)
+    return `<div class="v2-acts two"><button class="v2-go call" data-act="vtshow">${ico('eye',18)} Mostra le carte</button>${st.running&&HE.eligible(st).length>=2?`<div class="v2-next">Prossima mano<span class="tsec-w" data-dl="${(h.endedAt||0)+HE.NEXT_DELAY}"><span class="tsec"></span></span></div>`:''}</div>`;
+  if(st.sng&&st.sng.done&&!HE.sngOn(st)&&F.vt.hideRes!==st.sng.endedAt)return '';
+  if(h&&h.stage==='done'&&st.running&&HE.eligible(st).length>=2)
+    return `<div class="v2-turn wide"><span>Prossima mano</span><span class="tsec-w" data-dl="${(h.endedAt||0)+HE.NEXT_DELAY}"><span class="tsec"></span></span></div>`;
+  if(s.out)return `<div class="v2-wait">Sei fuori dal torneo: guarda come finisce</div>`;
+  if(st.lonelyAt&&st.cfg.mode!=='sng')
+    return `<div class="v2-away"><span>Sei rimasto solo. Il tavolo si chiude tra <b class="tsec-w" data-dl="${st.lonelyAt+HE.LONELY_MS}"><span class="tsec"></span></b> se non si siede nessuno.</span><button class="btn ghost" data-act="vtinvite">${ico('uplus',18)} Invita giocatori</button></div>`;
+  if(!st.running){const n=st.cfg.mode==='sng'?st.seats.filter(Boolean).length:HE.eligible(st).length;
+    return n>=2?`<button class="btn v2-start" data-act="vtstart">${st.cfg.mode==='sng'?'Inizia il torneo':'Inizia la partita'} · ${n} giocatori</button>`:`<button class="btn ghost" data-act="vtinvite">${ico('uplus',18)} Invita giocatori</button>`}
+  return `<div class="v2-wait">${HE.eligible(st).length<2?'Aspettate un altro giocatore':'Si mescola…'}</div>`;
+};
+/* intestazione con chat */
+const _topR=topHtml;
+topHtml=function(st){
+  const h=_topR(st),u=S.vt.unread;
+  return h.replace('<button class="v2-ib" data-act="vthist"',`<button class="v2-ib ${F.vt.chatOpen?'on':''}" data-act="vtchat" aria-label="Chat">${ico('chat',20)}${u?`<i class="v2-dot">${u>9?'9+':u}</i>`:''}</button><button class="v2-ib" data-act="vthist"`);
+};
+/* messaggi al centro */
+const _msgR=vtCenterMsg;
+vtCenterMsg=function(st,top,me){
+  if(st&&!st.hand&&!st.closed){
+    const n=st.seats.filter(Boolean).length;
+    if(st.lonelyAt&&st.cfg.mode!=='sng')return `<span class="v2-hint">Il tavolo si chiude se non si siede nessuno</span>`;
+    if(n<2)return `<span class="v2-hint">${n?'Aspettate un altro giocatore':'Tavolo libero'}</span>`;
+  }
+  return _msgR(st,top,me);
+};
+/* disegno: pannello chat + avvisi di chi esce */
+const _paintR=vtPaint;
+vtPaint=function(){
+  _paintR();
+  const st=S.vt.st;
+  vtChatPanel();
+  if(st)vtOutToast(st);
+};
+/* battito: serve un giro anche per chiusura e pause scadute */
+const _vtLiveR=vtLive;
+setInterval(()=>{
+  if(!(V&&V.name==='vt'&&S.table&&S.vt.st))return;
+  const st=S.vt.st,sn=vtNow();let need=false;
+  if(st.closed)return;
+  if(st.lonelyAt&&sn>st.lonelyAt+HE.LONELY_MS+500)need=true;
+  if(st.running&&st.hand&&st.hand.stage==='done'&&HE.eligible(st).length<2&&sn>(st.hand.endedAt||0)+HE.NEXT_DELAY+2800)need=true;
+  if(!vtLive()&&st.seats.some(s=>s&&s.away&&s.awayAt&&sn>s.awayAt+420000+500))need=true;
+  if(need&&Date.now()-(S.vt.lastTick||0)>2000&&vtSeat()>=0){S.vt.lastTick=Date.now();vtCall('tick',{},true)}
+},1000);
+/* apertura/chiusura stanza: chat agganciata */
+const _openRoomR=vtOpenRoom;
+vtOpenRoom=function(rid){
+  if(S.vt.rid!==rid){S.vt.lastOut=null}
+  _openRoomR(rid);vtChatSub();
+};
+const _resetR2=vtReset;
+vtReset=function(){vtChatUnsub();_resetR2();S.vt.chat=[];S.vt.unread=0;F.vt.chatOpen=false;vtChatPanel()};
+/* menu del tavolo: ricariche e pausa */
+const _menuR=vtMenuSheet;
+vtMenuSheet=function(){
+  const st=S.vt.st,me=vtSeat(),s=me>=0&&st&&st.seats[me],live=vtLive(),sngR=st&&HE.sngOn(st);
+  let h=_menuR();
+  if(st&&!sngR&&st.cfg.mode!=='sng'){
+    const c=F.vt.cfg,mr=c.maxRebuys==null?(st.cfg.maxRebuys==null?2:st.cfg.maxRebuys):c.maxRebuys;
+    const row=`<div class="field"><span>Ricariche per giocatore</span><div class="cgrid" style="grid-template-columns:repeat(4,minmax(0,1fr))">${[[0,'Nessuna'],[1,'1'],[2,'2'],[99,'∞']].map(([v,l])=>`<button class="chip t ${+mr===v?'on':''}" data-act="vcreb" data-v="${v}" ${live?'disabled':''}>${l}</button>`).join('')}</div><span class="xs">Chi finisce le fiches lascia il posto e può rientrare, fino a questo numero di volte.</span></div>`;
+    h=h.replace('<button class="btn ghost" data-act="vtcfg"',row+'<button class="btn ghost" data-act="vtcfg"');
+  }
+  if(s&&!s.away&&!live)h=h.replace('<button class="li" data-act="vtleave">',`<button class="li" data-act="vtpause"><span class="lic">${ico('clock',17)}</span><span class="grow">Salta le prossime mani<span class="mut xs" style="display:block">Rientri quando vuoi</span></span></button><button class="li" data-act="vtleave">`);
+  return h;
+};
+Object.assign(H,{
+  vtchat(){F.vt.chatOpen=!F.vt.chatOpen;if(F.vt.chatOpen)S.vt.unread=0;if(V&&V.name==='vt')vtPaint();else render();vtChatPanel()},
+  vtquick(d){vtChatSend(d.q)},
+  vtpause(){SH=null;vtDo('away',{away:true})},
+  vcreb(d){F.vt.cfg=Object.assign({},F.vt.cfg,{maxRebuys:+d.v});render()},
+  vtcfg(){const c=F.vt.cfg;vtDo('config',{cfg:{sb:+c.sb,bb:+c.bb,stack:+c.stack,turnSec:+c.turnSec,mode:c.mode,lvlMin:+c.lvlMin||6,maxRebuys:c.maxRebuys==null?undefined:+c.maxRebuys}}).then(r=>{if(r){SH=null;render();toast('Regole salvate','ok')}})},
+  vtrebuy(){vtDo('sit',{seat:-1})}
+});
+/* creazione tavolo: scelta delle ricariche */
+const _newSheetR=vtNewSheet;
+vtNewSheet=function(){
+  const n=F.vnew;if(n.maxRebuys==null)n.maxRebuys=2;
+  let h=_newSheetR();
+  if(n.mode!=='sng'){
+    const row=`<div class="field"><span>Ricariche per giocatore</span><div class="cgrid" style="grid-template-columns:repeat(4,minmax(0,1fr))">${[[0,'Nessuna'],[1,'1'],[2,'2'],[99,'∞']].map(([v,l])=>`<button class="chip t ${+n.maxRebuys===v?'on':''}" data-act="vnreb" data-v="${v}">${l}</button>`).join('')}</div><span class="xs">Chi finisce le fiches lascia il posto e può rientrare, fino a questo numero di volte.</span></div>`;
+    h=h.replace('<button class="btn" data-act="vncreate"',row+'<button class="btn" data-act="vncreate"');
+  }
+  return h;
+};
+H.vnreb=function(d){F.vnew.maxRebuys=+d.v;render()};
+const _vncreate=H.vncreate;
+H.vncreate=async function(){
+  const n=F.vnew;if(!n||n.busy)return;
+  const cfg={sb:+n.sb,bb:+n.bb,stack:+n.stack,turnSec:+n.turnSec||25,mode:n.mode,lvlMin:+n.lvlMin||6,maxRebuys:n.mode==='sng'?0:(+n.maxRebuys||0)};
+  if(!(cfg.sb>0&&cfg.bb>=cfg.sb&&cfg.stack>=cfg.bb*2)){toast('Controlla bui e fiches: il grande buio non può essere più piccolo del piccolo','err');return}
+  n.busy=true;render();
+  const r=await vtCall('create',{name:n.name.trim(),maxSeats:n.ms,cfg});
+  n.busy=false;
+  if(r&&r.rid){S.vt.rooms[r.rid]=r.state;SH=null;F.vnew=null;vtOpenRoom(r.rid);toast('Tavolo creato: invita gli altri','ok')}else render();
+};
+/* lobby: dice se puoi rientrare */
+const _lobbyR=vLobby;
+vLobby=function(){
+  let h=_lobbyR();const acct=myAcct(),u=S.vt.unread;
+  h=h.replace('<button class="me-btn" data-act="vtinvite"',`<button class="me-btn chatb ${F.vt.chatOpen?'on':''}" data-act="vtchat" aria-label="Chat">${ico('chat',22)}${u?`<i class="v2-dot">${u>9?'9+':u}</i>`:''}</button><button class="me-btn" data-act="vtinvite"`);
+  Object.values(S.vt.rooms).forEach(st=>{
+    if(!st.room||st.closed)return;
+    const was=(st.busted||{})[acct],seated=st.seats.some(x=>x&&x.acct===acct);
+    if(!was||seated)return;
+    const left=HE.rebuysLeft(st,acct);
+    h=h.replace(new RegExp('(data-rid="'+st.room.id+'"[\\s\\S]*?)<span class="vr-st'),`$1<span class="vr-back">${left?'Puoi rientrare':'Ricariche finite'}</span><span class="vr-st`);
+  });
+  return h;
+};
+
+/* =====================================================================
+   Musichetta da poker: jazz lounge generato dall'app (nessun file da
+   scaricare). Si accende e si spegne dalle impostazioni del tavolo.
+   ===================================================================== */
+Object.assign(IP,{music:'M9 18V5l12-2v13M9 18a3 3 0 11-6 0 3 3 0 016 0zM21 16a3 3 0 11-6 0 3 3 0 016 0z'});
+S.vt.music=LS.get('vtmusic',true);
+const MUS=(()=>{
+  let A=null,g=null,timer=null,step=0,next=0,duck=0;
+  const BPM=94,BEAT=60/BPM,BAR=BEAT*4;
+  const f=m=>440*Math.pow(2,(m-69)/12);
+  /* ii - V - I - VI in Fa maggiore, giro di quattro battute */
+  const PROG=[
+    {bass:[43,50,55,53],ch:[58,62,65]},   // Gm7
+    {bass:[48,55,52,50],ch:[52,55,58,64]},// C7
+    {bass:[41,48,45,43],ch:[57,60,64]},   // FM7
+    {bass:[38,45,41,40],ch:[57,60,62]}    // Dm7 -> ritorno
+  ];
+  function ctx(){
+    if(!A){try{A=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return null}
+      g=A.createGain();g.gain.value=0;
+      const lp=A.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2600;
+      g.connect(lp).connect(A.destination);
+    }
+    try{if(A.state==='suspended')A.resume()}catch(e){}
+    return A;
+  }
+  const vol=()=>S.vt.music===false?0:(Date.now()<duck?.016:.05);
+  function note(t,fr,dur,v,type,det){
+    const o=A.createOscillator(),n=A.createGain();
+    o.type=type||'sine';o.frequency.value=fr;if(det)o.detune.value=det;
+    n.gain.setValueAtTime(.0001,t);
+    n.gain.exponentialRampToValueAtTime(Math.max(.0002,v),t+.02);
+    n.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(n).connect(g);o.start(t);o.stop(t+dur+.05);
+  }
+  function brush(t,v){
+    const len=Math.floor(A.sampleRate*.09),b=A.createBuffer(1,len,A.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.4);
+    const s=A.createBufferSource();s.buffer=b;
+    const bp=A.createBiquadFilter();bp.type='bandpass';bp.frequency.value=5200;bp.Q.value=.8;
+    const n=A.createGain();n.gain.value=v;
+    s.connect(bp).connect(n).connect(g);s.start(t);
+  }
+  function schedule(){
+    if(!A)return;
+    g.gain.setTargetAtTime(vol(),A.currentTime,.4);
+    while(next<A.currentTime+.6){
+      const bar=PROG[(step>>2)%4],beat=step%4,t=next;
+      note(t,f(bar.bass[beat]),BEAT*.9,.5,'triangle');                     // basso che cammina
+      if(beat===0||beat===2)bar.ch.forEach((m,k)=>note(t+(beat===2?.06:0)+k*.012,f(m),BEAT*1.5,.11,'sine',k===1?5:-4)); // accordi morbidi
+      if(beat===1||beat===3)brush(t,.09);                                   // spazzole
+      brush(t+BEAT*.5,.035);
+      next+=BEAT;step++;
+    }
+  }
+  return {
+    on(){
+      if(S.vt.music===false)return;
+      if(!ctx())return;
+      if(next<A.currentTime)next=A.currentTime+.08;
+      if(!timer)timer=setInterval(schedule,200);
+      schedule();
+    },
+    off(){if(timer){clearInterval(timer);timer=null}if(g&&A)g.gain.setTargetAtTime(0,A.currentTime,.25)},
+    duck(ms){duck=Date.now()+(ms||1400)}
+  };
+})();
+const _sndTurn=SND.turn;SND.turn=function(){MUS.duck(1600);_sndTurn()};
+const _sndWin=SND.win;SND.win=function(){MUS.duck(2600);_sndWin()};
+function vtMusicSync(){
+  const want=V&&V.name==='vt'&&S.table&&S.vt.st&&!document.hidden&&S.vt.music!==false;
+  if(want)MUS.on();else MUS.off();
+}
+document.addEventListener('visibilitychange',vtMusicSync);
+const _paintM=vtPaint;
+vtPaint=function(){_paintM();vtMusicSync()};
+const _renderM=render;
+render=function(){const r=_renderM.apply(this,arguments);if(!(V&&V.name==='vt'))MUS.off();return r};
+const _menuM=vtMenuSheet;
+vtMenuSheet=function(){
+  return _menuM().replace(/(<button class="li" data-act="vtsound">[\s\S]*?<\/button>)/,
+    `$1<button class="li" data-act="vtmusic"><span class="lic">${ico('music',17)}</span><span class="grow">Musica di sottofondo<span class="mut xs" style="display:block">Jazz leggero mentre giocate</span></span><span class="sw ${S.vt.music!==false?'on':''}"><i></i></span></button>`);
+};
+H.vtmusic=function(){S.vt.music=S.vt.music===false;LS.set('vtmusic',S.vt.music);vtMusicSync();render()};
+
+/* =====================================================================
+   Schermata di ingresso: scegli Reale o Virtuale
+   ===================================================================== */
+vMode=function(){
+  const R=Object.values(S.vt.rooms).filter(x=>!x.closed),ppl=R.reduce((a,x)=>a+x.seats.filter(Boolean).length,0);
+  const liveR=R.filter(x=>x.running||(x.hand&&x.hand.stage!=='done')).length;
+  const gs=Object.values(S.games||{}).filter(g=>g.status==='closed'&&g.kind!=='netting').sort((a,b)=>String(b.scheduledAt).localeCompare(String(a.scheduledAt)));
+  const liveG=Object.values(S.games||{}).find(g=>g.status==='live');
+  const mine=S.me?owedMap(Object.entries(S.games).map(([id,g])=>Object.assign({id},g)))[S.me.id]:null;
+  const net=mine?sum(mine.get.map(x=>x.amt))-sum(mine.give.map(x=>x.amt)):0;
+  const rStat=liveG?'Partita in corso':gs.length?`${gs.length} serat${gs.length===1?'a':'e'} giocate`:'Nessuna serata ancora';
+  const vStat=S.vt.missing?'Da attivare in Supabase':R.length?`${R.length} tavol${R.length===1?'o':'i'} · ${ppl} giocator${ppl===1?'e':'i'}`:'Nessun tavolo aperto';
+  const chip=(c,x,y,r)=>`<span class="cs-chip" style="--c:${c};left:${x}%;top:${y}%;--r:${r}deg"></span>`;
+  return `<div class="cas">
+<header class="cas-hd">
+  <div class="cas-orn"><i>♠</i><i class="r">♥</i><i class="r">♦</i><i>♣</i></div>
+  <h1>${esc(S.table.name)}</h1>
+  <p>Come giocate oggi?</p>
+  <button class="me-btn cas-me" data-act="meopen" aria-label="Il mio profilo">${ava(S.me?S.me.name:'?')}</button>
+</header>
+<main class="cas-main">
+  <button class="cas-card real" data-act="goreal">
+    <span class="cas-tx"><span class="cas-k">Tavolo vero</span><b>Reale</b><span class="cas-d">Buy-in, debiti e classifica delle vostre serate.</span>
+    <span class="cas-st ${liveG?'live':''}">${esc(rStat)}${net?` · ${net>0?'ti devono':'devi'} ${eurS(Math.abs(net))}`:''}</span></span>
+    <span class="cas-art">${chip('#C8283E',6,30,-12)}${chip('#2F6FD6',40,10,8)}${chip('#E2B65B',24,52,-4)}<span class="cs-note"><b>€</b></span></span>
+  </button>
+  <button class="cas-card virt" data-act="govt">
+    <span class="cas-tx"><span class="cas-k">Fiches finte · gratis</span><b>Virtuale</b><span class="cas-d">Texas Hold'em online, ognuno dal suo telefono.</span>
+    <span class="cas-st ${liveR?'live':''}">${esc(vStat)}</span></span>
+    <span class="cas-art casfelt"><span class="cs-oval"></span><span class="cs-cd a">A<i>♠</i></span><span class="cs-cd b">K<i class="r">♥</i></span>${chip('#E2B65B',56,56,10)}${chip('#2E9E5B',34,64,-8)}</span>
+  </button>
+</main>
+<footer class="cas-ft"><button class="link" data-act="totables">Cambia tavolo</button></footer>
+</div>`;
+};
+
+/* l'animazione di ingresso non deve restare attaccata: su iOS terrebbe
+   la barra in basso agganciata alla pagina invece che allo schermo */
+const _renderAnim=render;
+render=function(){
+  const r=_renderAnim.apply(this,arguments);
+  const el=$('#app')&&$('#app').firstElementChild;
+  if(el&&/enter-/.test(el.className||'')){
+    const done=()=>el.classList.remove('enter-push','enter-back','enter-fade');
+    el.addEventListener('animationend',done,{once:true});
+    clearTimeout(el.__ea);el.__ea=setTimeout(done,420);
+  }
+  return r;
+};
+
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791829668183';
+const APP_VERSION='1791834915675';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
