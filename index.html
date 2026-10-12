@@ -298,6 +298,17 @@ body.noscroll #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))}
 /* le liste non devono mai restringersi dentro i fogli (iOS) */
 .sheet-body>*{flex-shrink:0}
 .list,.li{flex-shrink:0}
+/* torneo */
+.tclockbox{display:flex;flex-direction:column;gap:6px;padding:20px}
+.tblinds{text-align:center;font-family:var(--serif);font-weight:800;font-size:40px;letter-spacing:-.02em;margin-top:6px}
+.tblinds span{color:var(--mut);font-weight:500}
+.tclock{text-align:center;font-family:var(--serif);font-weight:800;font-size:86px;line-height:1;letter-spacing:-.04em;margin:4px 0 6px}
+.tclock.pz{color:var(--mut)}
+.tprog{height:8px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.tprog i{display:block;height:100%;background:var(--gold);border-radius:99px;transition:width 1s linear}
+.tctl{display:grid;grid-template-columns:56px 1fr 56px;gap:10px;margin-top:14px;align-items:center}
+.tctl .btn-s{min-height:56px;border-radius:18px;padding:0}
+.netb .suit{background:rgba(52,199,89,.16);color:#5BE07D}
 </style>
 
 <div id="app"></div>
@@ -422,6 +433,8 @@ const hueOf=s=>{let h=7;for(const c of String(s).toLowerCase())h=(h*31+c.charCod
 const inits=n=>{const w=String(n).trim().split(/\s+/);return ((w[0]||'?')[0]+(w.length>1?w[1][0]:'')).toUpperCase()};
 const ava=(n,s)=>`<span class="ava ${s||''}" style="--h:${hueOf(n)}"><i>${esc(inits(n))}</i></span>`;
 const dDay=iso=>new Date(iso).getDate();
+const pKey=(id,name)=>id&&id!=='dealer'?id:'n:'+String(name||'').trim().toLowerCase();
+const pName=(id,name)=>(id&&typeof S!=='undefined'&&S.players&&S.players[id]&&S.players[id].name)||name;
 const sgnS=c=>(c>0?'+':c<0?'−':'')+eurS(Math.abs(c));
 const eurS=c=>(c%100===0?(c/100).toLocaleString('it-IT'):nf.format(c/100))+' €';
 const dMon=iso=>new Date(iso).toLocaleDateString('it-IT',{month:'short'}).replace('.','');
@@ -681,9 +694,9 @@ function owedMap(gs){
   const bal={};
   gs.filter(g=>g.status==='closed').forEach(g=>(g.debts||[]).forEach(d=>{
     if(!(d.remainingAmount>0))return;
-    const fk=String(d.fromPlayerName).trim().toLowerCase(),tk=String(d.toPlayerName).trim().toLowerCase();
-    (bal[fk]=bal[fk]||{give:[],get:[]}).give.push({who:d.toPlayerName,amt:d.remainingAmount,gid:g.id,at:g.scheduledAt});
-    (bal[tk]=bal[tk]||{give:[],get:[]}).get.push({who:d.fromPlayerName,amt:d.remainingAmount,gid:g.id,at:g.scheduledAt});
+    const fk=pKey(d.fromPlayerId,d.fromPlayerName),tk=pKey(d.toPlayerId,d.toPlayerName);
+    (bal[fk]=bal[fk]||{give:[],get:[]}).give.push({who:pName(d.toPlayerId,d.toPlayerName),amt:d.remainingAmount,gid:g.id,at:g.scheduledAt});
+    (bal[tk]=bal[tk]||{give:[],get:[]}).get.push({who:pName(d.fromPlayerId,d.fromPlayerName),amt:d.remainingAmount,gid:g.id,at:g.scheduledAt});
   }));
   return bal;
 }
@@ -704,7 +717,7 @@ ${t.err?`<div class="red sm">${esc(t.err)}</div>`:''}
 function playerStats(k){
   const gs=Object.entries(S.games).map(([id,g])=>Object.assign({id},g)).filter(g=>g.status==='closed').sort((a,b)=>String(a.scheduledAt).localeCompare(String(b.scheduledAt)));
   const rows=[];let name='';
-  gs.forEach(g=>{const p=plist(g).find(x=>x.playerName.trim().toLowerCase()===k);if(!p)return;name=p.playerName;rows.push({gid:g.id,at:g.scheduledAt,net:p.netCents||0,inv:inv(p),buys:p.buyIns.length,n:plist(g).length})});
+  gs.forEach(g=>{const p=plist(g).find(x=>pKey(x.playerId,x.playerName)===k||x.playerName.trim().toLowerCase()===k);if(!p)return;name=pName(p.playerId,p.playerName);rows.push({gid:g.id,at:g.scheduledAt,net:p.netCents||0,inv:inv(p),buys:p.buyIns.length,n:plist(g).length})});
   const tot=sum(rows.map(r=>r.net)),wins=rows.filter(r=>r.net>0).length,invT=sum(rows.map(r=>r.inv));
   let streak=0,sk=rows.length?Math.sign(rows[rows.length-1].net):0;
   if(sk!==0)for(let i=rows.length-1;i>=0&&Math.sign(rows[i].net)===sk;i--)streak++;
@@ -780,7 +793,7 @@ ${M?`<button class="btn" data-act="setsave">Salva</button>`:''}</div>
 </div></div>`;
 }
 function rankRow(r,i,bal){
-  const k=r.name.trim().toLowerCase(),b=bal[k]||{give:[],get:[]};
+  const k=r.key,b=bal[k]||{give:[],get:[]};
   const give=sum(b.give.map(x=>x.amt)),get=sum(b.get.map(x=>x.amt)),open=!!F.open['rk:'+k];
   const items=(list,cls)=>list.slice().sort((x,y)=>String(y.at).localeCompare(String(x.at))).map(x=>`<button class="li" data-act="detail" data-gid="${x.gid}">${ava(x.who,'xs')}<span class="grow"><b>${esc(x.who)}</b><span class="mut xs"> · ${dDay(x.at)} ${dMon(x.at)}</span></span><b class="num ${cls}">${eur(x.amt)}</b></button>`).join('');
   const sub=[`${r.n} partit${r.n===1?'a':'e'}`,`${r.w} vint${r.w===1?'a':'e'}`];
@@ -796,11 +809,11 @@ function homeData(){
   const live=gs.find(g=>g.status==='live'&&g.id===LS.get('active',null))||gs.find(g=>g.status==='live');
   const agg={};
   gs.filter(g=>g.status==='closed').forEach(g=>plist(g).forEach(p=>{
-    const k=p.playerName.trim().toLowerCase();const a=agg[k]||(agg[k]={name:p.playerName,n:0,w:0,tot:0});
+    const k=pKey(p.playerId,p.playerName);const a=agg[k]||(agg[k]={key:k,name:pName(p.playerId,p.playerName),n:0,w:0,tot:0});
     a.n++;if((p.netCents||0)>0)a.w++;a.tot+=p.netCents||0;
   }));
   const rank=Object.values(agg).sort((a,b)=>b.tot-a.tot),bal=owedMap(gs);
-  const mine=S.me?(bal[S.me.name.trim().toLowerCase()]||{give:[],get:[]}):{give:[],get:[]};
+  const mine=S.me?(bal[S.me.id]||{give:[],get:[]}):{give:[],get:[]};
   return {gs,live,rank,bal,mine};
 }
 const inviteFriends=()=>waHref(`Ciao! Registrati su Home Poker per giocare con noi e tenere i conti delle serate:\n${APP_URL}`);
@@ -815,10 +828,10 @@ function tabSerata(D){
 ${A?`<div class="pinbar"><span class="row" style="gap:8px">${ico('key',16)}<span>PIN Admin</span></span><b class="num">${esc(adminPinOf(live.id)||'----')}</b></div>`:''}
 <button class="btn" data-act="live" data-gid="${live.id}">Apri la cassa live</button></section>`;
   }else{
-    h+=`<section class="hero stack" style="gap:16px"><div><h2 style="font-size:30px;line-height:1.08">Pronti a giocare?</h2><p class="mut" style="margin:8px 0 0">${gs.length?`Ultima serata: ${dDay(gs[0].scheduledAt)} ${dMon(gs[0].scheduledAt)}, ${eur(netPot(gs[0]))} di montepremi.`:'Apri il tavolo, scegli chi gioca e la cassa si tiene da sola.'}</p></div><button class="btn" data-act="newgame">${ico('plus',18)} Nuova partita</button></section>`;
+    h+=`<section class="hero stack" style="gap:16px"><div><h2 style="font-size:30px;line-height:1.08">Pronti a giocare?</h2><p class="mut" style="margin:8px 0 0">${realGames(gs).length?`Ultima serata: ${dDay(realGames(gs)[0].scheduledAt)} ${dMon(realGames(gs)[0].scheduledAt)}, ${eur(netPot(realGames(gs)[0]))} di montepremi.`:'Apri il tavolo, scegli chi gioca e la cassa si tiene da sola.'}</p></div><button class="btn" data-act="newgame">${ico('plus',18)} Nuova partita</button></section>`;
   }
   if(get>0||give>0)h+=`<div class="two"><button class="card tight tile" data-act="tab" data-t="classifica"><div class="mut xs">Da riscuotere</div><div class="num tval ${get>0?'green':'mut'}">${eur(get)}</div></button><button class="card tight tile" data-act="tab" data-t="classifica"><div class="mut xs">Da dare</div><div class="num tval ${give>0?'red':'mut'}">${eur(give)}</div></button></div>`;
-  if(cr.length)h+=`<div class="sec">Da riscuotere <small class="num">${eur(get)}</small></div><div class="list">${cr.map(x=>`<button class="li" data-act="detail" data-gid="${x.g.id}">${ava(x.d.fromPlayerName,'xs')}<span class="grow"><b>${esc(x.d.fromPlayerName)}</b><span class="mut xs"> · ${dDay(x.g.scheduledAt)} ${dMon(x.g.scheduledAt)}</span></span><b class="num green">${eur(x.d.remainingAmount)}</b>${ico('chevr',16)}</button>`).join('')}</div>`;
+  if(cr.length)h+=`<div class="sec">Da riscuotere <small class="num">${eur(get)}</small></div><div class="list">${cr.map(x=>`<button class="li" data-act="detail" data-gid="${x.g.id}">${ava(pName(x.d.fromPlayerId,x.d.fromPlayerName),'xs')}<span class="grow"><b>${esc(pName(x.d.fromPlayerId,x.d.fromPlayerName))}</b><span class="mut xs"> · ${dDay(x.g.scheduledAt)} ${dMon(x.g.scheduledAt)}</span></span><b class="num green">${eur(x.d.remainingAmount)}</b>${ico('chevr',16)}</button>`).join('')}</div>`;
   if(mine.give.length)h+=`<div class="sec">Da dare <small class="num">${eur(give)}</small></div><div class="list">${mine.give.slice().sort((a,b)=>String(b.at).localeCompare(String(a.at))).map(x=>`<button class="li" data-act="detail" data-gid="${x.gid}">${ava(x.who,'xs')}<span class="grow"><b>${esc(x.who)}</b><span class="mut xs"> · ${dDay(x.at)} ${dMon(x.at)}</span></span><b class="num red">${eur(x.amt)}</b>${ico('chevr',16)}</button>`).join('')}</div>`;
   if(live)h+=`<button class="btn ghost" style="margin-top:4px" data-act="newgame">${ico('plus',18)} Nuova partita</button>`;
   h+=`<div class="list" style="margin-top:10px"><a class="li" href="${inviteFriends()}" target="_blank" rel="noopener"><span class="lic">${ico('share',17)}</span><span class="grow">Invita gli amici nell'app</span>${ico('chevr',16)}</a></div>`;
@@ -835,7 +848,7 @@ function tabClassifica(D){
   const {rank,bal}=D;
   if(!rank.length)return `<div class="card"><b>La classifica parte dalla prima partita</b><p class="mut sm" style="margin:6px 0 0">Dopo la chiusura vedrai chi è in vantaggio e chi deve ancora saldare.</p></div>`;
   let pod='';
-  if(rank.length>=3){const o=[1,0,2];pod=`<div class="podium">${o.map(i=>{const r=rank[i];return `<button class="pod p${i+1}" data-act="pstats" data-k="${esc(r.name.trim().toLowerCase())}">${ava(r.name,i===0?'l':'')}<div class="pn">${esc(r.name)}</div><div class="num pa ${r.tot>=0?'green':'red'}">${sgnS(r.tot)}</div><div class="pb"><span>${i+1}</span></div></button>`}).join('')}</div>`}
+  if(rank.length>=3){const o=[1,0,2];pod=`<div class="podium">${o.map(i=>{const r=rank[i];return `<button class="pod p${i+1}" data-act="pstats" data-k="${esc(r.key)}">${ava(r.name,i===0?'l':'')}<div class="pn">${esc(r.name)}</div><div class="num pa ${r.tot>=0?'green':'red'}">${sgnS(r.tot)}</div><div class="pb"><span>${i+1}</span></div></button>`}).join('')}</div>`}
   return pod+`<div class="mut xs" style="margin:2px 4px 0">Tocca un nome per i suoi saldi e le statistiche.</div>`+rank.map((r,i)=>rankRow(r,i,bal)).join('');
 }
 function vHome(){
@@ -1084,14 +1097,15 @@ const avaN=(n,s)=>n==='Dealer'?`<span class="ava ${s||''}" style="--h:45"><i>�
 const meIsFrom=d=>!!S.me&&(d.fromPlayerId?d.fromPlayerId===S.me.id:String(d.fromPlayerName).toLowerCase()===S.me.name.toLowerCase());
 function debtRow(gid,d){
   const perm=debtPerm(gid,d),done=d.remainingAmount===0,part=d.paidAmount>0&&!done,mine=meIsFrom(d),toMe=isCreditor(d);
-  const st=done?'<span class="st ok">Pagato</span>':part?`<span class="st no num">Restano ${eur(d.remainingAmount)}</span>`:'<span class="st no">Da pagare</span>';
+  const nt=done&&isNetted(d)&&!d.paidAmount;
+  const st=nt?'<span class="st" style="color:var(--mut)">Compensato</span>':done?'<span class="st ok">Pagato</span>':part?`<span class="st no num">Restano ${eur(d.remainingAmount)}</span>`:'<span class="st no">Da pagare</span>';
   return `<div class="debt ${done?'done':''} ${mine||toMe?'me':''}">
 <div class="row" style="gap:12px"><div class="pair">${avaN(d.fromPlayerName,'xs')}<span class="arr">${ico('chevr',14)}</span>${avaN(d.toPlayerName,'xs')}</div>
-<div class="grow" style="min-width:0"><div class="dn">${mine?'<b>Tu</b>':`<b>${esc(d.fromPlayerName)}</b>`}</div><div class="mut sm ell">${toMe?'a <b class="gold">te</b>':'a '+esc(d.toPlayerName)}</div></div>
+<div class="grow" style="min-width:0"><div class="dn">${mine?'<b>Tu</b>':`<b>${esc(pName(d.fromPlayerId,d.fromPlayerName))}</b>`}</div><div class="mut sm ell">${toMe?'a <b class="gold">te</b>':'a '+esc(pName(d.toPlayerId,d.toPlayerName))}</div></div>
 <div style="text-align:right;flex:none"><b class="num amt">${eur(d.totalAmount)}</b><div>${st}</div></div></div>
 ${part?`<div class="meter thin" style="margin-top:10px"><i class="m-g" style="flex:${d.paidAmount} 1 0"></i><i class="m-r" style="flex:${d.remainingAmount} 1 0"></i></div>`:''}
 ${perm.can&&!done?`<button class="btn green sm" data-act="settle" data-did="${d.debtId}">${ico('check',18)} ${toMe?'Li ho ricevuti':'Segna come ricevuto'}</button>`:''}
-${perm.can&&done?`<button class="link" style="min-height:34px;font-size:14px" data-act="settle" data-did="${d.debtId}">Modifica</button>`:''}
+${perm.can&&done&&!nt?`<button class="link" style="min-height:34px;font-size:14px" data-act="settle" data-did="${d.debtId}">Modifica</button>`:''}
 ${mine&&!done?`<div class="stack" style="margin-top:10px;gap:8px">${payBlock(d)}</div>`:''}</div>`;
 }
 function vDetail(){
@@ -1611,7 +1625,8 @@ async function makeBase(){
       onSnapshot(cb){return watch(()=>{const d=colDocs(c);return {docs:d,size:d.length,empty:!d.length}},cb)}});
     return {doc,collection,close(){clearInterval(iv);document.removeEventListener('visibilitychange',vis);try{sb.removeChannel(ch)}catch(e){}}};
   }
-  return {getDoc,rpc,scope};
+  async function fn(name,body){const {data,error}=await sb.functions.invoke(name,{body});if(error)throw error;return data}
+  return {getDoc,rpc,scope,fn,sb};
 }
 
 /* ===== Tavolo: entra o crea ===== */
@@ -1794,7 +1809,7 @@ sheetHtml=function(){
   if(s.type==='me'&&S.me){
     title='Profilo';
     body=`<div class="row" style="gap:14px">${ava(S.me.name,'l')}<div class="grow"><div class="pl-name">${esc(S.me.name)}</div><div class="mut sm">${esc(S.table?S.table.name:'')}${isManager()?' · gestore':''}</div></div></div>
-<div class="list">${li('chip','I miei tavoli','tables')}${li('bars','Le mie statistiche','pstats',`data-k="${esc(S.me.name.trim().toLowerCase())}"`)}${li('coins','Come vuoi essere pagato','paym')}</div>
+<div class="list">${li('chip','I miei tavoli','tables')}${li('bars','Le mie statistiche','pstats',`data-k="${esc(S.me.id)}"`)}${li('coins','Come vuoi essere pagato','paym')}</div>
 <div class="list">${li('gear','Impostazioni tavolo','settings')}${li('share','Esporta i dati','export')}${legacyProfiles().length?li('link','Collega il mio vecchio profilo','relink'):''}</div>
 <div class="list">${bioLi()}${li('key','Cambia PIN','chpin')}</div>
 <button class="btn ghost" data-act="logout">${acctBio()?'Blocca l\'app':'Esci dall\'account'}</button>
@@ -1997,8 +2012,471 @@ render=function(){
 /* ogni foglio che chiede conferma parte da Face ID, se attivo */
 ['settle','subtap','histundo','delme'].forEach(k=>{const f=H[k];if(f)H[k]=function(d,e){F.usePin=false;F.bioOk=0;return f.call(this,d,e)}});
 
+/* =====================================================================
+   Funzioni nuove: compensazione saldi, resoconto come immagine, torneo,
+   serate programmate, notifiche push, cambio nome utente
+   ===================================================================== */
+const isNetted=d=>(d.transactions||[]).some(t=>t.status==='NETTED');
+const realGames=gs=>gs.filter(g=>g.kind!=='netting'&&g.status!=='scheduled');
+
+/* ---------- 1. Compensazione dei saldi tra serate ---------- */
+function openDebtsAll(){
+  return Object.entries(S.games).filter(([id,g])=>g.status==='closed').flatMap(([id,g])=>(g.debts||[]).filter(d=>d.remainingAmount>0&&!isDealerD(d)&&d.fromPlayerId!=='dealer').map(d=>({gid:id,g,d})));
+}
+function nettingPlan(){
+  const L=openDebtsAll();if(L.length<2)return null;
+  const bal={},names={};
+  L.forEach(({d})=>{const f=pKey(d.fromPlayerId,d.fromPlayerName),t=pKey(d.toPlayerId,d.toPlayerName);bal[f]=(bal[f]||0)-d.remainingAmount;bal[t]=(bal[t]||0)+d.remainingAmount;names[f]=pName(d.fromPlayerId,d.fromPlayerName);names[t]=pName(d.toPlayerId,d.toPlayerName)});
+  const nets=Object.keys(bal).filter(k=>bal[k]!==0).map(k=>({name:names[k],pid:k.startsWith('n:')?null:k,net:bal[k]}));
+  const tx=settle(nets);
+  if(tx.length>=L.length)return null;
+  return {old:L,tx,total:sum(L.map(x=>x.d.remainingAmount)),newTotal:sum(tx.map(t=>t.amt)),games:new Set(L.map(x=>x.gid)).size};
+}
+function nettingBanner(){
+  const P=nettingPlan();if(!P)return '';
+  return `<button class="card tap gcard netb" data-act="netting"><span class="suit">${ico('link',22)}</span><div class="grow"><div style="font-weight:700">Compensa i saldi</div><div class="mut sm">${P.old.length} debiti aperti diventano ${P.tx.length} pagamenti</div></div>${ico('chevr',18)}</button>`;
+}
+function vNetting(){
+  const P=nettingPlan(),M=isManager();
+  if(!P)return `<div class="wrap">${backBtn('home','Indietro')}<h1>Compensa i saldi</h1><p class="mut">Non c'è niente da compensare: i debiti aperti sono già ridotti al minimo.</p></div>`;
+  const tx=P.tx.slice().sort((a,b)=>b.amt-a.amt);
+  return `<div class="wrap">${backBtn('home','Indietro')}
+<h1>Compensa i saldi</h1>
+<div class="hero stack" style="margin-top:14px;gap:12px;padding:20px">
+<div class="row" style="gap:16px;align-items:flex-end"><div><div class="mut sm">Oggi</div><div class="bignum" style="font-size:44px">${P.old.length}</div><div class="mut xs">debiti in ${P.games} serat${P.games===1?'a':'e'}</div></div><span class="mut" style="padding-bottom:22px">${ico('chevr',26)}</span><div><div class="mut sm">Dopo</div><div class="bignum green" style="font-size:44px">${P.tx.length}</div><div class="mut xs">pagamenti</div></div></div>
+<p class="mut sm" style="margin:0">Ognuno paga o riceve esattamente lo stesso totale di prima, ma con meno passaggi: chi deve soldi a qualcuno che a sua volta ne deve, salta l'intermediario.</p></div>
+<div class="sec">I nuovi pagamenti <small class="num">${eurS(P.newTotal)}</small></div>
+<div class="card stack" style="gap:0;padding:6px 16px">${tx.map(t=>`<div class="debt"><div class="row" style="gap:12px"><div class="pair">${ava(t.from,'xs')}<span class="arr">${ico('chevr',14)}</span>${ava(t.to,'xs')}</div><div class="grow" style="min-width:0"><div class="dn"><b>${esc(t.from)}</b></div><div class="mut sm ell">a ${esc(t.to)}</div></div><b class="num amt">${eur(t.amt)}</b></div></div>`).join('')}</div>
+<details class="card" style="margin-top:12px"><summary class="mut sm" style="cursor:pointer">Debiti che vengono sostituiti (${P.old.length})</summary><div class="stack" style="gap:6px;margin-top:10px">${P.old.map(x=>`<div class="row sp sm"><span>${esc(pName(x.d.fromPlayerId,x.d.fromPlayerName))} → ${esc(pName(x.d.toPlayerId,x.d.toPlayerName))} <span class="mut xs">· ${dDay(x.g.scheduledAt)} ${dMon(x.g.scheduledAt)}</span></span><b class="num">${eur(x.d.remainingAmount)}</b></div>`).join('')}</div></details>
+${M?'':'<div class="note" style="margin:12px 0 0">Solo un gestore del tavolo può confermare la compensazione.</div>'}
+</div>
+${M?`<div class="bar"><div class="bar-in"><button class="btn" data-act="netok">Compensa: ${P.old.length} → ${P.tx.length} pagamenti</button></div></div>`:''}`;
+}
+async function applyNetting(){
+  if(!isManager())return;
+  const P=nettingPlan();if(!P)return;
+  const now=new Date().toISOString(),nid0='n'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  const byG={};P.old.forEach(x=>(byG[x.gid]=byG[x.gid]||[]).push(x.d.debtId));
+  for(const gid of Object.keys(byG)){
+    const ok=await saveGame(gid,g=>{(g.debts||[]).forEach(d=>{if(byG[gid].includes(d.debtId)){d.transactions.forEach(t=>{if(t.status==='PENDING'){t.status='NETTED';t.nettedBy=nid0;t.lastUpdated=now}});recompute(d)}})});
+    if(!ok){toast('Compensazione interrotta: riprova','err');return}
+  }
+  const doc={kind:'netting',status:'closed',scheduledAt:now,closedAt:now,createdAt:now,hostName:S.me.name,hostId:S.me.id,players:{},hist:[],
+    debts:P.tx.map((t,i)=>({debtId:'debt_n'+(i+1)+'_'+Math.random().toString(36).slice(2,6),fromPlayerName:t.from,toPlayerName:t.to,fromPlayerId:t.fromId,toPlayerId:t.toId,totalAmount:t.amt,paidAmount:0,remainingAmount:t.amt,transactions:[{subId:nid('s'),amount:t.amt,status:'PENDING',lastUpdated:now}]})),
+    replaced:P.old.map(x=>({gid:x.gid,debtId:x.d.debtId,amt:x.d.remainingAmount,from:pName(x.d.fromPlayerId,x.d.fromPlayerName),to:pName(x.d.toPlayerId,x.d.toPlayerName),at:x.g.scheduledAt}))};
+  try{await db.doc('games/'+nid0).set(doc);S.games[nid0]=doc}catch(e){toast(errMsg(e),'err');return}
+  go('detail',nid0);toast(`Fatto: ${P.old.length} debiti diventano ${P.tx.length} pagamenti`,'ok');
+}
+async function undoNetting(gid){
+  const n=S.games[gid];if(!n||n.kind!=='netting'||!isManager())return;
+  if((n.debts||[]).some(d=>d.paidAmount>0)){toast('Qualcuno ha già segnato un pagamento: annulla prima quello.','err');return}
+  if(!arm('netundo'))return;
+  const byG={};(n.replaced||[]).forEach(r=>(byG[r.gid]=byG[r.gid]||[]).push(r.debtId));
+  for(const g0 of Object.keys(byG)){
+    if(!S.games[g0])continue;
+    await saveGame(g0,g=>{(g.debts||[]).forEach(d=>{if(byG[g0].includes(d.debtId)){d.transactions.forEach(t=>{if(t.status==='NETTED'&&t.nettedBy===gid){t.status='PENDING';delete t.nettedBy}});recompute(d)}})});
+  }
+  try{await db.doc('games/'+gid).delete();delete S.games[gid]}catch(e){toast(errMsg(e),'err');return}
+  go('home');toast('Compensazione annullata: tornano i debiti di prima','ok');
+}
+function vNettingDetail(){
+  const gid=V.gid,g=S.games[gid],D=g.debts||[],R=g.replaced||[],M=isManager();
+  const nDone=D.filter(d=>d.remainingAmount===0).length;
+  return `<div class="wrap">${backBtn('home','Home')}
+<h1>Compensazione dei saldi</h1><div class="mut sm" style="margin-top:4px">${dDay(g.scheduledAt)} ${dMon(g.scheduledAt)} · fatta da ${esc(g.hostName)}</div>
+<div class="note" style="margin:14px 0 0">${R.length} debiti di ${new Set(R.map(r=>r.gid)).size} serate sono stati sostituiti da questi ${D.length} pagamenti.</div>
+<div class="sec">Saldo finale <small>${nDone} di ${D.length} pagat${D.length===1?'o':'i'}</small></div>
+<div class="mut xs" style="margin:-2px 4px 8px">Ogni pagamento lo segna chi riceve i soldi.</div>
+<div class="card stack" style="gap:0;padding:8px 16px 10px">${D.slice().sort((a,b)=>(a.remainingAmount===0)-(b.remainingAmount===0)||(meIsFrom(b)||isCreditor(b))-(meIsFrom(a)||isCreditor(a))).map(d=>debtRow(gid,d)).join('')}</div>
+<details class="card" style="margin-top:12px"><summary class="mut sm" style="cursor:pointer">Debiti sostituiti (${R.length})</summary><div class="stack" style="gap:6px;margin-top:10px">${R.map(r=>`<div class="row sp sm"><span>${esc(r.from)} → ${esc(r.to)} <span class="mut xs">· ${dDay(r.at)} ${dMon(r.at)}</span></span><b class="num">${eur(r.amt)}</b></div>`).join('')}</div></details>
+${histBlock(g,'detail')}
+${M?`<div style="text-align:center;margin-top:14px"><button class="link" data-act="netundo" data-gid="${gid}">${armed.netundo?'Confermi? Tocca di nuovo':'Annulla la compensazione'}</button></div>`:''}</div>`;
+}
+
+/* ---------- 5. Resoconto come immagine ---------- */
+async function shareCard(gid){
+  const g=S.games[gid];if(!g)return;
+  try{await Promise.all([document.fonts.load('800 60px "Bricolage Grotesque"'),document.fonts.load('600 30px "Instrument Sans"')])}catch(e){}
+  const W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  const SF='"Bricolage Grotesque",system-ui,sans-serif',IF='"Instrument Sans",system-ui,sans-serif';
+  const bg=x.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#262C57');bg.addColorStop(.55,'#161A2B');bg.addColorStop(1,'#0E0F13');x.fillStyle=bg;x.fillRect(0,0,W,H);
+  x.save();x.strokeStyle='rgba(255,255,255,.07)';x.lineWidth=46;x.setLineDash([46,40]);x.beginPath();x.arc(W-90,110,250,0,Math.PI*2);x.stroke();x.restore();
+  const txt=(s,X,Y,font,col,al)=>{x.font=font;x.fillStyle=col;x.textAlign=al||'left';x.fillText(s,X,Y)};
+  const fit=(s,max,font)=>{x.font=font;let t=String(s);while(t.length>1&&x.measureText(t).width>max)t=t.slice(0,-1);return t===String(s)?t:t.slice(0,-1)+'…'};
+  const day=(t=>t[0].toUpperCase()+t.slice(1))(new Date(g.scheduledAt).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}));
+  txt('HOME POKER · '+String(S.table?S.table.name:'').toUpperCase(),72,110,'600 30px '+IF,'#C9D0FF');
+  txt(fit(day,940,'800 76px '+SF),72,200,'800 76px '+SF,'#F4F2ED');
+  const isT=g.kind==='tournament',L=plist(g).slice().sort((a,b)=>isT?((a.out||1)-(b.out||1)):((b.netCents||0)-(a.netCents||0)));
+  txt(`${L.length} giocatori · montepremi ${eurS(netPot(g))}${isT?' · torneo':''}`,72,252,'500 32px '+IF,'#9EA3B3');
+  let y=320;const D=(g.debts||[]),rowsMax=D.length?Math.min(L.length,Math.max(5,10-Math.min(D.length,6))):Math.min(L.length,12);
+  x.fillStyle='rgba(255,255,255,.06)';const boxH=34+rowsMax*62+(L.length>rowsMax?44:0);x.beginPath();x.roundRect(48,y,W-96,boxH,36);x.fill();
+  y+=72;
+  L.slice(0,rowsMax).forEach((p,i)=>{
+    const net=p.netCents||0,col=net>0?'#5BE07D':net<0?'#FF6A60':'#9EA3B3';
+    const medal=['#F2C94C','#CBD1DC','#D08B5B'][i];
+    if(medal){x.fillStyle=medal;x.beginPath();x.arc(108,y-12,22,0,Math.PI*2);x.fill();txt(String(isT?(p.out||1):i+1),108,y-1,'800 26px '+SF,'#14161c','center')}
+    else txt(String(isT?(p.out||1):i+1),108,y-1,'700 28px '+SF,'#9EA3B3','center');
+    txt(fit(pName(p.playerId,p.playerName),560,'700 38px '+IF),150,y,'700 38px '+IF,'#F4F2ED');
+    txt(sgnS(net),W-90,y,'800 42px '+SF,col,'right');y+=62;
+  });
+  if(L.length>rowsMax){txt(`+ altri ${L.length-rowsMax}`,150,y-8,'500 28px '+IF,'#9EA3B3');y+=44}
+  y+=40;
+  if(D.length){
+    txt('Chi paga chi',72,y,'800 44px '+SF,'#F4F2ED');y+=58;
+    const max=Math.min(D.length,Math.floor((H-120-y)/54));
+    D.slice(0,max).forEach(d=>{
+      const done=d.remainingAmount===0;
+      txt(fit(`${pName(d.fromPlayerId,d.fromPlayerName)} → ${pName(d.toPlayerId,d.toPlayerName)}`,700,'600 34px '+IF),72,y,'600 34px '+IF,done?'#7d8291':'#F4F2ED');
+      txt(eurS(d.totalAmount)+(done?' ✓':''),W-72,y,'800 36px '+SF,done?'#5BE07D':'#C9D0FF','right');y+=54;
+    });
+    if(D.length>max)txt(`+ altri ${D.length-max} pagamenti nell'app`,72,y,'500 28px '+IF,'#9EA3B3');
+  }else txt('Tutti pari: nessuno deve niente a nessuno ✓',72,y,'600 34px '+IF,'#5BE07D');
+  txt('Home Poker',W-72,H-60,'700 28px '+SF,'rgba(201,208,255,.6)','right');
+  const blob=await new Promise(r=>c.toBlob(r,'image/png'));if(!blob){toast('Non riesco a creare l\'immagine','err');return}
+  const name='poker-'+dShort(g.scheduledAt).replace(/\//g,'-')+'.png',file=new File([blob],name,{type:'image/png'});
+  try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Resoconto poker'});return}}catch(e){if(e&&e.name==='AbortError')return}
+  dlBlob(name,blob);toast('Immagine salvata','ok');
+}
+
+/* ---------- 8. Torneo ---------- */
+const BLINDS=[[10,20],[15,30],[25,50],[50,100],[75,150],[100,200],[150,300],[200,400],[300,600],[400,800],[500,1000],[700,1400],[1000,2000],[1500,3000],[2000,4000],[3000,6000],[5000,10000],[7500,15000],[10000,20000]];
+const PAYOUTS={1:[100],2:[70,30],3:[50,30,20],4:[45,27,18,10]};
+const defPayKey=n=>n<=4?2:n<=8?3:4;
+const payLabel=k=>({1:'Vince tutto',2:'70 / 30',3:'50 / 30 / 20',4:'45 / 27 / 18 / 10'})[k];
+function tourLevels(startChips){const f=Math.max(1,Math.round((startChips||2000)/2000));return BLINDS.map(([s,b])=>[s*f,b*f])}
+function tourClock(g){
+  const t=g.tour||{},ms=(t.mins||15)*60000,now=Date.now();
+  if(!t.startedAt)return {started:false,paused:false,level:0,left:ms,ms,frac:0,lv:t.levels||tourLevels(g.chipsPerBuyIn)};
+  const el=Math.max(0,(t.pausedAt||now)-t.startedAt-(t.pausedMs||0)+(t.shiftMs||0));
+  const lv=t.levels||tourLevels(g.chipsPerBuyIn),level=Math.min(lv.length-1,Math.floor(el/ms)),into=el-level*ms;
+  return {started:true,paused:!!t.pausedAt,level,left:Math.max(0,ms-into),ms,frac:Math.min(1,into/ms),lv};
+}
+const mmss=ms=>{const s=Math.ceil(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+const bl=v=>v?v.toLocaleString('it-IT'):'—';
+function tourPrizes(g){
+  const pot=grossOf(g)-(g.dealerChips||0),pct=(g.tour&&g.tour.payouts)||[100];
+  const pr=pct.map(p=>Math.floor(pot*p/100));pr[0]+=pot-sum(pr);return {pot,pr,pct};
+}
+function tourResult(g){
+  const L=plist(g),inn=L.filter(p=>!p.out);
+  if(inn.length!==1||L.length<2)return {ok:false};
+  const {pot,pr}=tourPrizes(g),pos=p=>p.out||1;
+  const rows=L.map(p=>({p,pos:pos(p),prize:pr[pos(p)-1]||0,inv:inv(p)})).sort((a,b)=>a.pos-b.pos);
+  const nets=rows.map(r=>({name:r.p.playerName,pid:r.p.playerId,net:r.prize-r.inv}));
+  return {ok:true,pot,rows,nets,tx:settle(nets)};
+}
+let TOURTICK=null,LASTLEVEL=null;
+function beep(){try{const A=new (window.AudioContext||window.webkitAudioContext)();[0,.25,.5].forEach(t=>{const o=A.createOscillator(),gg=A.createGain();o.frequency.value=880;gg.gain.setValueAtTime(.0001,A.currentTime+t);gg.gain.exponentialRampToValueAtTime(.35,A.currentTime+t+.02);gg.gain.exponentialRampToValueAtTime(.0001,A.currentTime+t+.2);o.connect(gg).connect(A.destination);o.start(A.currentTime+t);o.stop(A.currentTime+t+.22)})}catch(e){}try{navigator.vibrate&&navigator.vibrate([250,120,250])}catch(e){}}
+let WAKE=null;async function keepAwake(on){try{if(on&&!WAKE&&navigator.wakeLock){WAKE=await navigator.wakeLock.request('screen');WAKE.addEventListener('release',()=>{WAKE=null})}else if(!on&&WAKE){await WAKE.release();WAKE=null}}catch(e){}}
+function tourTick(){
+  const g=V.name==='live'&&S.games[V.gid];
+  if(!g||g.kind!=='tournament'){clearInterval(TOURTICK);TOURTICK=null;LASTLEVEL=null;keepAwake(false);return}
+  const c=tourClock(g),el=$('#tclock');
+  if(LASTLEVEL!==null&&c.level!==LASTLEVEL&&c.started&&!c.paused){beep();LASTLEVEL=c.level;render();return}
+  LASTLEVEL=c.level;
+  if(el){el.textContent=mmss(c.left);const b=$('#tbar');if(b)b.style.width=(c.frac*100).toFixed(2)+'%'}
+}
+function vTourLive(){
+  const gid=V.gid,g=S.games[gid],A=isAdmin(gid),L=plist(g),inn=L.filter(p=>!p.out),out=L.filter(p=>p.out).sort((a,b)=>a.out-b.out);
+  const c=tourClock(g),[sb,bb]=c.lv[c.level]||[0,0],nx=c.lv[c.level+1],{pot,pr}=tourPrizes(g),pin=adminPinOf(gid),rebuy=!!(g.tour&&g.tour.rebuy);
+  if(!TOURTICK){TOURTICK=setInterval(tourTick,1000)}
+  keepAwake(c.started&&!c.paused);
+  return `<div class="wrap">${backBtn('home','Home')}
+<div class="row sp" style="align-items:flex-start"><div class="grow"><h1>Torneo</h1><div class="mut sm" style="margin-top:2px">${dDay(g.scheduledAt)} ${dMon(g.scheduledAt)} · ${inn.length} in gioco su ${L.length}</div></div><span class="badge ${A?'paid':'grey'}" style="margin-top:6px">${A?'Admin':'Sola lettura'}</span></div>
+<div class="hero tclockbox" style="margin-top:14px">
+<div class="row sp"><span class="mut sm">Livello ${c.level+1}</span><span class="mut sm">${c.started?(c.paused?'In pausa':'In corso'):'Da avviare'}</span></div>
+<div class="tblinds num">${bl(sb)} <span>/</span> ${bl(bb)}</div>
+<div class="tclock num ${c.paused||!c.started?'pz':''}" id="tclock">${mmss(c.left)}</div>
+<div class="tprog"><i id="tbar" style="width:${(c.frac*100).toFixed(2)}%"></i></div>
+<div class="mut sm" style="text-align:center;margin-top:8px">${nx?`Prossimo: ${bl(nx[0])} / ${bl(nx[1])} · livelli da ${(g.tour&&g.tour.mins)||15} minuti`:'Ultimo livello'}</div>
+${A?`<div class="tctl"><button class="btn-s" data-act="tlevel" data-d="-1" aria-label="Livello precedente">${ico('back',20)}</button><button class="btn" data-act="ttoggle">${!c.started?'Avvia il timer':c.paused?'Riprendi':'Pausa'}</button><button class="btn-s" data-act="tlevel" data-d="1" aria-label="Livello successivo">${ico('chevr',20)}</button></div>`:''}
+${A?`<div class="pinbar" style="margin-top:12px"><span class="row" style="gap:8px">${ico('key',16)}<span>PIN Admin</span></span><b class="num">${esc(pin||'----')}</b></div>`:''}</div>
+${A?'':pinBox(gid,'Per eliminare giocatori o gestire il timer serve il PIN Admin.')}
+<div class="card" style="margin-top:12px"><div class="row sp"><div><div class="mut sm">Montepremi</div><div class="num" style="font-family:var(--serif);font-weight:800;font-size:28px">${eur(pot)}</div></div><div class="stack" style="gap:2px;text-align:right">${pr.map((v,i)=>`<div class="num sm"><span class="mut">${i+1}°</span> <b>${eurS(v)}</b></div>`).join('')}</div></div></div>
+<div class="sec">In gioco <small>${inn.length}</small></div>
+<div class="list">${inn.map(p=>`<div class="li"><span>${ava(p.playerName,'xs')}</span><span class="grow" style="min-width:0"><b>${esc(p.playerName)}</b><span class="mut xs" style="display:block">${p.buyIns.length>1?`${p.buyIns.length} ingressi · `:''}${eurS(inv(p))}${pendOf(p)>0?` · <span class="red">${eurS(pendOf(p))} da pagare</span>`:''}</span></span>${A&&inn.length>1?`<button class="btn-s" style="min-height:38px;color:#FF6A60" data-act="bust" data-pid="${p.playerId}">${armed['bust'+p.playerId]?'Confermi?':'Eliminato'}</button>`:''}${A&&rebuy?`<button class="btn-s" style="min-height:38px" data-act="rebuy" data-pid="${p.playerId}">${ico('plus',16)}</button>`:''}</div>`).join('')}</div>
+${A?`<button class="btn dash" style="margin-top:8px" data-act="addpl">${ico('plus',18)} Aggiungi giocatori</button>`:''}
+${out.length?`<div class="sec">Eliminati</div><div class="list">${out.slice().sort((a,b)=>a.out-b.out).map(p=>`<div class="li"><span class="medal ${p.out<=3?'m'+p.out:''}">${p.out}</span><span class="grow"><b>${esc(p.playerName)}</b>${p.out<=pr.length?` <span class="green num sm">${eurS(pr[p.out-1])}</span>`:''}</span>${A&&rebuy?`<button class="btn-s" style="min-height:38px" data-act="reenter" data-pid="${p.playerId}">Rientra</button>`:''}</div>`).join('')}</div>`:''}
+${histBlock(g,'live')}
+${A?`<div style="text-align:center;margin-top:14px"><button class="link" style="color:#FF6A60" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Elimina torneo'}</button></div>`:''}</div>
+${A?`<div class="bar"><div class="bar-in"><button class="btn" data-act="tclose" ${inn.length===1&&L.length>1?'':'disabled'}>${inn.length===1&&L.length>1?`Chiudi il torneo · vince ${esc(inn[0].playerName)}`:`Restano ${inn.length} giocatori`}</button></div></div>`:''}`;
+}
+function vTourClose(){
+  const gid=V.gid,g=S.games[gid];if(!g)return notFound();const R=tourResult(g);
+  if(!R.ok){V={name:'live',gid};return vTourLive()}
+  return `<div class="wrap">${backBtn('live','Torneo',gid)}
+<h1>Risultato del torneo</h1>
+<div class="hero" style="margin-top:14px;padding:20px;text-align:center">${ava(R.rows[0].p.playerName,'l')}<div class="mut sm" style="margin-top:10px">Vince</div><div class="bignum" style="font-size:42px">${esc(R.rows[0].p.playerName)}</div><div class="green num" style="font-weight:700;margin-top:4px">${eur(R.rows[0].prize)}</div></div>
+<div class="sec">Classifica e premi</div>
+<div class="list">${R.rows.map((r,i)=>`<div class="li"><span class="medal ${r.pos<=3?'m'+r.pos:''}">${r.pos}</span><span class="grow"><b>${esc(r.p.playerName)}</b><span class="mut xs" style="display:block">premio ${eurS(r.prize)} · investiti ${eurS(r.inv)}</span></span><b class="num ${r.prize-r.inv>0?'green':r.prize-r.inv<0?'red':'mut'}">${sgnS(r.prize-r.inv)}</b></div>`).join('')}</div>
+<div class="sec">Chi paga chi</div>
+<div class="card stack" style="gap:0;padding:6px 16px">${R.tx.length?R.tx.map(t=>`<div class="debt"><div class="row" style="gap:12px"><div class="pair">${ava(t.from,'xs')}<span class="arr">${ico('chevr',14)}</span>${ava(t.to,'xs')}</div><div class="grow"><div class="dn"><b>${esc(t.from)}</b></div><div class="mut sm">a ${esc(t.to)}</div></div><b class="num amt">${eur(t.amt)}</b></div></div>`).join(''):'<div class="mut sm" style="padding:10px 0">Nessun pagamento necessario.</div>'}</div></div>
+<div class="bar"><div class="bar-in"><button class="btn" data-act="tsave">Salva e chiudi il torneo</button></div></div>`;
+}
+async function saveTournament(){
+  const gid=V.gid;
+  const ok=await saveGame(gid,g=>{
+    const R=tourResult(g);if(!R.ok)return false;const now=new Date().toISOString();
+    R.rows.forEach(r=>{const p=g.players[r.p.playerId];p.cashOutCents=r.prize;p.netCents=r.prize-r.inv;p.place=r.pos});
+    g.debts=R.tx.map((t,i)=>({debtId:'debt_'+(i+1)+'_'+Math.random().toString(36).slice(2,5),fromPlayerName:t.from,toPlayerName:t.to,fromPlayerId:t.fromId,toPlayerId:t.toId,totalAmount:t.amt,paidAmount:0,remainingAmount:t.amt,transactions:[{subId:nid('s'),amount:t.amt,status:'PENDING',lastUpdated:now}]}));
+    g.holeCents=0;g.status='closed';g.closedAt=now;
+  });
+  if(ok){if(LS.get('active',null)===gid)LS.del('active');go('detail',gid);toast('Torneo chiuso','ok')}
+}
+
+/* ---------- 2. Serate programmate ---------- */
+function vPlan(){
+  const p=F.plan||(F.plan={date:todayStr(),time:'21:00',loc:'',seats:'',note:''});
+  const ok=p.date&&p.time&&(p.seats.trim()===''||(+p.seats>=2&&+p.seats<=50));
+  return `<div class="wrap">${backBtn('home','Indietro')}
+<h1>Programma una serata</h1><p class="mut" style="margin:6px 0 0">Gli amici del tavolo ricevono una notifica e prenotano il posto.</p>
+<div class="card stack" style="gap:14px;margin-top:16px">
+<div class="two"><label class="field"><span>Data</span><input class="in" id="pl-date" type="date" data-bind="plan.date" data-ev="change" value="${esc(p.date)}"></label>
+<label class="field"><span>Ora</span><input class="in" id="pl-time" type="time" data-bind="plan.time" data-ev="change" value="${esc(p.time)}"></label></div>
+<label class="field"><span>Dove</span><input class="in" id="pl-loc" data-bind="plan.loc" value="${esc(p.loc)}" placeholder="Casa di ${esc(firstName(S.me.name))}"></label>
+<label class="field"><span>Posti (opzionale)</span><input class="in" id="pl-seats" inputmode="numeric" data-bind="plan.seats" value="${esc(p.seats)}" placeholder="Da 2 a 50"></label>
+<label class="field"><span>Nota (opzionale)</span><input class="in" id="pl-note" data-bind="plan.note" maxlength="80" value="${esc(p.note)}" placeholder="Es. buy-in 20 €, porto le birre"></label></div></div>
+<div class="bar"><div class="bar-in"><button class="btn" data-act="plansave" ${ok?'':'disabled'}>${ico('cal',18)} Programma e invita il tavolo</button></div></div>`;
+}
+async function savePlan(){
+  const p=F.plan;if(!p)return;
+  const gid='g'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),now=new Date().toISOString();
+  const at=new Date(p.date+'T'+p.time).toISOString();
+  const doc={status:'scheduled',scheduledAt:at,hostName:S.me.name,hostId:S.me.id,location:p.loc.trim(),note:p.note.trim(),maxSeats:p.seats.trim()?+p.seats:null,createdAt:now,players:{},debts:[],hist:[],buyInCents:defBuy(),chipsPerBuyIn:(S.cfg&&S.cfg.defChips)||2000};
+  try{await db.doc('games/'+gid).set(doc);S.games[gid]=doc;
+    const rid=nid('r');await db.doc(`games/${gid}/reservations/${rid}`).set({playerName:S.me.name,playerId:S.me.id,reservedAt:now,priorityOrder:1})}catch(e){toast(errMsg(e),'err');return}
+  F.plan=null;
+  const when=`${new Date(at).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})} alle ${p.time}`;
+  pushSend({to:'all',title:`♠️ Poker ${when}`,body:`${S.me.name} organizza${doc.location?' · '+doc.location:''}${doc.note?' · '+doc.note:''}. Tocca per prenotare il tuo posto.`,url:deepUrl('book',gid),tag:'invito-'+gid});
+  go('book',gid);toast('Serata programmata: invito inviato al tavolo','ok');
+}
+function upcoming(){return Object.entries(S.games).filter(([id,g])=>g.status==='scheduled'&&new Date(g.scheduledAt).getTime()>Date.now()-12*3600000).map(([id,g])=>Object.assign({id},g)).sort((a,b)=>String(a.scheduledAt).localeCompare(String(b.scheduledAt)))}
+function upcomingCards(){
+  return upcoming().map(g=>`<button class="card tap gcard upc" data-act="book" data-gid="${g.id}"><span class="dtile"><b>${dDay(g.scheduledAt)}</b><span>${dMon(g.scheduledAt)}</span></span><div class="grow" style="min-width:0"><div style="font-weight:700">Poker ${new Date(g.scheduledAt).toLocaleDateString('it-IT',{weekday:'long'})} alle ${tHM(g.scheduledAt)}</div><div class="mut sm ell">${esc(g.location||('da '+g.hostName))}${g.note?' · '+esc(g.note):''}</div></div><span class="badge live">Prenota</span></button>`).join('');
+}
+const deepUrl=(v,gid)=>'./#go='+v+'&t='+encodeURIComponent(S.table.id)+'&g='+encodeURIComponent(gid);
+function deepLink(){const m=/^#go=(\w+)&t=([^&]+)&g=([^&]+)/.exec(location.hash||'');return m?{v:m[1],t:decodeURIComponent(m[2]),g:decodeURIComponent(m[3])}:null}
+
+/* ---------- 2. Notifiche push ---------- */
+const VAPID_PUBLIC='BCnn5zA-GaX6MJhOF6mrLIkm7CfuFImZr_3YHaKPhZY644jdaiWsEEUo33pTsqBMuico3HhB5qhg0Swy1g_GMXQ';
+const pushSupported=()=>'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window&&/^https:/.test(location.protocol);
+const isStandalone=()=>window.matchMedia&&matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const isIOS=()=>/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+let SWREG=null;
+async function swReady(){if(!('serviceWorker' in navigator)||!/^https:/.test(location.protocol))return null;try{SWREG=SWREG||await navigator.serviceWorker.register('sw.js');return SWREG}catch(e){return null}}
+async function pushState(){try{const r=await swReady();if(!r)return false;const s=await r.pushManager.getSubscription();return !!s&&Notification.permission==='granted'}catch(e){return false}}
+async function pushOn(){
+  if(!pushSupported()){toast(isIOS()&&!isStandalone()?'Prima aggiungi l\'app alla schermata Home (Condividi → Aggiungi alla schermata Home), poi riprova da lì':'Questo telefono o browser non supporta le notifiche','err');return}
+  const perm=await Notification.requestPermission();
+  if(perm!=='granted'){toast('Notifiche non permesse: puoi attivarle dalle impostazioni del telefono','err');return}
+  try{
+    const r=await swReady();const key=unb64(VAPID_PUBLIC);
+    const sub=(await r.pushManager.getSubscription())||(await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:key}));
+    const j=sub.toJSON();await BASE.rpc('hpl_save_push',{p_endpoint:j.endpoint,p_p256dh:j.keys.p256dh,p_auth:j.keys.auth});
+    S.pushOn=true;render();toast('Notifiche attive','ok');
+  }catch(e){toast('Non riesco ad attivare le notifiche: '+errMsg(e),'err')}
+}
+async function pushOff(){
+  try{const r=await swReady();const s=r&&await r.pushManager.getSubscription();if(s){try{await BASE.rpc('hpl_delete_push',{p_endpoint:s.endpoint})}catch(e){}await s.unsubscribe()}}catch(e){}
+  S.pushOn=false;render();toast('Notifiche disattivate','ok');
+}
+async function pushSend(m){
+  if(!S.table)return;
+  try{await BASE.fn('hpl-push',Object.assign({table_id:S.table.id},m))}catch(e){console.warn('push',e)}
+}
+
+/* ---------- Cambio nome utente ---------- */
+async function renameOk(){
+  const n=String(F.rn.name||'').trim().replace(/\s+/g,' ');
+  if(n.length<2){toast('Il nome deve avere almeno 2 caratteri','err');return}
+  let r;try{r=await BASE.rpc('hpl_rename',{p_name:n,p_pin:F.rn.pin})}catch(e){toast(errMsg(e),'err');return}
+  if(r==='exists'){toast('Questo nome utente è già usato da un altro account','err');return}
+  if(r==='bad_pin'){toast('PIN errato','err');return}
+  if(r==='invalid'){toast('Nome non valido','err');return}
+  if(r!=='ok'){toast('Non è andata, riprova','err');return}
+  await refreshMe();if(S.me){S.me.name=n;if(S.players[S.me.id])S.players[S.me.id].name=n}
+  F.rn={name:'',pin:''};SH=null;render();toast('Ora ti chiami '+n,'ok');
+}
+
+/* ---------- collegamenti all'interfaccia ---------- */
+const _viewF=view;
+view=function(){
+  if(S.table&&db&&S.me&&S.loaded.games){
+    if(V.name==='netting')return vNetting();
+    if(V.name==='plan')return vPlan();
+    if(V.name==='tclose')return vTourClose();
+    if(V.name==='live'){const g=S.games[V.gid];if(g&&g.kind==='tournament'&&g.status==='live')return vTourLive()}
+    if(V.name==='detail'){const g=S.games[V.gid];if(g&&g.kind==='netting')return vNettingDetail();if(g&&g.status==='scheduled'){V={name:'book',gid:V.gid};}}
+  }
+  return _viewF();
+};
+const _createGame0=createGame;
+createGame=async function(){
+  const n=F.ng;if(!n)return;
+  const v=ngVals();if(!v.ok||!db)return;
+  const ts=targetsFrom(n.sel);if(ts.length<2)return;
+  const gid=n.fromGid||('g'+Date.now().toString(36)+Math.random().toString(36).slice(2,5));
+  const pin=String(crypto.getRandomValues(new Uint32Array(1))[0]%10000).padStart(4,'0');
+  const now=new Date().toISOString(),players={};
+  ts.forEach((r,i)=>{players[r.id]={playerId:r.id,playerName:r.name,seq:i+1,buyIns:[{buyInId:nid('b'),amountCents:v.buy,paymentStatus:n.pstatus,timestamp:now}],cashOuts:[],cashOutCents:null,netCents:null}});
+  const prev=n.fromGid&&S.games[n.fromGid]||{};
+  const doc={scheduledAt:new Date(n.date+'T'+n.time).toISOString(),hostName:n.host.trim()||S.me.name,location:n.loc.trim(),maxSeats:v.seats,dealerChips:0,buyInCents:v.buy,chipsPerBuyIn:v.chips,status:'live',pinHash:await sha(gid+':'+pin),hostId:S.me?S.me.id:null,adminPin:pin,holeCents:null,holeMode:'',createdAt:prev.createdAt||now,players,debts:[],seq:ts.length,hist:[]};
+  if(prev.note)doc.note=prev.note;
+  if(n.kind==='tournament'){const pk=n.payKey||defPayKey(ts.length);doc.kind='tournament';doc.tour={mins:n.tmins||15,levels:tourLevels(v.chips),payouts:PAYOUTS[pk],payKey:pk,rebuy:n.trebuy!==false,startedAt:null,pausedAt:null,pausedMs:0,shiftMs:0}}
+  try{await db.doc('games/'+gid).set(doc)}catch(e){toast(errMsg(e),'err');return}
+  S.games[gid]=doc;
+  const pins=LS.get('pins',{});pins[gid]=pin;LS.set('pins',pins);S.admin[gid]=true;
+  LS.set('active',gid);F.ng=null;
+  go('live',gid);toast(doc.kind==='tournament'?'Torneo creato: avvia il timer quando siete pronti':'Partita creata: buon divertimento!','ok');
+};
+const _addBuyIn0=addBuyIn;
+addBuyIn=async function(pid){
+  const gid=V.gid,g=S.games[gid],wasOut=!!(g&&g.kind==='tournament'&&g.players[pid]&&g.players[pid].out);
+  await _addBuyIn0(pid);
+  if(wasOut)await saveGame(gid,gg=>{const p=gg.players[pid];if(!p||!p.out)return false;const o=p.out;delete p.out;delete p.outAt;Object.values(gg.players).forEach(q=>{if(q.out&&q.out<o)q.out++})},'Rientro di '+g.players[pid].playerName);
+};
+const _vDetailF=vDetail;
+vDetail=function(){
+  const h=_vDetailF(),g=S.games[V.gid];
+  if(!g||g.status!=='closed')return h;
+  return h.replace('<a class="btn wa"',`<button class="btn" data-act="shareimg" data-gid="${V.gid}">${ico('share',18)} Condividi come immagine</button><a class="btn wa"`);
+};
+const _vBookF=vBook;
+vBook=function(){
+  let h=_vBookF();const g=S.games[V.gid];if(!g)return h;
+  if(g.status==='scheduled'){
+    const host=S.me&&(g.hostId===S.me.id||isManager());
+    h=h.replace('<h1>Poker night</h1>',`<h1>Poker ${new Date(g.scheduledAt).toLocaleDateString('it-IT',{weekday:'long'})}</h1>`);
+    if(g.note)h=h.replace('<p class="mut" style="margin:6px 0 0">Prenota il tuo posto al tavolo</p>',`<p class="mut" style="margin:6px 0 0">${esc(g.note)}</p>`);
+    h=h.replace('<button class="btn ghost" data-act="live" data-gid="'+V.gid+'">Apri la cassa</button>',host?`<button class="btn" data-act="startplan" data-gid="${V.gid}">${ico('chip',18)} Inizia la partita con i prenotati</button><button class="btn ghost" data-act="pushinvite" data-gid="${V.gid}">${ico('share',18)} Ricorda l'invito con una notifica</button><button class="link" style="align-self:center;color:#FF6A60" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Annulla la serata'}</button>`:'');
+  }
+  return h;
+};
+const _tabSerataF=tabSerata;
+tabSerata=function(D){
+  let h=_tabSerataF(D);
+  const up=upcomingCards();
+  if(up)h=h.replace(/(<\/section>)/,`$1<div class="sec">In programma</div>${up}`);
+  if(!D.live)h=h.replace(`${ico('plus',18)} Nuova partita</button></section>`,`${ico('plus',18)} Nuova partita</button><button class="btn ghost" data-act="plan">${ico('cal',18)} Programma una serata</button></section>`);
+  const nb=nettingBanner();if(nb)h+=nb;
+  return h;
+};
+const _tabClassF=tabClassifica;
+tabClassifica=function(D){const nb=nettingBanner();return (nb?nb:'')+_tabClassF(D)};
+const _tabStoricoF=tabStorico;
+tabStorico=function(D){
+  const D2=Object.assign({},D,{gs:D.gs.filter(g=>g.status!=='scheduled')});
+  let h=_tabStoricoF(D2);
+  D2.gs.filter(g=>g.kind==='netting').forEach(g=>{
+    const re=new RegExp('<button class="li tall" data-act="detail" data-gid="'+g.id+'">[\\s\\S]*?</button>');
+    const o=(g.debts||[]).filter(d=>d.remainingAmount>0).length;
+    h=h.replace(re,`<button class="li tall" data-act="detail" data-gid="${g.id}"><span class="dtile sm"><b>${dDay(g.scheduledAt)}</b><span>${dMon(g.scheduledAt)}</span></span><span class="grow"><b>Compensazione saldi</b><span class="mut xs" style="display:block">${(g.replaced||[]).length} debiti → ${(g.debts||[]).length} pagamenti</span></span>${o?`<span class="badge pend num">${o} da saldare</span>`:'<span class="badge paid">Saldata</span>'}</button>`);
+  });
+  D2.gs.filter(g=>g.kind==='tournament').forEach(g=>{h=h.replace(new RegExp('(data-gid="'+g.id+'">[\\s\\S]*?<span class="mut sm"> montepremi</span>)'),'$1 <span class="badge grey" style="padding:2px 8px;font-size:11.5px">Torneo</span>')});
+  return h;
+};
+/* nuova partita: cash o torneo */
+const _vNewF=vNew;
+vNew=function(){
+  const n=F.ng,T=n.kind==='tournament',ts=targetsFrom(n.sel),pk=n.payKey||defPayKey(ts.length);
+  let h=_vNewF();
+  h=h.replace('<h1>Nuova partita</h1>',`<h1>${n.fromGid?'Si gioca!':'Nuova partita'}</h1><div class="seg" style="display:flex;margin-top:14px"><button class="${!T?'on':''}" style="flex:1" data-act="nkind" data-k="cash">Cash game</button><button class="${T?'on':''}" style="flex:1" data-act="nkind" data-k="tournament">Torneo</button></div>`);
+  if(T){
+    h=h.replace('<div class="lbl in">Buy-in</div>','<div class="lbl in">Buy-in del torneo</div>').replace('<span>Fiches per buy-in</span>','<span>Fiches iniziali</span>');
+    h=h.replace('<div class="field"><span>Il primo buy-in è</span>',`<div class="field"><span>Livelli dei bui</span><div class="cgrid" style="grid-template-columns:repeat(4,minmax(0,1fr))">${[10,15,20,30].map(m=>`<button class="chip t ${(n.tmins||15)===m?'on':''}" data-act="ntmins" data-m="${m}">${m} min</button>`).join('')}</div><span class="xs">Si parte da ${bl(tourLevels(parseCh(n.chips)||2000)[0][0])} / ${bl(tourLevels(parseCh(n.chips)||2000)[0][1])}, poi salgono a ogni livello.</span></div>
+<div class="field"><span>Premi</span><div class="chips">${[1,2,3,4].map(k=>`<button class="chip t ${pk===k?'on':''}" data-act="npay" data-k="${k}">${payLabel(k)}</button>`).join('')}</div></div>
+<button class="li" style="padding:6px 0;min-height:44px" data-act="ntrebuy"><span class="grow">Rientri consentiti</span><span class="sw ${n.trebuy!==false?'on':''}"><i></i></span></button>
+<div class="field"><span>Il primo buy-in è</span>`);
+    h=h.replace(/Inizia con (\d+) giocatori · /,'Inizia il torneo con $1 giocatori · ');
+  }
+  return h;
+};
+/* ---------- azioni ---------- */
+Object.assign(H,{
+  netting(){go('netting')},
+  netok(){applyNetting()},
+  netundo(d){undoNetting(d.gid)},
+  shareimg(d){shareCard(d.gid)},
+  nkind(d){F.ng.kind=d.k;render()},
+  ntmins(d){F.ng.tmins=+d.m;render()},
+  npay(d){F.ng.payKey=+d.k;render()},
+  ntrebuy(){F.ng.trebuy=F.ng.trebuy===false;render()},
+  ttoggle(){const gid=V.gid;saveGame(gid,g=>{const t=g.tour,now=Date.now();if(!t.startedAt){t.startedAt=now}else if(t.pausedAt){t.pausedMs=(t.pausedMs||0)+(now-t.pausedAt);t.pausedAt=null}else{t.pausedAt=now}})},
+  tlevel(d){const gid=V.gid;saveGame(gid,g=>{const t=g.tour;if(!t.startedAt)return false;const c=tourClock(g);if(+d.d>0){if(c.level>=c.lv.length-1)return false;t.shiftMs=(t.shiftMs||0)+c.left}else{t.shiftMs=(t.shiftMs||0)-(c.ms-c.left)-(c.level>0&&c.ms-c.left<5000?c.ms:0)}LASTLEVEL=null})},
+  bust(d){if(!arm('bust'+d.pid))return;const gid=V.gid;saveGame(gid,g=>{const p=g.players[d.pid];if(!p||p.out)return false;const inn=Object.values(g.players).filter(q=>!q.out).length;if(inn<2)return false;p.out=inn;p.outAt=new Date().toISOString()},()=>'Eliminato '+S.games[gid].players[d.pid].playerName)},
+  reenter(d){freshBi(S.games[V.gid]);openSheet({type:'rebuy',pid:d.pid})},
+  tclose(){go('tclose',V.gid)},
+  tsave(){saveTournament()},
+  plan(){F.plan=null;go('plan')},
+  plansave(){savePlan()},
+  book(d){go('book',d.gid)},
+  startplan(d){
+    const g=S.games[d.gid];if(!g)return;resetNew();
+    const sel={};resSorted().forEach(r=>{const id=r.playerId&&S.players[r.playerId]?r.playerId:(Object.entries(S.players).find(([i,p])=>String(p.name).toLowerCase()===String(r.playerName).toLowerCase())||[])[0];if(id)sel[id]=true});
+    if(S.me)sel[S.me.id]=true;
+    const dt=new Date(g.scheduledAt);
+    Object.assign(F.ng,{sel,fromGid:d.gid,loc:g.location||'',date:dt.getFullYear()+'-'+p2(dt.getMonth()+1)+'-'+p2(dt.getDate()),time:p2(dt.getHours())+':'+p2(dt.getMinutes()),seats:g.maxSeats?String(g.maxSeats):''});
+    go('new');
+  },
+  pushinvite(d){const g=S.games[d.gid];if(!g)return;pushSend({to:'all',title:`♠️ Poker ${new Date(g.scheduledAt).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})} alle ${tHM(g.scheduledAt)}`,body:`Ci sono ancora posti: tocca per prenotarti.`,url:deepUrl('book',d.gid),tag:'invito-'+d.gid});toast('Promemoria inviato al tavolo','ok')},
+  pushtoggle(){S.pushOn?pushOff():pushOn()},
+  rename(){F.rn={name:S.acct?S.acct.name:'',pin:''};openSheet({type:'rename'})},
+  renameok(){renameOk()}
+});
+/* notifica al debitore quando il creditore segna un pagamento */
+['sfull','spartok'].forEach(k=>{const f=H[k];H[k]=async function(d,e){
+  const gid=V.gid,s=SH,g0=S.games[gid],d0=g0&&(g0.debts||[]).find(x=>x.debtId===(s&&s.did)),before=d0?d0.remainingAmount:0;
+  await f.call(this,d,e);
+  const g1=S.games[gid],d1=g1&&(g1.debts||[]).find(x=>x.debtId===(s&&s.did));
+  if(!d1||d1.remainingAmount===before||isDealerD(d1)||!d1.fromPlayerId)return;
+  const got=before-d1.remainingAmount;
+  pushSend({to:[d1.fromPlayerId],title:d1.remainingAmount?`${S.me.name} ha ricevuto ${eurS(got)}`:`Saldo chiuso con ${S.me.name} ✓`,body:d1.remainingAmount?`Ha segnato un acconto di ${eur(got)}: restano ${eur(d1.remainingAmount)} da dare.`:`Ha segnato ricevuti ${eur(got)}: non gli devi più niente${g1.kind==='netting'?'':' per la partita di '+new Date(g1.scheduledAt).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})}.`,url:deepUrl('detail',gid),tag:'saldo-'+d1.debtId});
+}});
+/* fogli: notifiche e cambio nome nel profilo */
+const _sheetF=sheetHtml;
+sheetHtml=function(){
+  const s=SH;if(!s)return '';
+  if(s.type==='rename'&&S.acct){
+    const ok=String(F.rn.name||'').trim().length>=2&&PIN_RE.test(F.rn.pin||'');
+    return `<div class="back" data-act="closesheet"><div class="sheet ${s.anim?'anim':''}" role="dialog" aria-label="Cambia nome utente"><div class="grab"></div><div class="sheet-body"><div class="row sp"><h2 style="font-size:22px">Cambia nome utente</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
+<p class="mut sm" style="margin:0">Il nuovo nome vale per l'accesso e compare in tutti i tuoi tavoli. Storico e saldi restano tuoi.</p>
+<label class="field"><span>Nuovo nome utente</span><input class="in" id="rn-name" data-bind="rn.name" value="${esc(F.rn.name)}" maxlength="24" autocapitalize="words"></label>
+<label class="field"><span>Conferma con il tuo PIN</span><input class="in" id="rn-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="rn.pin" value="${esc(F.rn.pin)}" autocomplete="current-password"></label>
+<button class="btn" data-act="renameok" ${ok?'':'disabled'}>Salva il nuovo nome</button></div></div></div>`;
+  }
+  let h=_sheetF();
+  if((s.type==='me'||s.type==='acct')&&h){
+    const pushLi=`<button class="li" data-act="pushtoggle"><span class="lic">${ico('bell',17)}</span><span class="grow">Notifiche${!pushSupported()&&isIOS()&&!isStandalone()?'<span class="mut xs" style="display:block">Aggiungi prima l\'app alla schermata Home</span>':''}</span><span class="sw ${S.pushOn?'on':''}"><i></i></span></button>`;
+    const nameLi=`<button class="li" data-act="rename"><span class="lic">${ico('user',17)}</span><span class="grow">Cambia nome utente</span>${ico('chevr',16)}</button>`;
+    h=h.replace(/(<button class="li" data-act="chpin"\s*>)/,nameLi+'$1');
+    h=h.replace(/(<div class="list">)(?![\s\S]*<div class="list">)/,'$1'+pushLi);
+  }
+  return h;
+};
+Object.assign(IP,{bell:'M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 003.4 0'});
+/* collegamenti dalle notifiche */
+const _vTablesF=vTables;
+vTables=function(){
+  const d=deepLink();
+  if(d&&!S.deepTried){S.deepTried=true;const t=(S.acct.tables||[]).find(x=>x.id===d.t);if(t){S.deep=d;setTimeout(()=>openTable(t),0)}}
+  return _vTablesF();
+};
+const _afterDataF=afterData;
+afterData=async function(){
+  await _afterDataF();
+  if(S.deep&&S.me&&S.table&&S.table.id===S.deep.t&&S.loaded.games){
+    const d=S.deep;S.deep=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+    if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g);
+  }
+};
+window.addEventListener('hashchange',()=>{const d=deepLink();if(!d||!S.acct||S.locked)return;
+  if(S.table&&S.table.id===d.t){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g)}
+  else{S.deepTried=false;backToTables()}});
+navigator.serviceWorker&&navigator.serviceWorker.addEventListener&&navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.url){location.hash=new URL(e.data.url,location.href).hash}});
+setTimeout(async()=>{S.pushOn=await pushState()},1500);
+
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791812665863';
+const APP_VERSION='1791813835902';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
