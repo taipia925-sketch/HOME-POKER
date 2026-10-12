@@ -230,7 +230,7 @@ body.noscroll #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))}
 .prow{padding:12px 0;border-top:1px solid var(--line2)}
 .sheet input.in,.sheet textarea.in{background:#262A36}
 .sheet input.in:focus,.sheet textarea.in:focus{background:#2A2F45}
-.pacts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:10px}
+.pacts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:10px}
 .pacts .btn-s{min-height:40px;padding:6px 8px;font-size:13.5px;white-space:normal;line-height:1.15;text-align:center}
 .upd{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:90;display:flex;align-items:center;gap:12px;width:min(calc(100% - 24px),440px);padding:10px 10px 10px 18px;border-radius:999px;background:var(--gold);color:var(--on-acc);font-weight:600;font-size:15px;box-shadow:0 14px 34px rgba(0,0,0,.5);animation:toastIn .42s var(--ease) both}
 .upd span{flex:1}.upd button{background:var(--on-acc);color:#fff;border-radius:999px;padding:10px 16px;font-weight:700}
@@ -683,7 +683,7 @@ function payBlock(d){
   if(!h)return `<div class="mut xs">${esc(d.toPlayerName)} non ha ancora indicato come preferisce essere pagato.</div>`;
   return h+`<div class="mut xs">Dopo il pagamento, ${esc(d.toPlayerName)} lo segna come ricevuto.</div>`;
 }
-const isReg=p=>!!(p&&p.pinHash);
+const isReg=p=>!!(p&&(p.pinHash||p.acct));
 const defBuy=()=>(S.cfg&&S.cfg.defBuy)||2000;
 const isManager=()=>!!(S.me&&S.cfg&&(S.cfg.managers||[]).includes(S.me.id));
 const hasManagers=()=>!!(S.cfg&&(S.cfg.managers||[]).some(id=>S.players[id]));
@@ -697,11 +697,11 @@ function vSettings(){
   return `<div class="wrap">${backBtn('home','Indietro')}
 <h1>Impostazioni tavolo</h1><div class="mut sm" style="margin-top:4px">${esc(S.table?S.table.name:'')}</div>
 <div class="stack" style="margin-top:18px;gap:14px">
-${!hasManagers()?`<div class="hero stack" style="gap:12px;padding:20px"><div><b style="font-size:18px">Il tavolo non ha ancora un gestore</b><p class="mut sm" style="margin:6px 0 0">Il gestore può rimuovere giocatori, azzerare i PIN dimenticati e scegliere il buy-in predefinito.</p></div><button class="btn" data-act="claimmgr">Diventa gestore</button></div>`:M?'':`<div class="note" style="margin:0">Solo i gestori del tavolo possono cambiare queste impostazioni.</div>`}
+${!hasManagers()?`<div class="hero stack" style="gap:12px;padding:20px"><div><b style="font-size:18px">Il tavolo non ha ancora un gestore</b><p class="mut sm" style="margin:6px 0 0">Il gestore può rimuovere giocatori e scegliere il buy-in predefinito.</p></div><button class="btn" data-act="claimmgr">Diventa gestore</button></div>`:M?'':`<div class="note" style="margin:0">Solo i gestori del tavolo possono cambiare queste impostazioni.</div>`}
 <div class="card stack" style="gap:12px"><div class="lbl in">Giocatori registrati <span class="mut" style="font-weight:500">· ${players.length}</span></div>
 ${players.map(p=>{const isM=mgr.includes(p.id),self=S.me&&p.id===S.me.id;return `<div class="prow"><div class="row" style="gap:12px">${ava(p.name,'s')}<div class="grow"><div style="font-weight:600">${esc(p.name)}${self?' <span class="mut">(tu)</span>':''}</div><div class="mut xs">${p.games} partit${p.games===1?'a':'e'}${isM?' · gestore':''}</div></div>${isM?'<span class="badge paid">Gestore</span>':''}</div>
-${M&&!self?`<div class="pacts"><button class="btn-s" data-act="mgrtoggle" data-id="${p.id}">${isM?'Togli gestore':'Rendi gestore'}</button><button class="btn-s" data-act="resetpin" data-id="${p.id}">${armed['rp'+p.id]?'Confermi?':'Azzera PIN'}</button><button class="btn-s" style="color:#FF6A60" data-act="rmplayer" data-id="${p.id}">${armed['rm'+p.id]?'Tocca di nuovo':'Rimuovi'}</button></div>`:''}</div>`}).join('')}
-<div class="mut xs">Chi viene rimosso può tornare quando vuole: basta registrarsi di nuovo al tavolo. Con "Azzera PIN" il giocatore sceglie un nuovo PIN registrandosi con lo stesso nome e tiene il suo storico.</div></div>
+${M&&!self?`<div class="pacts"><button class="btn-s" data-act="mgrtoggle" data-id="${p.id}">${isM?'Togli gestore':'Rendi gestore'}</button><button class="btn-s" style="color:#FF6A60" data-act="rmplayer" data-id="${p.id}">${armed['rm'+p.id]?'Tocca di nuovo':'Rimuovi'}</button></div>`:''}</div>`}).join('')}
+<div class="mut xs">Chi viene rimosso può tornare quando vuole: basta registrarsi di nuovo al tavolo. Rientrando con il suo account ritrova storico e saldi.</div></div>
 <div class="card stack" style="gap:12px"><div class="lbl in">Nuova partita: valori predefiniti</div>
 <div class="field"><span>Buy-in</span><div class="chips">${[500,1000,2000,5000].map(c=>`<button class="chip t ${buy===c?'on':''}" data-act="setbuy" data-v="${c}" ${M?'':'disabled'}>${c/100} €</button>`).join('')}</div></div>
 <label class="field"><span>Fiches per buy-in</span><input class="in" id="set-chips" inputmode="numeric" data-bind="set.chips" value="${esc(chips)}" ${M?'':'disabled'}></label>
@@ -772,7 +772,7 @@ function vHome(){
 /* --- Giocatori: scelta multipla (nuova partita e cassa live) --- */
 function targetsFrom(sel){
   const out=[];
-  Object.keys(sel||{}).filter(id=>sel[id]&&S.players[id]&&S.players[id].pinHash).forEach(id=>out.push({id,name:S.players[id].name}));
+  Object.keys(sel||{}).filter(id=>sel[id]&&S.players[id]&&isReg(S.players[id])).forEach(id=>out.push({id,name:S.players[id].name}));
   return out;
 }
 async function ensurePlayers(ts){
@@ -784,7 +784,7 @@ async function ensurePlayers(ts){
   }
   return out;
 }
-const rubrica=()=>Object.entries(S.players).map(([id,p])=>({id,name:p.name,reg:!!p.pinHash})).sort((a,b)=>a.name.localeCompare(b.name,'it'));
+const rubrica=()=>Object.entries(S.players).map(([id,p])=>({id,name:p.name,reg:!!(p.pinHash||p.acct)})).sort((a,b)=>a.name.localeCompare(b.name,'it'));
 
 /* --- Nuova partita --- */
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
@@ -1573,8 +1573,322 @@ async function doTable(){
   }catch(e){fail(errMsg(e))}
 }
 
+/* ===== Account unico: prima chi sei, poi in quale tavolo entri ===== */
+Object.assign(S,{acct:null,acctReady:false,locked:false,linking:false});
+Object.assign(F,{ac:{mode:null,name:'',pin:'',pin2:'',err:'',busy:false},ul:{pin:'',err:'',show:false},cl:{pin:'',name:'',err:'',busy:false,other:false},tbOpen:false});
+const acctBio=()=>{const b=LS.get('bio',null);return b&&S.acct&&b.acct===S.acct.id?b:null};
+async function refreshMe(){const r=await BASE.rpc('hpl_me');S.acct=r&&r.id?r:null;S.acctReady=true;return S.acct}
+const firstName=n=>String(n||'').split(/\s+/)[0];
+function resetTableState(){
+  try{if(db&&db.close)db.close()}catch(e){}
+  db=null;S.table=null;S.me=null;S.games={};S.players={};S.cfg=null;S.admin={};S.res=[];S.resGid=null;
+  if(S.unsubRes){try{S.unsubRes()}catch(e){}S.unsubRes=null}
+  S.loaded={games:false,players:false,cfg:true};S.booted=false;V={name:'home'};SH=null;
+}
+async function openTable(t){
+  resetTableState();render();
+  try{await enterTable({id:t.id,name:t.name});LS.set('lasttable',t.id);BASE.rpc('hpl_touch_table',{p_tid:t.id}).catch(()=>{})}
+  catch(e){toast(errMsg(e),'err');resetTableState();render()}
+}
+async function backToTables(){resetTableState();ENTER='back';render();try{await refreshMe()}catch(e){}render()}
+/* chi sono in questo tavolo */
+async function syncMe(){
+  if(!S.acct||!S.table||!S.loaded.players)return;
+  const link=(S.acct.tables||[]).find(x=>x.id===S.table.id);
+  if(link){
+    const p=S.players[link.player_id];
+    if(p){S.me={id:link.player_id,name:p.name};const b=acctBio();if(b&&b.id!==S.me.id)LS.set('bio',Object.assign({},b,{id:S.me.id}));return}
+    if(!S.linking){S.linking=true;try{await db.doc('players/'+link.player_id).set({name:S.acct.name,createdAt:new Date().toISOString(),registered:true,acct:S.acct.id})}catch(e){}S.linking=false}
+    return;
+  }
+  S.me=null;if(S.linking)return;
+  const lk=S.acct.name.toLowerCase(),ex=Object.entries(S.players).find(([id,p])=>String(p.name).toLowerCase()===lk);
+  if(ex&&(ex[1].pinHash||(ex[1].acct&&ex[1].acct!==S.acct.id)))return; // serve il vecchio PIN o un altro nome: vClaim
+  await linkAs(ex?ex[0]:null,S.acct.name,null);
+}
+async function linkAs(pid,name,oldPin){
+  S.linking=true;let r='error';
+  try{
+    if(!pid){
+      pid='u'+S.acct.id.replace(/-/g,'').slice(0,12)+Math.random().toString(36).slice(2,6);
+      await db.doc('players/'+pid).set({name,createdAt:new Date().toISOString(),registered:true,acct:S.acct.id});
+    }
+    r=await BASE.rpc('hpl_link_table',{p_tid:S.table.id,p_player:pid,p_old_pin:oldPin});
+    if(r==='ok'){
+      await refreshMe();
+      if(!hasManagers()&&Object.values(S.players).filter(isReg).length<=1)saveCfg({managers:[pid]});
+    }
+  }catch(e){r='error';toast(errMsg(e),'err')}
+  S.linking=false;await syncMe();render();return r;
+}
+afterData=async function(){
+  S.reqHash='ok';
+  await checkAdmin();
+  if(V.name==='live'||V.name==='detail'){if(!S.games[V.gid]&&S.loaded.games){const a=LS.get('active',null);if(a===V.gid)LS.del('active');V={name:'home'}}}
+  await syncMe();
+  boot();render();
+};
+/* ---- schermate ---- */
+function vAccount(){
+  const a=F.ac;if(a.mode===null)a.mode=LS.get('hadacct',null)?'login':'reg';
+  const reg=a.mode==='reg';
+  return `<div class="wrap">${topbar()}
+<form id="f-acct" class="hero stack" style="margin-top:12px;gap:16px">
+<div><h1>${reg?'Crea il tuo account':'Accedi'}</h1><p class="mut" style="margin:8px 0 0">${reg?'Un solo nome utente e un PIN per tutti i tuoi tavoli.':'Entra con il tuo nome utente e il tuo PIN.'}</p></div>
+<div class="seg" style="align-self:stretch"><button type="button" class="${!reg?'on':''}" style="flex:1" data-act="acmode" data-m="login">Accedi</button><button type="button" class="${reg?'on':''}" style="flex:1" data-act="acmode" data-m="reg">Registrati</button></div>
+<label class="field"><span>Nome utente</span><input class="in" id="ac-name" data-bind="ac.name" value="${esc(a.name)}" autocomplete="username" maxlength="24" autocapitalize="words"></label>
+<label class="field"><span>PIN (da 4 a 6 cifre)</span><input class="in" id="ac-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="ac.pin" value="${esc(a.pin)}" autocomplete="${reg?'new-password':'current-password'}"></label>
+${reg?`<label class="field"><span>Ripeti il PIN</span><input class="in" id="ac-pin2" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="ac.pin2" value="${esc(a.pin2)}" autocomplete="new-password"></label>`:''}
+${a.err?`<div class="red sm">${esc(a.err)}</div>`:''}
+<button class="btn" type="submit" ${a.busy?'disabled':''}>${a.busy?'Un attimo…':reg?'Crea account':'Entra'}</button>
+<div class="mut xs">${reg?'Usa nome e cognome o un soprannome: il nome utente vale per tutti i tavoli. Dopo potrai attivare Face ID.':'Se avevi già un profilo in un tavolo, crea il tuo account: entrando nel tavolo ritroverai storico e saldi.'}</div></form></div>`;
+}
+function vLock(){
+  const u=F.ul;
+  return `<div class="wrap">${topbar()}
+<form id="f-unlock" class="hero stack" style="margin-top:24px;gap:18px;align-items:stretch">
+<div class="row" style="gap:14px">${ava(S.acct.name,'l')}<div><h1>Ciao ${esc(firstName(S.acct.name))}</h1><div class="mut sm">Sblocca per vedere i tuoi tavoli</div></div></div>
+<button type="button" class="btn" data-act="unlockbio">Entra con Face ID</button>
+${u.show?`<label class="field"><span>Oppure il tuo PIN</span><input class="in" id="ul-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="ul.pin" value="${esc(u.pin)}" autocomplete="current-password"></label>
+${u.err?`<div class="red sm">${esc(u.err)}</div>`:''}<button class="btn ghost" type="submit">Entra con il PIN</button>`:`<button type="button" class="link" style="align-self:center" data-act="ulpin">Usa il PIN</button>`}
+<button type="button" class="link" style="align-self:center" data-act="fulllogout">Non sei ${esc(firstName(S.acct.name))}? Esci</button></form></div>`;
+}
+function vTables(){
+  const T0=S.acct.tables||[],t=F.tb,show=F.tbOpen||!T0.length;
+  if(t.mode===null)t.mode='join';
+  const create=t.mode==='create';
+  const inv=parseHash();
+  return `<div class="app"><header class="hd"><div class="t1"><h1>Ciao ${esc(firstName(S.acct.name))}</h1><div class="t2">${T0.length?'Scegli il tavolo':'Entra nel tuo primo tavolo'}</div></div><button class="me-btn" data-act="acctopen" aria-label="Il mio account">${ava(S.acct.name)}</button></header>
+<main class="pg">
+${inv&&T0.length?`<div class="note" style="margin:0">Hai aperto un invito: entra nel tavolo della serata.</div>`:''}
+${T0.map(x=>`<button class="card tap gcard" data-act="opentable" data-id="${esc(x.id)}"><span class="suit">${ico('chip',24)}</span><div class="grow"><div style="font-weight:700;font-size:18px">${esc(x.name)}</div><div class="mut sm">Ultimo accesso ${dShort(x.last_at)}</div></div><span class="mut">${ico('chevr',20)}</span></button>`).join('')}
+${show?`<form id="f-table" class="card stack" style="gap:14px;margin-top:${T0.length?'8px':'0'}">
+<div class="seg" style="align-self:stretch"><button type="button" class="${!create?'on':''}" style="flex:1" data-act="tbmode" data-m="join">Entra in un tavolo</button><button type="button" class="${create?'on':''}" style="flex:1" data-act="tbmode" data-m="create">Crea un tavolo</button></div>
+<p class="mut sm" style="margin:0">${create?'Scegli un nome e una password: li darai agli amici per farli entrare.':'Ti servono il nome del tavolo e la sua password: li chiedi una volta sola.'}</p>
+<label class="field"><span>Nome del tavolo</span><input class="in" id="tb-name" data-bind="tb.name" value="${esc(t.name)}" maxlength="30" autocomplete="off" autocapitalize="words"></label>
+<label class="field"><span>Password del tavolo</span><input class="in" id="tb-pw" type="password" data-bind="tb.pw" value="${esc(t.pw)}" autocomplete="off"></label>
+${create?`<label class="field"><span>Ripeti la password</span><input class="in" id="tb-pw2" type="password" data-bind="tb.pw2" value="${esc(t.pw2)}" autocomplete="off"></label>`:''}
+${t.err?`<div class="red sm">${esc(t.err)}</div>`:''}
+<button class="btn" type="submit" ${t.busy?'disabled':''}>${t.busy?'Un attimo…':create?'Crea il tavolo':'Entra nel tavolo'}</button></form>`:`<div class="stack" style="margin-top:8px"><button class="btn ghost" data-act="tbshow" data-m="join">Entra in un tavolo</button><button class="btn ghost" data-act="tbshow" data-m="create">Crea un tavolo</button></div>`}
+</main></div>`;
+}
+function vClaim(){
+  const c=F.cl,lk=S.acct.name.toLowerCase(),ex=Object.entries(S.players).find(([id,p])=>String(p.name).toLowerCase()===lk);
+  const taken=ex&&ex[1].acct&&ex[1].acct!==S.acct.id,needPin=ex&&ex[1].pinHash&&!c.other;
+  if(S.linking||(!taken&&!needPin&&!c.other))return skeleton();
+  return `<div class="wrap">${backBtn('tables','I miei tavoli')}
+<div class="hero stack" style="margin-top:8px;gap:16px"><div><h1>${esc(S.table.name)}</h1>
+<p class="mut" style="margin:8px 0 0">${needPin?`In questo tavolo c'è già il giocatore <b>${esc(ex[1].name)}</b>. Se sei tu, scrivi il PIN che usavi qui: ritrovi partite, saldi e statistiche.`:`Il nome <b>${esc(S.acct.name)}</b> qui è già usato da un altro giocatore. Scegli come vuoi comparire in questo tavolo.`}</p></div>
+${needPin?`<form id="f-claim" class="stack" style="gap:12px"><label class="field"><span>Il tuo vecchio PIN di questo tavolo</span><input class="in" id="cl-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="cl.pin" value="${esc(c.pin)}" autocomplete="off"></label>
+${c.err?`<div class="red sm">${esc(c.err)}</div>`:''}<button class="btn" type="submit" ${c.busy?'disabled':''}>Sono io, collega il profilo</button></form>
+<button class="link" style="align-self:center" data-act="clother">Non sono io</button>`:`<form id="f-claim" class="stack" style="gap:12px"><label class="field"><span>Nome in questo tavolo</span><input class="in" id="cl-name" data-bind="cl.name" value="${esc(c.name)}" maxlength="24" autocapitalize="words"></label>
+${c.err?`<div class="red sm">${esc(c.err)}</div>`:''}<button class="btn" type="submit" ${c.busy?'disabled':''}>Entra con questo nome</button></form>`}</div></div>`;
+}
+const _view0=view;
+view=function(){
+  if(S.dbReady===false)return _view0();
+  if(!S.baseReady||!S.acctReady)return skeleton();
+  if(!S.acct)return vAccount();
+  if(S.locked)return vLock();
+  if(!S.table)return vTables();
+  if(!db||!(S.loaded.games&&S.loaded.players))return skeleton();
+  if(!S.me)return vClaim();
+  return _view0();
+};
+/* ---- fogli: profilo nel tavolo e account ---- */
+const _sheet0=sheetHtml;
+sheetHtml=function(){
+  const s=SH;if(!s)return '';let title='',body='';
+  const bioRow=()=>S.bioOk?(acctBio()?'<button class="btn ghost" data-act="biooff">Disattiva Face ID su questo telefono</button>':'<button class="btn" data-act="bioask">Attiva Face ID</button>'):'';
+  if(s.type==='me'&&S.me){
+    title='Il mio profilo';
+    body=`<div class="row" style="gap:14px">${ava(S.me.name,'l')}<div class="grow"><div class="pl-name">${esc(S.me.name)}</div><div class="mut sm">Tavolo: ${esc(S.table?S.table.name:'')}</div></div></div>
+<button class="btn" data-act="tables">${ico('chip',18)} I miei tavoli</button>
+<button class="btn ghost" data-act="pstats" data-k="${esc(S.me.name.trim().toLowerCase())}">${ico('bars',18)} Le mie statistiche</button>
+<button class="btn ghost" data-act="paym">${ico('coins',18)} Come vuoi essere pagato</button>
+<button class="btn ghost" data-act="settings">Impostazioni tavolo</button>
+<button class="btn ghost" data-act="export">${ico('share',18)} Esporta i dati</button>
+${bioRow()}<button class="btn ghost" data-act="chpin">Cambia PIN</button><button class="btn redb" data-act="logout">${acctBio()?'Blocca':'Esci'}</button>
+<button class="link" style="align-self:center;color:#FF6A60" data-act="delme">Esci da questo tavolo</button>`;
+  }else if(s.type==='acct'&&S.acct){
+    const n=(S.acct.tables||[]).length;title='Il mio account';
+    body=`<div class="row" style="gap:14px">${ava(S.acct.name,'l')}<div class="grow"><div class="pl-name">${esc(S.acct.name)}</div><div class="mut sm">${n} tavol${n===1?'o':'i'}</div></div></div>
+${bioRow()}<button class="btn ghost" data-act="chpin">Cambia PIN</button>
+${acctBio()?'<button class="btn ghost" data-act="logout">Blocca</button>':''}<button class="btn redb" data-act="fulllogout">Esci da questo telefono</button>
+<button class="link" style="align-self:center;color:#FF6A60" data-act="delacct">Elimina il mio account</button>`;
+  }else if(s.type==='bio'&&S.acct){
+    title='Attiva Face ID';
+    body=`<p class="mut sm" style="margin:0">Aprendo l'app entri con il volto o l'impronta e confermi i pagamenti senza scrivere il PIN. Conferma ora il tuo PIN.</p>
+<label class="field"><span>Il tuo PIN</span><input class="in" id="bio-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="bpin" value="${esc(F.bpin||'')}" autocomplete="current-password"></label>
+<button class="btn" data-act="bioon" ${PIN_RE.test(F.bpin||'')?'':'disabled'}>Attiva Face ID</button>`;
+  }else if(s.type==='delme'&&S.me){
+    const w=openStuffFor(S.me.id,S.me.name).map(x=>x.replace('è seduto','sei seduto').replace('deve ancora','devi ancora'));
+    title='Esci da questo tavolo';
+    body=w.length?`<div class="box r sm">Non puoi uscire adesso: ${esc(w.join(', '))}.</div><button class="btn ghost" data-act="sheetclose">Ho capito</button>`:`<p class="mut sm" style="margin:0"><b>${esc(S.table.name)}</b> non comparirà più tra i tuoi tavoli. Le partite giocate restano nello storico. Per rientrare ti serviranno nome e password del tavolo.</p>
+<label class="field"><span>Conferma con il tuo PIN</span><input class="in" id="del-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="dpin" value="${esc(F.dpin||'')}" autocomplete="off"></label>
+<button class="btn redb" data-act="delmeok" ${PIN_RE.test(F.dpin||'')?'':'disabled'}>Esci dal tavolo</button>`;
+  }else if(s.type==='delacct'&&S.acct){
+    const n=(S.acct.tables||[]).length;title='Elimina il mio account';
+    body=n?`<div class="box r sm">Prima esci dai tuoi tavoli (${n}): entra in ognuno e, dal profilo, tocca "Esci da questo tavolo".</div><button class="btn ghost" data-act="sheetclose">Ho capito</button>`:`<p class="mut sm" style="margin:0">L'account <b>${esc(S.acct.name)}</b> verrà cancellato e il nome tornerà libero.</p>
+<label class="field"><span>Conferma con il tuo PIN</span><input class="in" id="da-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="dpin" value="${esc(F.dpin||'')}" autocomplete="off"></label>
+<button class="btn redb" data-act="delacctok" ${PIN_RE.test(F.dpin||'')?'':'disabled'}>Elimina definitivamente</button>`;
+  }else return _sheet0();
+  return `<div class="back" data-act="closesheet"><div class="sheet ${s.anim?'anim':''}" role="dialog" aria-label="${esc(title)}"><div class="grab"></div><div class="sheet-body"><div class="row sp"><h2 style="font-size:22px">${esc(title)}</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>${body}</div></div></div>`;
+};
+/* il PIN ora è quello dell'account e lo controlla il server */
+const checkMyPin=async pin=>{try{return !!(await BASE.rpc('hpl_check_pin',{p_pin:pin}))}catch(e){toast(errMsg(e),'err');return null}};
+bioFresh=async function(){return bioFreshUi()&&!!acctBio()};
+authDebt=async function(did){
+  const g=S.games[V.gid],d=g&&(g.debts||[]).find(x=>x.debtId===did);if(!d)return false;
+  const perm=debtPerm(V.gid,d);
+  if(!perm.can){toast('Solo '+perm.who+' può modificare questo saldo','err');return false}
+  if(perm.needPin){
+    if(await bioFresh()){F.bioOk=0}
+    else{const ok=await checkMyPin(F.pinp);if(ok===null)return false;if(!ok){toast('PIN errato, riprova.','err');return false}}
+  }
+  F.pinp='';return true;
+};
+async function doAcct(){
+  const a=F.ac,reg=a.mode==='reg',name=a.name.trim().replace(/\s+/g,' ');
+  const fail=m=>{a.err=m;a.busy=false;render()};
+  if(name.length<2)return fail('Il nome utente deve avere almeno 2 caratteri.');
+  if(!PIN_RE.test(a.pin))return fail('Il PIN deve avere da 4 a 6 cifre.');
+  if(reg&&a.pin!==a.pin2)return fail('I due PIN non coincidono.');
+  a.busy=true;a.err='';render();
+  try{
+    const r=await BASE.rpc(reg?'hpl_register':'hpl_login',{p_name:name,p_pin:a.pin});
+    const st=r&&r.status;
+    if(st==='exists')return fail('Questo nome utente esiste già: tocca Accedi, oppure scegline un altro.');
+    if(st==='reserved')return fail('Questo nome utente è riservato.');
+    if(st==='invalid')return fail('Controlla nome utente e PIN.');
+    if(st==='not_found')return fail('Nome utente non trovato. Se è la prima volta, tocca Registrati.');
+    if(st==='bad_pin')return fail('Nome utente o PIN errati.');
+    if(st!=='ok')return fail('Non è andata, riprova.');
+    await refreshMe();LS.set('hadacct',1);S.locked=false;
+    F.ac={mode:null,name:'',pin:'',pin2:'',err:'',busy:false};
+    toast('Ciao '+firstName(S.acct.name)+'!','ok');render();
+  }catch(e){fail(errMsg(e))}
+}
+doTable=async function(){
+  const t=F.tb,create=t.mode==='create',name=t.name.trim().replace(/\s+/g,' ');
+  const fail=m=>{t.err=m;t.busy=false;render()};
+  if(name.length<2)return fail('Il nome del tavolo deve avere almeno 2 caratteri.');
+  if(t.pw.length<4)return fail('La password deve avere almeno 4 caratteri.');
+  if(create&&t.pw!==t.pw2)return fail('Le due password non coincidono.');
+  t.busy=true;t.err='';render();
+  try{
+    const id='t'+(await sha('hpltn:'+name.toLowerCase())).slice(0,20);let shown=name;
+    const mine=(S.acct.tables||[]).find(x=>x.id===id);
+    if(mine&&!create){F.tb={mode:null,name:'',pw:'',pw2:'',err:'',busy:false};F.tbOpen=false;return openTable(mine)}
+    if(create){
+      const r=await BASE.rpc('hpl_create_table',{tid:id,tname:name,pw:t.pw});
+      if(r==='exists')return fail('Esiste già un tavolo con questo nome: tocca "Entra in un tavolo", oppure scegli un altro nome.');
+      if(r!=='ok')return fail('Non sono riuscito a creare il tavolo, riprova.');
+    }else{
+      const r=await BASE.rpc('hpl_join_table',{tid:id,pw:t.pw});
+      if(!r||r.status==='not_found')return fail('Nessun tavolo con questo nome. Controlla come è scritto, oppure creane uno.');
+      if(r.status==='bad_password')return fail('Password errata.');
+      if(r.status==='too_many')return fail('Troppi tentativi sbagliati: riprova tra qualche minuto.');
+      shown=r.name;
+    }
+    LS.set('lasttb',shown);
+    F.tb={mode:null,name:'',pw:'',pw2:'',err:'',busy:false};F.tbOpen=false;
+    await openTable({id,name:shown});
+  }catch(e){fail(errMsg(e))}
+};
+async function doClaim(){
+  const c=F.cl;c.err='';c.busy=true;render();
+  const lk=S.acct.name.toLowerCase(),ex=Object.entries(S.players).find(([id,p])=>String(p.name).toLowerCase()===lk);
+  const needPin=ex&&ex[1].pinHash&&!c.other&&!(ex[1].acct&&ex[1].acct!==S.acct.id);
+  let r;
+  if(needPin){
+    if(!PIN_RE.test(c.pin)){c.err='Scrivi il PIN che usavi in questo tavolo.';c.busy=false;return render()}
+    r=await linkAs(ex[0],ex[1].name,c.pin);
+    if(r==='bad_pin')c.err='PIN errato.';else if(r==='too_many')c.err='Troppi tentativi: riprova tra qualche minuto.';else if(r==='taken')c.err='Questo profilo è già collegato a un altro account.';
+  }else{
+    const n=c.name.trim().replace(/\s+/g,' ');
+    if(n.length<2){c.err='Scrivi un nome di almeno 2 caratteri.';c.busy=false;return render()}
+    if(Object.values(S.players).some(p=>String(p.name).toLowerCase()===n.toLowerCase())){c.err='Anche questo nome è già usato in questo tavolo.';c.busy=false;return render()}
+    r=await linkAs(null,n,null);
+  }
+  c.busy=false;if(r==='ok')F.cl={pin:'',name:'',err:'',busy:false,other:false};render();
+}
+document.addEventListener('submit',e=>{
+  const id=e.target.id;
+  if(id==='f-acct')doAcct();
+  else if(id==='f-claim')doClaim();
+  else if(id==='f-unlock')(async()=>{const ok=await checkMyPin(F.ul.pin);if(ok){S.locked=false;F.ul={pin:'',err:'',show:false};render()}else if(ok===false){F.ul.err='PIN errato.';render()}})();
+});
+async function fullLogout(){
+  try{await BASE.rpc('hpl_logout')}catch(e){}
+  resetTableState();S.acct=null;S.locked=false;LS.del('bio');LS.del('pins');LS.del('active');render();
+}
+Object.assign(H,{
+  acmode(d){F.ac.mode=d.m;F.ac.err='';F.ac.pin='';F.ac.pin2='';render()},
+  ulpin(){F.ul.show=true;render()},
+  async unlockbio(){const b=acctBio();if(!b){F.ul.show=true;render();return}try{await bioAssert(b.cred);S.locked=false;F.ul={pin:'',err:'',show:false};render()}catch(e){F.ul.show=true;F.ul.err='Face ID non riuscito: usa il PIN.';render()}},
+  fulllogout(){SH=null;fullLogout()},
+  logout(){SH=null;if(acctBio()){resetTableState();S.locked=true;render()}else fullLogout()},
+  tables(){SH=null;backToTables()},
+  leave(){SH=null;backToTables()},
+  acctopen(){openSheet({type:'acct'})},
+  opentable(d){const t=(S.acct.tables||[]).find(x=>x.id===d.id);if(t)openTable(t)},
+  tbshow(d){F.tbOpen=true;F.tb.mode=d.m;F.tb.err='';render()},
+  clother(){F.cl.other=true;F.cl.err='';render()},
+  bioask(){F.bpin='';openSheet({type:'bio'})},
+  async bioon(){
+    const ok=await checkMyPin(F.bpin);if(ok===null)return;if(!ok){toast('PIN errato','err');return}
+    let cred;
+    try{const c=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'Home Poker'},user:{id:new TextEncoder().encode(S.acct.id),name:S.acct.name,displayName:S.acct.name},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'preferred'},timeout:60000,attestation:'none'}});cred=b64(c.rawId)}
+    catch(e){toast('Face ID non disponibile su questo telefono o browser','err');return}
+    LS.set('bio',{acct:S.acct.id,cred,id:S.me?S.me.id:null});F.bpin='';SH=null;render();toast('Face ID attivato','ok');
+  },
+  biooff(){LS.del('bio');SH=null;render();toast('Face ID disattivato','ok')},
+  async chpinok(){
+    let r;try{r=await BASE.rpc('hpl_change_pin',{p_old:F.chpin.old,p_new:F.chpin.nw})}catch(e){toast(errMsg(e),'err');return}
+    if(r==='ok'){SH=null;F.chpin={old:'',nw:''};render();toast('PIN aggiornato','ok')}
+    else toast(r==='bad_pin'?'PIN attuale errato':'Il nuovo PIN deve avere da 4 a 6 cifre','err');
+  },
+  async delmeok(){
+    if(!S.me||openStuffFor(S.me.id,S.me.name).length){render();return}
+    const ok=await checkMyPin(F.dpin);if(ok===null)return;if(!ok){toast('PIN errato','err');return}
+    const tn=S.table.name;
+    try{await BASE.rpc('hpl_leave_table',{p_tid:S.table.id})}catch(e){toast(errMsg(e),'err');return}
+    F.dpin='';SH=null;await backToTables();toast('Sei uscito da '+tn,'ok');
+  },
+  delacct(){F.dpin='';openSheet({type:'delacct'})},
+  async delacctok(){
+    let r;try{r=await BASE.rpc('hpl_delete_account',{p_pin:F.dpin})}catch(e){toast(errMsg(e),'err');return}
+    if(r==='bad_pin'){toast('PIN errato','err');return}
+    if(r!=='ok'){render();return}
+    F.dpin='';SH=null;LS.del('bio');LS.del('hadacct');S.acct=null;resetTableState();render();toast('Account eliminato','ok');
+  },
+  async rmplayer(d){
+    if(!isManager())return;const p=S.players[d.id];if(!p)return;
+    const w=openStuffFor(d.id,p.name);if(w.length){toast('Non si può rimuovere: '+p.name+' '+w.join(', '),'err');return}
+    if(!arm('rm'+d.id))return;
+    try{await BASE.rpc('hpl_kick',{p_tid:S.table.id,p_player:d.id})}catch(e){toast(errMsg(e),'err');return}
+    const m=((S.cfg&&S.cfg.managers)||[]);if(m.includes(d.id))await saveCfg({managers:m.filter(x=>x!==d.id)});
+    render();toast(p.name+' rimosso dal tavolo','ok');
+  }
+});
+
+/* i fogli devono aprirsi anche fuori da un tavolo (lista tavoli, account) */
+const _render0=render;
+render=function(){
+  const ae=document.activeElement,fid=ae&&ae.id,an=!!(SH&&SH.anim);let ss=null,se=null;try{ss=ae.selectionStart;se=ae.selectionEnd}catch(e){}
+  const sb=document.querySelector('.sheet-body'),st=sb?sb.scrollTop:0;
+  _render0();
+  if(SH&&S.acct&&!(db&&unlocked())){
+    SH.anim=an;$('#sheet').innerHTML=sheetHtml();SH.anim=false;
+    const n=document.querySelector('.sheet-body');if(n)n.scrollTop=st;
+    document.body.classList.add('noscroll');
+    if(fid){const el=document.getElementById(fid);if(el){el.focus();try{if(ss!=null)el.setSelectionRange(ss,se)}catch(e){}}}
+  }
+};
+
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791805446736';
+const APP_VERSION='1791809279497';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
@@ -1601,11 +1915,8 @@ setInterval(checkUpdate,15*60*1000);
   try{BASE=await makeBase()}catch(e){console.error(e);window.__dbErr=(e&&(e.message||e.details||e.code))||String(e);S.dbReady=false;render();return}
   S.dbReady=true;S.baseReady=true;
   bioSupport().then(v=>{S.bioOk=v;if(SH)render()});
-  const sess=LS.get('table',null);
-  if(sess){
-    try{const r=await BASE.rpc('hpl_my_table',{tid:sess.id});if(r&&r.status==='ok'){await enterTable({id:sess.id,name:r.name});return}}catch(e){console.error(e)}
-    LS.del('table');
-  }
+  try{await refreshMe()}catch(e){console.error(e);window.__dbErr=(e&&(e.message||e.details||e.code))||String(e);S.dbReady=false;render();return}
+  if(S.acct){LS.set('hadacct',1);S.locked=!!acctBio()}
   render();
 })();
 </script>
