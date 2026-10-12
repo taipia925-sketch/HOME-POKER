@@ -609,6 +609,55 @@ body.noscroll #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))}
 .v2-res-in{background:#0C111C;backdrop-filter:blur(8px)}
 .v2-res{inset:12% 4%}
 .v2-pod{gap:18px;align-items:flex-end}.pd{padding-bottom:0}.pd.p1{padding-bottom:16px}.pd.p1 .ava{width:62px;height:62px;font-size:20px;box-shadow:0 0 0 3px #E2B65B,0 0 22px rgba(226,182,91,.6)}.pd.p1 b{color:#FFE3A1;font-size:15px}
+/* ===== v3: carte dell'eroe sul tavolo, lobby ===== */
+.v2-mine{display:none}
+.st.heroseat{width:176px;z-index:6}
+.st.heroseat .st-av{display:none}
+.st.heroseat .st-cards{position:relative;top:auto;left:auto;transform:none}
+.st-cc.herocards{display:flex;justify-content:center}
+.st-cc.herocards .cd.l:first-child{transform:rotate(-5deg) translateX(9px)}
+.st-cc.herocards .cd.l:last-child{transform:rotate(5deg) translateX(-9px)}
+.st-cc.herocards .cd.l.hi:first-child{transform:rotate(-5deg) translate(9px,-8px)}
+.st-cc.herocards .cd.l.hi:last-child{transform:rotate(5deg) translate(-9px,-8px)}
+.st-cc.herocards.gone .cd{opacity:.32;transform:translateY(8px) rotate(0)}
+.st.heroseat .st-plate{margin-top:-18px;z-index:5;min-width:104px;padding:3px 12px 4px}
+.st.heroseat .st-plate b{font-size:12.5px}
+.st.heroseat .st-plate span{font-size:14px}
+.st.heroseat.act .st-plate{border-color:#8E9CFF;box-shadow:0 0 0 2px rgba(142,156,255,.35),0 0 18px rgba(142,156,255,.4)}
+.st.heroseat.win .st-plate{border-color:#E2B65B;box-shadow:0 0 22px rgba(226,182,91,.6)}
+.st.heroseat .st-act{margin-top:5px}
+.la-hand{background:rgba(6,10,18,.8);color:#9BF0B0;font-size:12.5px;box-shadow:inset 0 0 0 1px rgba(155,240,176,.25)}
+.st.heroseat .la.win{font-size:12.5px}
+.v2-emo{position:absolute;left:1%;bottom:2%;z-index:25}
+.v2-emo .v2-emos{position:absolute;left:0;right:auto;bottom:50px}
+.v2-fly.muck{transition-property:transform,opacity;opacity:1}
+.v2-fly.muck.go{opacity:0}
+.v2-fly.muck .st-cc{display:flex}
+/* lobby */
+.vr-cta{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:18px 16px;border-radius:22px;background:linear-gradient(135deg,#1E7A57 0%,#11402F 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 10px 30px rgba(0,0,0,.35);color:#fff}
+.vr-cta b{display:block;font-family:var(--serif);font-size:20px;font-weight:800}
+.vr-cta span span,.vr-cta .grow span{display:block;font-size:13px;color:rgba(255,255,255,.78);line-height:1.35;margin-top:2px}
+.vr-ic{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:rgba(52,199,89,.16);color:#5BE07D;flex:none}
+.vr-ic.big{width:52px;height:52px;background:rgba(255,255,255,.14);color:#fff}
+.vr-ic.t{background:rgba(226,182,91,.16);color:#E2B65B}
+.vr-card{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card);border-radius:22px;padding:14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
+.vr-card:active,.vr-cta:active{transform:scale(.985)}
+.vr-card.mine{box-shadow:inset 0 0 0 1.5px rgba(226,182,91,.45)}
+.vr-card b{font-size:16.5px;display:block;font-weight:700}
+.vr-sub{display:block;font-size:12.5px;color:var(--mut);margin-top:1px}
+.vr-ppl{display:flex;align-items:center;gap:8px;margin-top:7px;font-size:12.5px;color:var(--mut)}
+.vr-ppl .stk .ava{width:24px;height:24px;font-size:9.5px;margin-left:-7px;box-shadow:0 0 0 2px var(--card)}
+.vr-ppl .stk .ava:first-child{margin-left:0}
+.vr-ppl .stk .more{width:24px;height:24px;margin-left:-7px;font-size:10px;box-shadow:0 0 0 2px var(--card)}
+.vr-me{font-size:11px;font-weight:800;color:#1A1300;background:#E2B65B;padding:1px 7px;border-radius:999px}
+.vr-st{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--mut);white-space:nowrap;flex:none}
+.vr-st.live{background:var(--green-bg);color:#5BE07D}
+.vr-st.wait{background:rgba(142,156,255,.14);color:#C9D0FF}
+.vr-st.done{background:rgba(255,255,255,.06);color:var(--mut)}
+
+.v2-tbl{max-height:none}
+.st.heroseat{transform:translate(-50%,-46%)}
+.v2-brand{bottom:auto;top:58%}
 </style>
 
 <div id="app"></div>
@@ -2880,11 +2929,11 @@ afterData=async function(){
   await _afterDataF();
   if(S.deep&&S.me&&S.table&&S.table.id===S.deep.t&&S.loaded.games){
     const d=S.deep;S.deep=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
-    if(d.v==='vt'){H.govt()}else if(d.v==='net'){F.pinp='';go('netting',null,{pid:d.g})}else if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g);
+    if(d.v==='vt'){H.govt({rid:d.g})}else if(d.v==='net'){F.pinp='';go('netting',null,{pid:d.g})}else if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g);
   }
 };
 window.addEventListener('hashchange',()=>{const d=deepLink();if(!d||!S.acct||S.locked)return;
-  if(S.table&&S.table.id===d.t){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(d.v==='vt'){H.govt()}else if(d.v==='net'){F.pinp='';go('netting',null,{pid:d.g})}else if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g)}
+  if(S.table&&S.table.id===d.t){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(d.v==='vt'){H.govt({rid:d.g})}else if(d.v==='net'){F.pinp='';go('netting',null,{pid:d.g})}else if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g)}
   else{S.deepTried=false;backToTables()}});
 navigator.serviceWorker&&navigator.serviceWorker.addEventListener&&navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.url){location.hash=new URL(e.data.url,location.href).hash}});
 setTimeout(async()=>{S.pushOn=await pushState()},1500);
@@ -2896,7 +2945,7 @@ setTimeout(async()=>{S.pushOn=await pushState()},1500);
    Modalità: cash (fiches ricaricabili) e sng (torneo Sit & Go, bui crescenti).
    ===================================================================== */
 const HE=(()=>{
-const RANKS='23456789TJQKA',SUITS='shdc',NS=9,NEXT_DELAY=5500,HIST=25;
+const RANKS='23456789TJQKA',SUITS='shdc',NS=9,NEXT_DELAY=4000,HIST=25;
 const LV=[1,1.5,2,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200];
 const rv=c=>RANKS.indexOf(c[0])+2;
 const RN={11:'J',12:'Q',13:'K',14:'A'};const rn=v=>RN[v]||String(v);
@@ -2937,7 +2986,7 @@ function best5(cards){
 }
 
 /* ---- stato ---- */
-function initState(){return {v:0,cfg:{sb:5,bb:10,stack:1000,turnSec:30,mode:'cash',lvlMin:8},seats:Array(NS).fill(null),running:false,handNo:0,dealer:-1,hand:null,hist:[],sng:null}}
+function initState(room){return {room:room||null,closed:false,v:0,cfg:{sb:5,bb:10,stack:1000,turnSec:30,mode:'cash',lvlMin:8},seats:Array(NS).fill(null),running:false,handNo:0,dealer:-1,hand:null,hist:[],sng:null}}
 const E=c=>{const e=new Error(c);e.code=c;throw e};
 const seatOf=(st,acct)=>st.seats.findIndex(s=>s&&s.acct===acct);
 const nextIdx=(from,ok)=>{for(let k=1;k<=NS;k++){const i=((from+k)%NS+NS)%NS;if(ok(i))return i}return -1};
@@ -2952,9 +3001,10 @@ function blinds(st,now){
 
 function sit(st,who,seat){
   if(seatOf(st,who.acct)>=0)E('already_seated');
-  if(sngOn(st))E('sng_running');
-  if(seat==null||seat<0)seat=st.seats.findIndex(s=>!s);
-  if(seat<0||seat>=NS)E('full');if(st.seats[seat])E('seat_taken');
+  if(sngOn(st))E('sng_running');if(st.closed)E('room_closed');
+  const mx=maxSeats(st);
+  if(seat==null||seat<0)seat=st.seats.findIndex((s,i)=>!s&&i<mx);
+  if(seat<0||seat>=mx)E('full');if(st.seats[seat])E('seat_taken');
   st.seats[seat]={acct:who.acct,pid:who.pid||null,name:String(who.name||'?').slice(0,24),stack:st.cfg.stack,away:false,rebuys:0};
   return true;
 }
@@ -2996,13 +3046,14 @@ function start(st,priv,now){
   }
   st.running=true;tick(st,priv,now);return true;
 }
+const maxSeats=st=>Math.min(NS,Math.max(2,(st.room&&st.room.maxSeats)||NS));
 const eligible=st=>st.seats.map((s,i)=>s&&s.stack>0&&!s.out&&(sngOn(st)||!s.away)?i:-1).filter(i=>i>=0);
 
 function newHand(st,priv,now){
   const el=eligible(st);if(el.length<2)return false;
   const ok=i=>el.includes(i);
   const B=blinds(st,now);
-  st.handNo++;st.dealer=nextIdx(st.dealer,ok);
+  st.handNo++;st.dealer=nextIdx(st.dealer,ok);if(st.room)st.room.started=true;
   const hu=el.length===2,sb=hu?st.dealer:nextIdx(st.dealer,ok),bb=nextIdx(sb,ok);
   const deck=newDeck(),holes={},p={};
   el.forEach(i=>{const s=st.seats[i];p[i]={name:s.name,acct:s.acct,bet:0,contrib:0,folded:false,allin:false,acted:false,la:null,start:s.stack};holes[s.acct]=[deck.pop(),deck.pop()]});
@@ -3125,6 +3176,18 @@ function show(st,priv,who){
   const last=st.hist&&st.hist[st.hist.length-1];if(last&&last.no===h.no){last.shown=last.shown||{};last.shown[i]={name:h.p[i].name,cards:h.reveal[i]}}
   return true;
 }
+/* il tavolo si chiude quando resta un solo giocatore (o nessuno) */
+function roomCheck(st,now){
+  if(st.closed)return false;
+  const sat=st.seats.filter(Boolean),alive=sat.filter(s=>!s.out);
+  if(handLive(st))return false;
+  if(!sat.length||(st.room&&st.room.started&&alive.length<=1)){
+    st.closed=true;st.closedAt=now;st.running=false;
+    st.final=sat.concat(st.sng&&st.sng.out?[]:[]).map(s=>({name:s.name,acct:s.acct,stack:s.stack,out:!!s.out,net:s.stack-st.cfg.stack*(1+(s.rebuys||0))})).sort((a,b)=>b.stack-a.stack);
+    return true;
+  }
+  return false;
+}
 /* da chiamare spesso: scade il turno, parte la mano successiva */
 function tick(st,priv,now){
   const h=st.hand;
@@ -3140,7 +3203,7 @@ function tick(st,priv,now){
   if(st.running&&(!h||now>=(h.endedAt||0)+NEXT_DELAY))return newHand(st,priv,now);
   return false;
 }
-return {initState,sit,leave,rebuy,setAway,config,start,act,show,tick,newHand,evalHand,best5,cmp,seatOf,eligible,blinds,sngOn,NEXT_DELAY,NS,LV};
+return {roomCheck,maxSeats,initState,sit,leave,rebuy,setAway,config,start,act,show,tick,newHand,evalHand,best5,cmp,seatOf,eligible,blinds,sngOn,NEXT_DELAY,NS,LV};
 })();
 
 /* =====================================================================
@@ -3405,7 +3468,9 @@ Object.assign(H,{
 Object.assign(IP,{clock:'M12 7v5l3 2M12 3a9 9 0 100 18 9 9 0 000-18z',uplus:'M15 20a6 6 0 00-12 0M9 12a4 4 0 100-8 4 4 0 000 8zM19 8v6M16 11h6',smile:'M12 3a9 9 0 100 18 9 9 0 000-18zM8.5 14.5a4.5 4.5 0 007 0M9 9.5h.01M15 9.5h.01',vol:'M4 9v6h4l5 4V5L8 9H4zM16.5 8.5a5 5 0 010 7',mute:'M4 9v6h4l5 4V5L8 9H4zM17 9.5l5 5M22 9.5l-5 5',eye:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 100 6 3 3 0 000-6z',trophy:'M8 4h8v5a4 4 0 01-8 0V4zM8 6H5a3 3 0 003 4M16 6h3a3 3 0 01-3 4M12 13v4M8 21h8M9 17h6'});
 S.vt.sound=LS.get('vtsound',true);
 Object.assign(F.vt,{pre:null,emo:false,hideRes:null});
-const SP=[[50,91],[17,79],[12,55],[15,31],[33,12],[67,12],[85,31],[88,55],[83,79]];
+const SP=[[50,83],[16,77],[11,54],[14,30],[33,11],[67,11],[86,30],[89,54],[84,77]];
+const SP6=[[50,83],[13,63],[15,27],[50,10],[85,27],[87,63]],SP2=[[50,83],[50,11]];
+const layoutOf=st=>{const ms=st?HE.maxSeats(st):9;return {ms,L:ms<=2?SP2:ms<=6?SP6:SP}};
 const CR=c=>c[0]==='T'?'10':c[0];
 function cardHTML(c,size,extra,style){
   if(!c)return `<span class="cd back ${size} ${extra||''}" ${style?`style="${style}"`:''}><i></i></span>`;
@@ -3450,9 +3515,9 @@ function vtSendReact(e){
 function vtShowReact(p){
   const st=S.vt.st;if(!st||!st.seats[p.seat]||st.seats[p.seat].acct!==p.acct||!EMO.includes(p.e))return;
   const fx=$$id('v2-fx');if(!fx)return;
-  const at=p.seat===vtSeat()?$$id('v2-mycards'):$$id('vs'+p.seat);if(!at)return;
+  const at=$$id('vs'+p.seat);if(!at)return;
   const r=relRect(at);const b=document.createElement('div');b.className='v2-react';b.textContent=p.e;
-  b.style.left=(r.x+r.w/2)+'px';b.style.top=(r.y+(p.seat===vtSeat()?0:r.h*.15))+'px';fx.appendChild(b);setTimeout(()=>b.remove(),2600);
+  b.style.left=(r.x+r.w/2)+'px';b.style.top=(r.y+r.h*.15)+'px';fx.appendChild(b);setTimeout(()=>b.remove(),2600);
 }
 
 /* ---------- radice persistente ---------- */
@@ -3464,10 +3529,10 @@ vVT=function(){
 <div class="v2-center"><div class="v2-pot" id="v2-pot"></div><div class="v2-board">${[0,1,2,3,4].map(k=>`<span class="v2-slot" id="v2-c${k}"></span>`).join('')}</div><div class="v2-msg" id="v2-msg"></div></div>
 ${[...Array(9)].map((_,i)=>`<div class="st off" id="vs${i}"><div class="st-cards"></div><div class="st-av"><svg class="st-ring" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29"/></svg><div class="st-ava"></div></div><div class="st-plate"></div><div class="st-act"></div></div><div class="v2-bet" id="vb${i}"></div>`).join('')}
 <div class="v2-dbtn" id="v2-dbtn">D</div>
+<div class="v2-emo" id="v2-emo"></div>
 <div class="v2-over" id="v2-over"></div>
 <div class="v2-fx" id="v2-fx"></div>
 </div></div>
-<div class="v2-mine" id="v2-mine"></div>
 <div class="v2-ctl" id="v2-ctl"></div>
 </div>`;
 };
@@ -3508,7 +3573,7 @@ function vtPaint(){
   setH($$id('v2-top'),topHtml(st));
   setH($$id('v2-brand'),`<span>${esc(S.table.name)}</span>`);
   if(S.vt.missing){setH($$id('v2-msg'),'Il tavolo virtuale va attivato in Supabase: esegui virtuale.sql e pubblica la funzione hpl-holdem.');setH($$id('v2-ctl'),'');setH($$id('v2-mine'),'');return}
-  const base=me>=0?me:0,rel=i=>((i-base)%9+9)%9;
+  const {ms,L}=layoutOf(st);const base=me>=0?me:0,rel=i=>((i-base)%ms+ms)%ms;
   const won={};if(h&&h.stage==='done'&&h.results)h.results.forEach(r=>{if(r.win>0)won[r.seat]=r});
   const top=h&&h.stage==='done'&&h.results&&h.results[0]&&h.results[0].win>0?h.results[0]:null;
   const bestSet=new Set(top&&top.best?top.best:[]);
@@ -3517,9 +3582,11 @@ function vtPaint(){
   const nIn=h?Object.keys(h.p).length:0;
   /* posti */
   for(let i=0;i<9;i++){
-    const el=$$id('vs'+i),s=st?st.seats[i]:null,[x,y]=SP[rel(i)];
+    const el=$$id('vs'+i),s=st?st.seats[i]:null;
+    if(i>=ms){setCl(el,'st off');delete el.dataset.act;setCl($$id('vb'+i),'v2-bet');setH($$id('vb'+i),'');continue}
+    const [x,y]=L[rel(i)];
     if(el.__pos!==x+','+y){el.style.left=x+'%';el.style.top=y+'%';el.__pos=x+','+y}
-    const bt=$$id('vb'+i),bx=x+(50-x)*.40,by=y+(50-y)*.36;
+    const hero=me>=0&&i===me,bt=$$id('vb'+i),bx=x+(50-x)*(hero?.08:.40),by=y+(50-y)*(hero?.62:.36);
     if(bt.__pos!==bx+','+by){bt.style.left=bx+'%';bt.style.top=by+'%';bt.__pos=bx+','+by}
     if(!s){
       if(me<0){setCl(el,'st empty');el.dataset.act='vtsit';el.dataset.seat=i;setH(el.querySelector('.st-ava'),`<span class="st-plus">${ico('plus',20)}</span>`);setH(el.querySelector('.st-plate'),'<b>Siediti</b>');}
@@ -3528,13 +3595,16 @@ function vtPaint(){
     }
     delete el.dataset.act;
     const P=h&&h.p[i],act=live&&h.toAct===i,isMe=i===me,out=s.out;
-    setCl(el,`st${isMe?' me':''}${act?' act':''}${P&&P.folded?' fold':''}${P&&P.allin&&live?' allin':''}${won[i]?' win':''}${s.away?' away':''}${out?' out':''}${!P&&h&&live&&!out?' wait':''}`);
+    setCl(el,`st${isMe?' me heroseat':''}${act?' act':''}${P&&P.folded?' fold':''}${P&&P.allin&&live?' allin':''}${won[i]?' win':''}${s.away?' away':''}${out?' out':''}${!P&&h&&live&&!out?' wait':''}`);
     const ring=el.querySelector('.st-ring');if(act){ring.dataset.dl=h.deadline}else delete ring.dataset.dl;
     setH(el.querySelector('.st-ava'),ava(s.name));
     setH(el.querySelector('.st-plate'),`<b>${esc(isMe?'Tu':firstName(s.name))}</b><span class="num">${out?'Eliminato':s.away?'In pausa':fchip(s.stack)}</span>`);
     // carte del posto
     let ch='';
-    if(P&&!P.folded&&!isMe){
+    if(isMe&&P){
+      const cards=S.vt.cardsHand===h.no?S.vt.cards:null,fresh=newHand||S.vt.heroDealt!==h.no;if(cards)S.vt.heroDealt=h.no;
+      ch=`<div class="st-cc herocards ${P.folded?'gone':''}">${(cards||[null,null]).map((c,k)=>cardHTML(c,'l',(top&&c?(bestSet.has(c)?'hi ':'dim '):'')+(fresh&&cards?'dealin':''),fresh&&cards?`animation-delay:${k*140+(newHand?nIn*110:0)+120}ms`:'')).join('')}</div>`;
+    }else if(P&&!P.folded&&!isMe){
       const rv=h.reveal&&h.reveal[i];
       if(rv)ch=`<div class="st-cc up">${rv.map(c=>cardHTML(c,'s',top&&won[i]&&bestSet.has(c)?'hi':top&&!won[i]?'':''+'')).join('')}</div>`;
       else{const d=dealOrder[i]||0;ch=`<div class="st-cc">${[0,1].map(r=>cardHTML(null,'s',newHand?'dealin':'',newHand?`animation-delay:${(r*nIn+d)*110+80}ms`:'')).join('')}</div>`}
@@ -3542,7 +3612,10 @@ function vtPaint(){
     setH(el.querySelector('.st-cards'),ch);
     // ultima mossa / vincita
     let la='';
-    if(won[i])la=`<span class="la win num">+${fchip(won[i].win)}</span>`;
+    if(isMe&&P){const cards=S.vt.cardsHand===h.no?S.vt.cards:null;const ev=cards&&HE.evalHand(cards.concat(h.board));
+      la=won[i]?`<span class="la win num">+${fchip(won[i].win)}${won[i].hand?' · '+esc(won[i].hand):''}</span>`:P.folded?'<span class="la la-fold">Hai lasciato</span>':ev?`<span class="la la-hand">${esc(ev.n)}</span>`:''}
+    else if(isMe){const nt=out?'Sei fuori dal torneo':s.away?'Sei in pausa':s.stack===0?'Hai finito le fiches':live?'Entri dalla prossima mano':'';la=nt?`<span class="la la-blind">${nt}</span>`:''}
+    else if(won[i])la=`<span class="la win num">+${fchip(won[i].win)}</span>`;
     else if(P&&P.la&&!(h.stage==='done'&&P.la!=='Lascia'))la=`<span class="la la-${P.la==='All-in'?'allin':P.la==='Lascia'?'fold':P.la==='Passa'?'check':P.la==='Chiama'?'call':'raise'}">${P.la}</span>`;
     else if(h&&live&&i===h.sb&&P&&!P.la&&h.stage==='preflop')la='<span class="la la-blind">SB</span>';
     else if(h&&live&&i===h.bb&&P&&!P.la&&h.stage==='preflop')la='<span class="la la-blind">BB</span>';
@@ -3553,7 +3626,7 @@ function vtPaint(){
   }
   /* bottone del mazziere */
   const db_=$$id('v2-dbtn');
-  if(h&&st.seats[h.dealer]){const [x,y]=SP[rel(h.dealer)];const dx=x+(50-x)*.26+(x<50?6:x>50?-6:11),dy=y+(50-y)*.26+(y>50?-1:1);db_.style.left=dx+'%';db_.style.top=dy+'%';db_.classList.add('on')}else db_.classList.remove('on');
+  if(h&&st.seats[h.dealer]&&h.dealer<ms){const [x,y]=L[rel(h.dealer)];const hd=me>=0&&h.dealer===me;const dx=hd?x+21:x+(50-x)*.26+(x<50?6:x>50?-6:11),dy=hd?y-3:y+(50-y)*.26+(y>50?-1:1);db_.style.left=dx+'%';db_.style.top=dy+'%';db_.classList.add('on')}else db_.classList.remove('on');
   /* centro */
   const pot=h?(h.stage==='done'?(h.pot||potOf(h)):potOf(h)-betsOf(h)):0;
   setH($$id('v2-pot'),h&&(pot||potOf(h))?`<span class="chips">${chipStack(pot||potOf(h))}</span><span><small>Piatto</small> <b class="num">${fchip(pot||potOf(h))}</b></span>`:'');
@@ -3574,7 +3647,7 @@ function vtPaint(){
   /* sovrapposizione risultati torneo */
   setH($$id('v2-over'),sngResultsHtml(st));
   /* le mie carte e controlli */
-  setH($$id('v2-mine'),mineHtml(st,me,top,bestSet));
+  setH($$id('v2-emo'),me>=0&&st?`<button class="v2-ib emo ${F.vt.emo?'on':''}" data-act="vtemo" aria-label="Reazioni">${ico('smile',21)}</button>${F.vt.emo?`<div class="v2-emos">${EMO.map(e=>`<button data-act="vtreact" data-e="${e}">${e}</button>`).join('')}</div>`:''}`:'');
   setH($$id('v2-ctl'),ctlHtml(st,me));
   /* animazioni dal confronto con lo stato precedente */
   try{vtAnimate(prev,st,me)}catch(e){console.warn(e)}
@@ -3685,7 +3758,7 @@ function vtAnimate(prev,st,me){
   if(!ph||ph.no!==h.no){
     const center=$$id('v2-c2'),order=Object.keys(h.dealOrder||{});
     let k=0,i=h.dealer;const seq=[];for(let n=0;n<9;n++){i=(i+1)%9;if(h.p[i])seq.push(i)}
-    [0,1].forEach(r=>seq.forEach(s=>{const to=s===me?$$id('v2-mycards'):$$id('vs'+s).querySelector('.st-cards');fxFly(center,to,cardHTML(null,'s'),'card',(r*seq.length+k%seq.length)*110,380);k++}));
+    [0,1].forEach(r=>seq.forEach(s=>{const to=$$id('vs'+s).querySelector(s===me?'.st-plate':'.st-cards');fxFly(center,to,cardHTML(null,'s'),'card',(r*seq.length+k%seq.length)*110,380);k++}));
     for(let n=0;n<seq.length*2;n++)SND.card(n*.11);
     // i bui
     [h.sb,h.bb].forEach(s=>{if(h.p[s]&&h.p[s].bet)bump('vb'+s)});
@@ -3695,7 +3768,7 @@ function vtAnimate(prev,st,me){
   let chips=0;Object.keys(h.p).forEach(k=>{const a=(ph.p[k]&&ph.p[k].bet)||0,b=h.p[k].bet||0;if(b>a&&h.stage===ph.stage){chips++;bump('vb'+k)}});
   if(chips)SND.chip(3);
   // ultima mossa: lascia/passa
-  Object.keys(h.p).forEach(k=>{const a=ph.p[k]&&ph.p[k].la,b=h.p[k].la;if(b!==a){if(b==='Lascia')SND.fold();else if(b==='Passa')SND.check()}});
+  Object.keys(h.p).forEach(k=>{const a=ph.p[k]&&ph.p[k].la,b=h.p[k].la;if(b!==a){if(b==='Lascia'){SND.fold();if(+k!==me){const from=$$id('vs'+k);fxFly(from&&from.querySelector('.st-av'),$$id('v2-c2'),`<span class="st-cc">${cardHTML(null,'s')}${cardHTML(null,'s')}</span>`,'muck',0,420)}}else if(b==='Passa')SND.check()}});
   // fine del giro: le puntate vanno nel piatto
   if(ph.stage!==h.stage){
     let n=0;Object.keys(ph.p).forEach(k=>{const b=ph.p[k].bet||0;if(b>0){fxFly($$id('vb'+k),potEl,`<span class="chips">${chipStack(b)}</span>`,'chip',n*40,420);n++}});
@@ -3704,7 +3777,7 @@ function vtAnimate(prev,st,me){
   // fine mano: il piatto va ai vincitori
   if(ph.stage!=='done'&&h.stage==='done'&&h.results){
     const W=h.results.filter(r=>r.win>0);
-    W.forEach((r,j)=>{const to=r.seat===me?$$id('v2-mycards'):$$id('vs'+r.seat);fxFly(potEl,to,`<span class="chips">${chipStack(r.win)}</span>`,'chip big',(h.reveal?900:350)+j*120,560)});
+    W.forEach((r,j)=>{const to=$$id('vs'+r.seat);fxFly(potEl,to,`<span class="chips">${chipStack(r.win)}</span>`,'chip big',(h.reveal?900:350)+j*120,560)});
     setTimeout(()=>{W.some(r=>r.seat===me)?SND.win():SND.chip(5)},(h.reveal?900:350)+400);
   }
 }
@@ -3794,8 +3867,223 @@ vtReset=function(){vtReactUnsub();_vtResetV2();S.vt.painted=null;F.vt.pre=null;F
 const _vtDoV2=vtDo;
 vtDo=async function(a,x){const r=await _vtDoV2(a,x);vtPaint();return r};
 
+/* =====================================================================
+   Più tavoli virtuali dentro un tavolo: lobby, creazione, chiusura
+   automatica quando resta un solo giocatore. Mosse istantanee.
+   ===================================================================== */
+Object.assign(S.vt,{rooms:{},rid:null,roomsLoaded:false,gone:null,wantRid:null,optPending:false});
+F.vnew=null;
+Object.assign(VT_ERR,{room_closed:'Questo tavolo è chiuso',room_gone:'Questo tavolo non esiste più',too_many_rooms:'Ci sono già troppi tavoli aperti: chiudetene qualcuno',need_players:'Servono almeno 2 giocatori seduti'});
+
+/* ---------- dati: tutti i tavoli virtuali del tavolo ---------- */
+const _vtApplyR=vtApply;
+vtApply=function(st){
+  if(!st||!st.room||!st.room.id)return;const rid=st.room.id;
+  const cur=S.vt.rooms[rid];if(!cur||(st.v||0)>=(cur.v||0))S.vt.rooms[rid]=st;
+  if(rid!==S.vt.rid){if(V.name==='vlobby'||V.name==='mode')render();return}
+  if(S.vt.optPending&&S.vt.st&&(st.v||0)>(S.vt.st.v||0))S.vt.optPending=false;
+  _vtApplyR(st);
+};
+function vtRoomGone(rid){
+  const last=S.vt.rooms[rid];delete S.vt.rooms[rid];
+  if(rid===S.vt.rid){const st=S.vt.st||last;if(st){st.closed=true;S.vt.gone=st}if(V.name==='vt')render()}
+  else if(V.name==='vlobby'||V.name==='mode')render();
+}
+vtLoad=async function(){
+  if(!S.table||!BASE)return;const tid=S.table.id;
+  try{
+    const {data,error}=await BASE.sb.from('hpl_vr').select('room_id,state').eq('table_id',tid);
+    if(error){if(/hpl_vr|relation|schema cache|does not exist/i.test(error.message||'')){S.vt.missing=true;if(['vt','vlobby','mode'].includes(V.name))render()}return}
+    if(!S.table||S.table.id!==tid)return;
+    S.vt.missing=false;S.vt.roomsLoaded=true;
+    const seen={};(data||[]).forEach(r=>{seen[r.room_id]=1;vtApply(r.state)});
+    Object.keys(S.vt.rooms).forEach(k=>{if(!seen[k])vtRoomGone(k)});
+    if(S.vt.wantRid){const w=S.vt.wantRid;S.vt.wantRid=null;if(S.vt.rooms[w])vtOpenRoom(w);else toast('Quel tavolo virtuale non esiste più','err')}
+    if(V.name==='vlobby'||V.name==='mode')render();
+  }catch(e){}
+};
+vtSubscribe=function(){
+  if(S.vt.ch||!S.table||!BASE)return;const tid=S.table.id;
+  try{S.vt.ch=BASE.sb.channel('vr-'+tid).on('postgres_changes',{event:'*',schema:'public',table:'hpl_vr',filter:'table_id=eq.'+tid},pl=>{
+    if(!S.table||S.table.id!==tid)return;
+    if(pl.eventType==='DELETE'){const r=pl.old&&pl.old.room_id;if(r)vtRoomGone(r)}
+    else if(pl.new&&pl.new.state)vtApply(pl.new.state);
+  }).subscribe()}catch(e){}
+  vtLoad();
+};
+const _vtUnsubR=vtUnsubscribe;
+vtUnsubscribe=function(){if(V&&V.name==='vlobby')return;_vtUnsubR()};
+setInterval(()=>{if(V&&V.name==='vlobby'&&S.table){if(!S.vt.ch)vtSubscribe();if(Date.now()-(S.vt.lpoll||0)>4000){S.vt.lpoll=Date.now();vtLoad()}}},500);
+const _vtCallR=vtCall;
+vtCall=async function(action,extra,quiet){
+  if(action!=='create'&&!S.vt.rid)return null;
+  const rid=S.vt.rid;
+  const r=await _vtCallR(action,Object.assign(action==='create'?{}:{room_id:rid},extra||{}),quiet);
+  if(r&&r.deleted)vtRoomGone(rid);
+  return r;
+};
+// gli errori "tavolo sparito" arrivano come error: li intercettiamo dalla risposta grezza
+const _fnR=()=>BASE&&BASE.fn;
+setTimeout(function wrapFn(){if(!BASE){setTimeout(wrapFn,300);return}if(BASE.__vr)return;BASE.__vr=1;const f=BASE.fn;BASE.fn=async function(n,b){const r=await f.call(BASE,n,b);if(n==='hpl-holdem'&&r&&r.gone&&b&&b.room_id)setTimeout(()=>vtRoomGone(b.room_id),0);return r}},300);
+const _vtResetR=vtReset;
+vtReset=function(){_vtResetR();Object.assign(S.vt,{rooms:{},rid:null,roomsLoaded:false,gone:null,wantRid:null,optPending:false})};
+vtReactSub=function(){
+  if(!S.table||!BASE||!S.vt.rid)return;const key=S.table.id+'-'+S.vt.rid;
+  if(S.vt.rch&&S.vt.rchKey===key)return;vtReactUnsub();
+  try{S.vt.rch=BASE.sb.channel('vtr-'+key,{config:{broadcast:{self:true}}}).on('broadcast',{event:'r'},m=>{const p=m&&m.payload;if(p&&S.table&&S.table.id+'-'+S.vt.rid===key)vtShowReact(p)}).subscribe();S.vt.rchKey=key}catch(e){}
+};
+function vtOpenRoom(rid){
+  if(S.vt.rid!==rid){
+    vtReactUnsub();
+    Object.assign(S.vt,{rid,st:null,painted:null,cards:null,cardsHand:null,gone:null,myTurnSeen:null,optPending:false,heroDealt:null});
+    Object.assign(F.vt,{raise:null,pre:null,emo:false,hideRes:null});
+  }
+  const st=S.vt.rooms[rid];if(st)_vtApplyR(st);
+  go('vt');vtSubscribe();vtReactSub();if(vtSeat()>=0)vtCall('state',{},true);
+}
+
+/* ---------- mosse istantanee (si vedono subito, poi conferma il server) ---------- */
+function vtOpt(move){
+  const st=S.vt.st,me=vtSeat();if(!st||!st.hand||st.hand.stage==='done'||st.hand.toAct!==me)return null;
+  const prev=JSON.parse(JSON.stringify(st)),n=JSON.parse(JSON.stringify(st)),h=n.hand,P=h.p[me],s=n.seats[me],toCall=Math.max(0,h.curBet-P.bet);
+  if(move.type==='fold'){P.folded=true;P.la='Lascia'}
+  else if(move.type==='check'){if(toCall>0)return null;P.la='Passa'}
+  else if(move.type==='call'){const a=Math.min(toCall,s.stack);P.bet+=a;P.contrib+=a;s.stack-=a;P.la=s.stack?'Chiama':'All-in'}
+  else{const to=move.type==='allin'?P.bet+s.stack:Math.min(+move.amount,P.bet+s.stack);if(!(to>h.curBet))return null;const a=to-P.bet;P.bet=to;P.contrib+=a;s.stack-=a;P.la=s.stack?(h.curBet?'Rilancia':'Punta'):'All-in';h.curBet=to}
+  h.toAct=null;S.vt.st=n;S.vt.optPending=true;F.vt.raise=null;render();
+  return prev;
+}
+function vtMove(move){
+  const prev=vtOpt(move);
+  return vtDo('act',{move}).then(r=>{S.vt.optPending=false;if(!r&&prev&&S.vt.st&&S.vt.st.v===prev.v){S.vt.st=prev;S.vt.painted=prev;render()}return r});
+}
+
+/* ---------- lobby ---------- */
+function roomStatus(st){
+  const n=st.seats.filter(Boolean).length,ms=HE.maxSeats(st);
+  if(st.closed)return ['Finito','done'];
+  if(HE.sngOn(st)){const b=HE.blinds(st,vtNow());return ['Livello '+(b.level+1),'live']}
+  if(st.hand&&st.hand.stage!=='done'||st.running)return ['In corso','live'];
+  return n<2?['Cerca giocatori','wait']:n>=ms?['Pieno','wait']:['Pronto','wait'];
+}
+function vLobby(){
+  const acct=myAcct();
+  const R=Object.values(S.vt.rooms).filter(st=>!st.closed||st.seats.some(x=>x&&x.acct===acct)).sort((a,b)=>{
+    const ma=a.seats.some(x=>x&&x.acct===acct),mb=b.seats.some(x=>x&&x.acct===acct);if(ma!==mb)return mb-ma;
+    return ((b.room&&b.room.createdAt)||0)-((a.room&&a.room.createdAt)||0)});
+  const head=`<div class="app"><div class="wrap" style="padding-bottom:6px">${backBtn('mode','Indietro')}</div><header class="hd" style="padding-top:0"><div class="t1"><h1>Tavoli virtuali</h1><div class="t2">${esc(S.table.name)} · Texas Hold'em</div></div><button class="me-btn" data-act="vtinvite" aria-label="Invita">${ico('uplus',22)}</button></header><main class="pg">`;
+  if(S.vt.missing)return head+`<div class="box o sm">Per i tavoli virtuali va eseguito <b>virtuale2.sql</b> in Supabase (e aggiornata la funzione hpl-holdem).</div></main></div>`;
+  const cta=`<button class="vr-cta" data-act="vtnew"><span class="vr-ic big">${ico('plus',26)}</span><span class="grow"><b>Crea un tavolo</b><span>Cash o torneo, da 2 a 9 posti. Ti siedi subito e inviti gli altri.</span></span>${ico('chevr',20)}</button>`;
+  const list=R.map(st=>{
+    const ms=HE.maxSeats(st),sat=st.seats.filter(Boolean),sng=st.cfg.mode==='sng',[stt,cls]=roomStatus(st),mine=sat.some(x=>x.acct===acct);
+    const b=HE.blinds(st,vtNow());
+    return `<button class="vr-card ${mine?'mine':''}" data-act="vtopen" data-rid="${esc(st.room.id)}"><span class="vr-ic ${sng?'t':''}">${sng?ico('trophy',22):'<span style="font-size:24px;line-height:1">♠</span>'}</span>
+<span class="grow" style="min-width:0"><b class="ell">${esc(st.room.name)}</b><span class="vr-sub">${sng?'Torneo':'Cash'} · bui ${fchip(b.sb)}/${fchip(b.bb)} · ${fchip(st.cfg.stack)} fiches</span>
+<span class="vr-ppl">${sat.length?stackAva(sat.map(x=>x.name),5):''}<span class="num">${sat.length}/${ms}</span>${mine?'<span class="vr-me">Ci sei</span>':''}</span></span>
+<span class="vr-st ${cls}">${stt}</span></button>`}).join('');
+  return head+cta+(R.length?`<div class="sec" style="margin-top:6px">Aperti ora <small>${R.length}</small></div><div class="stack" style="gap:10px">${list}</div>`:`<div class="card" style="text-align:center;margin-top:4px"><p class="mut sm" style="margin:0">${S.vt.roomsLoaded?'Nessun tavolo aperto. Creane uno e invita gli altri: arriva una notifica.':'Carico i tavoli…'}</p></div>`)+`</main></div>`;
+}
+function vtNewSheet(){
+  const n=F.vnew,S2=n.mode==='sng',nm='Tavolo di '+firstName(S.acct?S.acct.name:'');
+  return `<div class="back" data-act="closesheet"><div class="sheet ${SH.anim?'anim':''}" role="dialog" aria-label="Nuovo tavolo"><div class="grab"></div><div class="sheet-body"><div class="row sp"><h2 style="font-size:22px">Nuovo tavolo virtuale</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
+<label class="field"><span>Nome</span><input class="in" id="vn-name" data-bind="vnew.name" value="${esc(n.name)}" placeholder="${esc(nm)}" maxlength="28" autocapitalize="sentences"></label>
+<div class="seg" style="display:flex"><button class="${!S2?'on':''}" style="flex:1" data-act="vnmode" data-m="cash">Cash</button><button class="${S2?'on':''}" style="flex:1" data-act="vnmode" data-m="sng">Torneo Sit & Go</button></div>
+<p class="mut xs" style="margin:0">${S2?'Tutti con le stesse fiches, i bui salgono a ogni livello, chi le finisce è eliminato. Vince l\'ultimo rimasto.':'Si gioca quanto si vuole e chi finisce le fiches può ricaricarle.'} Quando resta un solo giocatore il tavolo si chiude.</p>
+<div class="field"><span>Posti al tavolo</span><div class="cgrid" style="grid-template-columns:repeat(3,minmax(0,1fr))">${[[2,'2 · testa a testa'],[6,'6 posti'],[9,'9 posti']].map(([v,l])=>`<button class="chip t ${n.ms===v?'on':''}" data-act="vnms" data-v="${v}">${l}</button>`).join('')}</div></div>
+<div class="two"><label class="field"><span>Piccolo buio</span><input class="in num" id="vn-sb" inputmode="numeric" data-digits="1" data-bind="vnew.sb" value="${n.sb}"></label><label class="field"><span>Grande buio</span><input class="in num" id="vn-bb" inputmode="numeric" data-digits="1" data-bind="vnew.bb" value="${n.bb}"></label></div>
+<div class="two"><label class="field"><span>Fiches iniziali</span><input class="in num" id="vn-st" inputmode="numeric" data-digits="1" data-bind="vnew.stack" value="${n.stack}"></label><label class="field"><span>Secondi per turno</span><input class="in num" id="vn-t" inputmode="numeric" data-digits="1" data-bind="vnew.turnSec" value="${n.turnSec}"></label></div>
+${S2?`<label class="field"><span>Minuti per livello di bui</span><input class="in num" id="vn-l" inputmode="numeric" data-digits="1" data-bind="vnew.lvlMin" value="${n.lvlMin}"></label>`:''}
+<button class="btn" data-act="vncreate" ${n.busy?'disabled':''}>${n.busy?'Un attimo…':'Crea e siediti'}</button>
+</div></div></div>`;
+}
+function vtClosedHtml(st){
+  if(!st||!st.closed||F.vt.hideRes===(st.closedAt||1))return '';
+  if(st.sng&&st.sng.ranking)return '';
+  const L=(st.final||[]).slice(0,9);
+  return `<div class="v2-res"><div class="v2-res-in"><div class="v2-res-t">${ico('trophy',22)}<b>Tavolo chiuso</b></div><p class="mut sm" style="margin:-6px 0 0;text-align:center">È rimasto un solo giocatore: il tavolo si chiude.</p>
+${L.length?`<div class="list" style="width:100%">${L.map((r,k)=>`<div class="li">${ava(r.name,'xs')}<span class="grow"><b>${esc(r.name)}</b><span class="mut xs" style="display:block">${fchip(r.stack)} fiches</span></span><b class="num ${r.net>0?'green':r.net<0?'red':''}">${r.net>0?'+':r.net<0?'−':''}${fchip(Math.abs(r.net))}</b></div>`).join('')}</div>`:''}
+<div class="row" style="gap:8px;width:100%"><button class="btn ghost" style="flex:1" data-act="vtlobby">Lobby</button><button class="btn" style="flex:1.4" data-act="vtnewsame">Nuovo tavolo</button></div></div></div>`;
+}
+
+/* ---------- collegamenti all'interfaccia del tavolo ---------- */
+topHtml=function(st){
+  const b=st?HE.blinds(st,vtNow()):null,sng=st&&HE.sngOn(st);
+  const name=st&&st.room?st.room.name:'Tavolo virtuale';
+  const sub=!st?'':sng?`Livello ${b.level+1} · ${fchip(b.sb)}/${fchip(b.bb)}${b.next?` · <span id="v2-lvl" data-lvl="${b.next}"></span>`:''}`:st.cfg.mode==='sng'?`Torneo · bui ${fchip(st.cfg.sb)}/${fchip(st.cfg.bb)}`:`Cash · bui ${fchip(st.cfg.sb)}/${fchip(st.cfg.bb)}`;
+  return `<button class="v2-ib" data-act="vtlobby" aria-label="Lobby">${ico('back',22)}</button>
+<div class="v2-tt"><b class="ell">${esc(name)}</b><span>${sub}</span></div>
+<button class="v2-ib" data-act="vthist" aria-label="Storico mani">${ico('clock',20)}</button><button class="v2-ib" data-act="vtinvite" aria-label="Invita">${ico('uplus',20)}</button><button class="v2-ib" data-act="vtmenu" aria-label="Menu">${ico('gear',20)}</button>`;
+};
+const _sngResR=sngResultsHtml;
+sngResultsHtml=function(st){
+  const h=_sngResR(st);
+  if(h&&st&&st.closed)return h.replace('<button class="btn" style="flex:1.4" data-act="vtstart">Nuovo torneo</button>','<button class="btn" style="flex:1.4" data-act="vtnewsame">Nuovo torneo</button>').replace('data-act="vtreshide">Chiudi','data-act="vtlobby">Lobby');
+  return h||vtClosedHtml(st);
+};
+const _ctlR=ctlHtml;
+ctlHtml=function(st,me){
+  if(st&&st.closed)return `<button class="btn" data-act="vtlobby">Torna alla lobby</button>`;
+  if(S.vt.optPending&&st&&st.hand&&st.hand.toAct==null&&st.hand.stage!=='done')return `<div class="v2-turn wide"><span class="mut">Fatto</span></div>`;
+  return _ctlR(st,me);
+};
+vMode=function(){
+  const R=Object.values(S.vt.rooms).filter(x=>!x.closed),ppl=R.reduce((a,x)=>a+x.seats.filter(Boolean).length,0);
+  const vsub=S.vt.missing?'Da attivare in Supabase':R.length?`${R.length} tavol${R.length===1?'o':'i'} apert${R.length===1?'o':'i'} · ${ppl} giocator${ppl===1?'e':'i'}`:'Nessun tavolo aperto';
+  const gs=Object.values(S.games||{}).filter(g=>g.status==='closed'&&g.kind!=='netting').sort((a,b)=>String(b.scheduledAt).localeCompare(String(a.scheduledAt)));
+  const liveG=Object.values(S.games||{}).some(g=>g.status==='live');
+  const rsub=liveG?'Partita in corso':gs.length?`Ultima serata ${dDay(gs[0].scheduledAt)} ${dMon(gs[0].scheduledAt)}`:'Nessuna serata ancora';
+  return `<div class="app">${hd(S.table.name,'Come giocate oggi?')}<main class="pg">
+<button class="card tap mode-c real" data-act="goreal"><span class="mode-ic">${ico('chip',30)}</span><span class="grow"><b>Reale</b><span class="mut sm">Cassa delle serate al tavolo vero: buy-in, debiti e classifica.</span><span class="mode-st ${liveG?'on':''}">${esc(rsub)}</span></span>${ico('chevr',20)}</button>
+<button class="card tap mode-c virt" data-act="govt"><span class="mode-ic"><span style="font-size:30px;line-height:1">♠</span></span><span class="grow"><b>Virtuale</b><span class="mut sm">Texas Hold'em online con gli amici del tavolo, ognuno dal suo telefono. Fiches finte, gratis.</span><span class="mode-st ${R.length?'on':''}">${esc(vsub)}</span></span>${ico('chevr',20)}</button>
+<button class="link" style="align-self:center;margin-top:6px" data-act="totables">Cambia tavolo</button>
+</main></div>`;
+};
+const _viewR=view;
+view=function(){
+  if(S.table&&db&&S.me&&S.loaded.games&&V.name==='vlobby')return vLobby();
+  return _viewR();
+};
+const _sheetR=sheetHtml;
+sheetHtml=function(){if(SH&&SH.type==='vtnew'&&F.vnew)return vtNewSheet();return _sheetR()};
+// pre-azioni: passano dalle mosse istantanee
+vtPreFire=(function(orig){return function(st,me){
+  const pre=F.vt.pre;if(!pre||!st||!st.hand)return;const h=st.hand;
+  if(h.no!==pre.no||h.stage!==pre.stage||h.stage==='done'){F.vt.pre=null;return}
+  if(h.toAct!==me||S.vt.busy)return;
+  const P=h.p[me],toCall=Math.max(0,h.curBet-P.bet);let move=null;
+  if(pre.k==='cf')move=toCall?'fold':'check';else if(pre.k==='ck')move=toCall?null:'check';else if(pre.k==='cl')move=h.curBet===pre.bet?(toCall?'call':'check'):null;else if(pre.k==='ca')move=toCall?'call':'check';
+  F.vt.pre=null;if(move)setTimeout(()=>vtMove({type:move}),200);else vtPaint();
+}})(vtPreFire);
+const newDefaults=()=>({name:'',mode:'cash',ms:6,sb:5,bb:10,stack:1000,turnSec:25,lvlMin:6,busy:false});
+Object.assign(H,{
+  govt(d){F.vt.raise=null;if(d&&d.rid&&d.rid!=='x'){S.vt.wantRid=d.rid}go('vlobby');vtSubscribe();vtLoad()},
+  vtlobby(){F.vt.raise=null;SH=null;go('vlobby');vtLoad()},
+  vtopen(d){vtOpenRoom(d.rid)},
+  vtnew(){F.vnew=newDefaults();openSheet({type:'vtnew'})},
+  vtnewsame(){const st=S.vt.st;F.vnew=Object.assign(newDefaults(),st?{mode:st.cfg.mode,ms:HE.maxSeats(st),sb:st.cfg.sb,bb:st.cfg.bb,stack:st.cfg.stack,turnSec:st.cfg.turnSec,lvlMin:st.cfg.lvlMin||6}:{});go('vlobby');openSheet({type:'vtnew'})},
+  vnmode(d){F.vnew.mode=d.m;render()},
+  vnms(d){F.vnew.ms=+d.v;render()},
+  async vncreate(){
+    const n=F.vnew;if(!n||n.busy)return;
+    const cfg={sb:+n.sb,bb:+n.bb,stack:+n.stack,turnSec:+n.turnSec||25,mode:n.mode,lvlMin:+n.lvlMin||6};
+    if(!(cfg.sb>0&&cfg.bb>=cfg.sb&&cfg.stack>=cfg.bb*2)){toast('Controlla bui e fiches: il grande buio non può essere più piccolo del piccolo','err');return}
+    n.busy=true;render();
+    const r=await vtCall('create',{name:n.name.trim(),maxSeats:n.ms,cfg});
+    n.busy=false;
+    if(r&&r.rid){S.vt.rooms[r.rid]=r.state;SH=null;F.vnew=null;vtOpenRoom(r.rid);toast('Tavolo creato: invita gli altri','ok')}else render();
+  },
+  vtmove(d){F.vt.raise=null;vtMove({type:d.m})},
+  vtraiseok(){const v=vtRaiseVal();F.vt.raise=null;vtMove({type:'raise',amount:v})},
+  vtleave(){if(!arm('vtleave'))return;SH=null;vtDo('leave').then(r=>{if(r){toast('Ti sei alzato dal tavolo','ok');go('vlobby');vtLoad()}})},
+  vtreshide(){const st=S.vt.st;if(st)F.vt.hideRes=st.sng&&st.sng.endedAt&&!st.closed?st.sng.endedAt:(st.closedAt||1);vtPaint()},
+  vinvsend(){const ids=Object.keys(F.vinv||{}).filter(k=>F.vinv[k]);if(!ids.length)return;
+    const st=V.name==='vt'?S.vt.st:null,n=st?st.seats.filter(Boolean).length:0;
+    pushSend({to:ids,title:`♠️ ${S.me.name} ti invita a Texas Hold'em`,body:st?`Tavolo «${st.room.name}» · ${st.cfg.mode==='sng'?'torneo':'cash'}${n?` · ${n} già sedut${n===1?'o':'i'}`:''}. Tocca per sederti.`:`Tavoli virtuali di ${S.table.name}. Tocca per entrare.`,url:deepUrl('vt',st?st.room.id:'x'),tag:'vt-'+S.table.id+(st?'-'+st.room.id:'')});
+    F.vinv={};SH=null;render();toast(ids.length>1?'Invito inviato a '+ids.length+' giocatori':'Invito inviato','ok')}
+});
+
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791827336987';
+const APP_VERSION='1791829668183';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
