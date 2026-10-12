@@ -1636,6 +1636,7 @@ async function enterTable(t){
   const onErr=e=>{toast(errMsg(e),'err')};
   db.collection('games').onSnapshot(sn=>{const o={};sn.docs.forEach(d=>{o[d.id]=d.data()});S.games=o;S.loaded.games=true;afterData()},onErr);
   db.doc('settings/table').onSnapshot(sn=>{S.cfg=sn.exists?sn.data():null;if(S.loaded.players)render()},onErr);
+  S.netreq={};db.collection('netreq').onSnapshot(sn=>{const o={};sn.docs.forEach(d=>{o[d.id]=d.data()});S.netreq=o;if(S.loaded.players)render()},onErr);
   db.collection('players').onSnapshot(sn=>{const o={};sn.docs.forEach(d=>{o[d.id]=d.data()});S.players=o;S.loaded.players=true;afterData()},onErr);
   render();
 }
@@ -1673,7 +1674,7 @@ async function refreshMe(){const r=await BASE.rpc('hpl_me');S.acct=r&&r.id?r:nul
 const firstName=n=>String(n||'').split(/\s+/)[0];
 function resetTableState(){
   try{if(db&&db.close)db.close()}catch(e){}
-  db=null;S.table=null;S.me=null;S.games={};S.players={};S.cfg=null;S.admin={};S.res=[];S.resGid=null;
+  db=null;S.table=null;S.me=null;S.games={};S.players={};S.cfg=null;S.admin={};S.res=[];S.resGid=null;S.netreq={};
   if(S.unsubRes){try{S.unsubRes()}catch(e){}S.unsubRes=null}
   S.loaded={games:false,players:false,cfg:true};S.booted=false;V={name:'home'};SH=null;
 }
@@ -2019,57 +2020,131 @@ render=function(){
 const isNetted=d=>(d.transactions||[]).some(t=>t.status==='NETTED');
 const realGames=gs=>gs.filter(g=>g.kind!=='netting'&&g.status!=='scheduled');
 
-/* ---------- 1. Compensazione dei saldi tra serate ---------- */
+/* ---------- 1. Compensazione tra due persone: uno la chiede, l'altro la accetta dal suo telefono ---------- */
 function openDebtsAll(){
   return Object.entries(S.games).filter(([id,g])=>g.status==='closed').flatMap(([id,g])=>(g.debts||[]).filter(d=>d.remainingAmount>0&&!isDealerD(d)&&d.fromPlayerId!=='dealer').map(d=>({gid:id,g,d})));
 }
-function nettingPlan(){
-  const L=openDebtsAll();if(L.length<2)return null;
-  const bal={},names={};
-  L.forEach(({d})=>{const f=pKey(d.fromPlayerId,d.fromPlayerName),t=pKey(d.toPlayerId,d.toPlayerName);bal[f]=(bal[f]||0)-d.remainingAmount;bal[t]=(bal[t]||0)+d.remainingAmount;names[f]=pName(d.fromPlayerId,d.fromPlayerName);names[t]=pName(d.toPlayerId,d.toPlayerName)});
-  const nets=Object.keys(bal).filter(k=>bal[k]!==0).map(k=>({name:names[k],pid:k.startsWith('n:')?null:k,net:bal[k]}));
-  const tx=settle(nets);
-  if(tx.length>=L.length)return null;
-  return {old:L,tx,total:sum(L.map(x=>x.d.remainingAmount)),newTotal:sum(tx.map(t=>t.amt)),games:new Set(L.map(x=>x.gid)).size};
+const nmP=id=>pName(id,(S.players[id]||{}).name)||'?';
+const pairId=(a,b)=>a<b?a+'_'+b:b+'_'+a;
+function nettingPairs(){
+  const M={};
+  openDebtsAll().forEach(x=>{const f=x.d.fromPlayerId,t=x.d.toPlayerId;if(!f||!t||f==='dealer'||t==='dealer'||f===t)return;const k=f<t?f+'|'+t:t+'|'+f;(M[k]=M[k]||[]).push(x)});
+  return Object.entries(M).map(([k,xs])=>{
+    const [a,b]=k.split('|'),ab=xs.filter(x=>x.d.fromPlayerId===a),ba=xs.filter(x=>x.d.fromPlayerId===b);
+    if(!ab.length||!ba.length)return null;
+    const sAB=sum(ab.map(x=>x.d.remainingAmount)),sBA=sum(ba.map(x=>x.d.remainingAmount));
+    return {a,b,old:xs,sAB,sBA,net:Math.abs(sAB-sBA),from:sAB>=sBA?a:b,to:sAB>=sBA?b:a,sig:xs.map(x=>x.d.debtId+':'+x.d.remainingAmount).sort().join(',')};
+  }).filter(Boolean);
 }
+const pairOther=p=>p.a===S.me.id?p.b:p.a;
+function myPairs(){if(!S.me)return [];return nettingPairs().filter(p=>p.a===S.me.id||p.b===S.me.id)}
+function pairView(p){const me=S.me.id,o=pairOther(p),iO=p.a===me?p.sAB:p.sBA,tO=p.a===me?p.sBA:p.sAB;return {o,iO,tO,on:nmP(o)}}
+const reqWith=o=>S.me&&(S.netreq||{})[pairId(S.me.id,o)]||null;
+const myReqs=()=>S.me?Object.values(S.netreq||{}).filter(r=>r.from===S.me.id||r.to===S.me.id):[];
 function nettingBanner(){
-  const P=nettingPlan();if(!P)return '';
-  return `<button class="card tap gcard netb" data-act="netting"><span class="suit">${ico('link',22)}</span><div class="grow"><div style="font-weight:700">Compensa i saldi</div><div class="mut sm">${P.old.length} debiti aperti diventano ${P.tx.length} pagamenti</div></div>${ico('chevr',18)}</button>`;
+  if(!S.me)return '';
+  const L=myPairs(),seen=new Set(L.map(pairOther));
+  const extra=myReqs().map(r=>r.from===S.me.id?r.to:r.from).filter(o=>!seen.has(o));
+  const rows=L.map(p=>{const v=pairView(p);return Object.assign(v,{r:reqWith(v.o)})}).concat(extra.map(o=>({o,on:nmP(o),iO:0,tO:0,r:reqWith(o),gone:true})));
+  if(!rows.length)return '';
+  rows.sort((x,y)=>((y.r&&y.r.to===S.me.id)?1:0)-((x.r&&x.r.to===S.me.id)?1:0));
+  const inc=rows.filter(x=>x.r&&x.r.to===S.me.id);
+  const row=x=>{const d=x.tO-x.iO,inq=x.r&&x.r.to===S.me.id,out=x.r&&x.r.from===S.me.id;
+    const sub=inq?`<span class="xs" style="display:block;color:var(--gold-l);font-weight:600">Ti chiede di compensare · tocca per rispondere</span>`:out?`<span class="mut xs" style="display:block">Richiesta inviata · aspetta che accetti</span>`:`<span class="mut xs" style="display:block">Devi ${eurS(x.iO)} · ti deve ${eurS(x.tO)}</span>`;
+    return `<button class="li" data-act="netting" data-pid="${esc(x.o)}">${ava(x.on,'xs')}<span class="grow" style="min-width:0"><b>${esc(x.on)}</b>${sub}</span>${x.gone?'':`<b class="num ${d>0?'green':d<0?'red':''}" style="white-space:nowrap">${d?(d>0?'+':'−')+eur(Math.abs(d)):'pari'}</b>`}${ico('chevr',16)}</button>`};
+  const title=inc.length?(inc.length===1?`${esc(inc[0].on)} ti chiede di compensare`:`${inc.length} richieste di compensazione`):'Vi dovete soldi a vicenda';
+  return `<div class="card stack netb" style="gap:6px;padding:14px 16px 8px"><div class="row" style="gap:12px"><span class="suit">${ico('link',20)}</span><div class="grow"><div style="font-weight:700">${title}</div><div class="mut xs">Compensa: si fa la differenza e resta un solo debito</div></div></div><div class="list">${rows.map(row).join('')}</div></div>`;
 }
 function vNetting(){
-  const P=nettingPlan(),M=isManager();
-  if(!P)return `<div class="wrap">${backBtn('home','Indietro')}<h1>Compensa i saldi</h1><p class="mut">Non c'è niente da compensare: i debiti aperti sono già ridotti al minimo.</p></div>`;
-  const tx=P.tx.slice().sort((a,b)=>b.amt-a.amt);
-  return `<div class="wrap">${backBtn('home','Indietro')}
-<h1>Compensa i saldi</h1>
-<div class="hero stack" style="margin-top:14px;gap:12px;padding:20px">
-<div class="row" style="gap:16px;align-items:flex-end"><div><div class="mut sm">Oggi</div><div class="bignum" style="font-size:44px">${P.old.length}</div><div class="mut xs">debiti in ${P.games} serat${P.games===1?'a':'e'}</div></div><span class="mut" style="padding-bottom:22px">${ico('chevr',26)}</span><div><div class="mut sm">Dopo</div><div class="bignum green" style="font-size:44px">${P.tx.length}</div><div class="mut xs">pagamenti</div></div></div>
-<p class="mut sm" style="margin:0">Ognuno paga o riceve esattamente lo stesso totale di prima, ma con meno passaggi: chi deve soldi a qualcuno che a sua volta ne deve, salta l'intermediario.</p></div>
-<div class="sec">I nuovi pagamenti <small class="num">${eurS(P.newTotal)}</small></div>
-<div class="card stack" style="gap:0;padding:6px 16px">${tx.map(t=>`<div class="debt"><div class="row" style="gap:12px"><div class="pair">${ava(t.from,'xs')}<span class="arr">${ico('chevr',14)}</span>${ava(t.to,'xs')}</div><div class="grow" style="min-width:0"><div class="dn"><b>${esc(t.from)}</b></div><div class="mut sm ell">a ${esc(t.to)}</div></div><b class="num amt">${eur(t.amt)}</b></div></div>`).join('')}</div>
-<details class="card" style="margin-top:12px"><summary class="mut sm" style="cursor:pointer">Debiti che vengono sostituiti (${P.old.length})</summary><div class="stack" style="gap:6px;margin-top:10px">${P.old.map(x=>`<div class="row sp sm"><span>${esc(pName(x.d.fromPlayerId,x.d.fromPlayerName))} → ${esc(pName(x.d.toPlayerId,x.d.toPlayerName))} <span class="mut xs">· ${dDay(x.g.scheduledAt)} ${dMon(x.g.scheduledAt)}</span></span><b class="num">${eur(x.d.remainingAmount)}</b></div>`).join('')}</div></details>
-${M?'':'<div class="note" style="margin:12px 0 0">Solo un gestore del tavolo può confermare la compensazione.</div>'}
-</div>
-${M?`<div class="bar"><div class="bar-in"><button class="btn" data-act="netok">Compensa: ${P.old.length} → ${P.tx.length} pagamenti</button></div></div>`:''}`;
+  const o=V.pid,on=nmP(o),me=S.me.id,p=myPairs().find(x=>pairOther(x)===o),r=reqWith(o);
+  const head=`${backBtn('home','Indietro')}<h1>Compensa con ${esc(on)}</h1>`;
+  if(!p)return `<div class="wrap">${head}<p class="mut">Tra te e ${esc(on)} non ci sono più debiti incrociati da compensare.</p>${r?`<button class="btn ghost" style="margin-top:14px" data-act="netdel" data-pid="${esc(o)}">Elimina la richiesta</button>`:''}</div>`;
+  const {iO,tO}=pairView(p),stale=r&&r.sig!==p.sig,inq=r&&r.to===me&&!stale,out=r&&r.from===me&&!stale;
+  const b=bioMine(),useBio=b&&!F.usePin,pinOk=(useBio||PIN_RE.test(F.pinp))&&!F.netBusy;
+  const hasAcct=!!(S.players[o]&&S.players[o].acct);
+  const lines=xs=>xs.map(x=>`<div class="row sp sm"><span class="mut">${dDay(x.g.scheduledAt)} ${dMon(x.g.scheduledAt)}${x.g.kind==='netting'?' · da compensazione':''}</span><b class="num">${eur(x.d.remainingAmount)}</b></div>`).join('');
+  const mine=p.old.filter(x=>x.d.fromPlayerId===me),theirs=p.old.filter(x=>x.d.fromPlayerId===o);
+  const res=iO===tO?`<div class="bignum" style="font-size:30px">Pari</div><div class="mut sm">Nessuno deve più niente all'altro.</div>`
+    :iO>tO?`<div class="bignum red" style="font-size:40px">${eur(iO-tO)}</div><div class="mut sm">resti a dare a ${esc(on)}</div>`
+    :`<div class="bignum green" style="font-size:40px">${eur(tO-iO)}</div><div class="mut sm">${esc(on)} resta a darti</div>`;
+  const amt=iO===tO?'siete pari':'resta '+eur(Math.abs(iO-tO));
+  let act='',bar='';
+  if(inq){
+    act=`<div class="sec">${esc(on)} ti chiede di compensare</div><div class="card stack" style="gap:12px"><p class="mut sm" style="margin:0">Ha già confermato con il suo PIN. Se sei d'accordo, conferma con il tuo.</p>${pinField({needPin:true})}</div>
+<div style="text-align:center;margin-top:12px"><button class="link" style="color:#FF6A60" data-act="netno" data-pid="${esc(o)}">${armed.netno?'Confermi? Tocca di nuovo':'Rifiuta'}</button></div>`;
+    bar=`<button class="btn" data-act="netok" ${pinOk?'':'disabled'}>${F.netBusy?'Un attimo…':'Accetta: '+amt}</button>`;
+  }else if(out){
+    act=`<div class="box o" style="margin-top:14px">Richiesta inviata a ${esc(on)} il ${dDay(r.at)} ${dMon(r.at)} alle ${tHM(r.at)}. La compensazione si fa quando la accetta dal suo telefono con il suo PIN.</div>
+<div style="text-align:center;margin-top:12px"><button class="link" data-act="netdel" data-pid="${esc(o)}">Annulla la richiesta</button></div>`;
+  }else if(!hasAcct){
+    act=`<div class="box r sm" style="margin-top:14px">${esc(on)} non ha un account collegato a questo tavolo, quindi non può accettare con il suo PIN.</div>`;
+  }else{
+    act=`${stale?`<div class="box o sm" style="margin-top:14px">I debiti sono cambiati dopo l'ultima richiesta: inviane una nuova con i conti aggiornati.</div>`:''}
+<div class="sec">Chiedi a ${esc(on)}</div><div class="card stack" style="gap:12px"><p class="mut sm" style="margin:0">Conferma con il tuo PIN: ${esc(on)} riceve la richiesta e la accetta dal suo telefono con il suo PIN.</p>${pinField({needPin:true})}</div>`;
+    bar=`<button class="btn" data-act="netsend" ${pinOk?'':'disabled'}>${F.netBusy?'Un attimo…':'Invia la richiesta a '+esc(firstName(on))}</button>`;
+  }
+  return `<div class="wrap">${head}
+<p class="mut sm" style="margin:6px 0 0">Vi dovete soldi a vicenda: si fa la differenza e resta un solo debito.</p>
+<div class="hero stack" style="margin-top:14px;gap:10px;padding:20px">
+<div class="row sp"><span>Tu devi a ${esc(on)}</span><b class="num">${eur(iO)}</b></div>
+<div class="row sp"><span>${esc(on)} deve a te</span><b class="num">− ${eur(tO)}</b></div>
+<div style="border-top:1px solid rgba(255,255,255,.12);padding-top:12px;text-align:center">${res}</div></div>
+<details class="card" style="margin-top:12px"><summary class="mut sm" style="cursor:pointer">Da quali serate (${p.old.length} debiti)</summary><div class="stack" style="gap:6px;margin-top:10px"><div class="lbl in">Tu a ${esc(on)}</div>${lines(mine)}<div class="lbl in" style="margin-top:6px">${esc(on)} a te</div>${lines(theirs)}</div></details>
+${act}</div>${bar?`<div class="bar"><div class="bar-in">${bar}</div></div>`:''}`;
 }
-async function applyNetting(){
-  if(!isManager())return;
-  const P=nettingPlan();if(!P)return;
+async function authMe(){
+  const b=bioMine();
+  if(b&&!F.usePin&&!PIN_RE.test(F.pinp)){try{await bioAssert(b.cred);return true}catch(e){F.usePin=true;render();toast('Face ID non riuscito: scrivi il tuo PIN','err');return false}}
+  const ok=await checkMyPin(F.pinp);if(ok===null)return false;
+  if(!ok){F.pinp='';render();toast('PIN errato, riprova.','err');return false}
+  return true;
+}
+const netMsg=(iO,tO)=>iO===tO?'siete pari':iO>tO?`resti a dare ${eur(iO-tO)}`:`resti a ricevere ${eur(tO-iO)}`;
+async function sendNetReq(){
+  const o=V.pid,p=myPairs().find(x=>pairOther(x)===o);if(!p||F.netBusy)return;
+  F.netBusy=true;render();
+  if(!(await authMe())){F.netBusy=false;render();return}
+  const me=S.me.id,{iO,tO}=pairView(p),now=new Date().toISOString(),id=pairId(me,o);
+  const r={from:me,to:o,fromName:S.me.name,toName:nmP(o),sig:p.sig,at:now,owe:iO,owed:tO};
+  try{await db.doc('netreq/'+id).set(r);(S.netreq=S.netreq||{})[id]=r}catch(e){F.netBusy=false;render();toast(errMsg(e),'err');return}
+  F.netBusy=false;F.pinp='';render();toast('Richiesta inviata a '+nmP(o),'ok');
+  pushSend({to:[o],title:`${S.me.name} ti chiede di compensare`,body:`Ti deve ${eur(iO)}, gli devi ${eur(tO)}: ${netMsg(tO,iO)}. Tocca per accettare.`,url:deepUrl('net',me),tag:'net-'+id});
+}
+async function acceptNetReq(){
+  const o=V.pid,p=myPairs().find(x=>pairOther(x)===o),r=reqWith(o);
+  if(!p||!r||r.to!==S.me.id||F.netBusy)return;
+  if(r.sig!==p.sig){toast('I debiti sono cambiati: serve una nuova richiesta','err');render();return}
+  F.netBusy=true;render();
+  if(!(await authMe())){F.netBusy=false;render();return}
+  const stop=m=>{F.netBusy=false;render();if(m)toast(m,'err')};
   const now=new Date().toISOString(),nid0='n'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-  const byG={};P.old.forEach(x=>(byG[x.gid]=byG[x.gid]||[]).push(x.d.debtId));
+  const byG={};p.old.forEach(x=>(byG[x.gid]=byG[x.gid]||[]).push(x.d.debtId));
   for(const gid of Object.keys(byG)){
     const ok=await saveGame(gid,g=>{(g.debts||[]).forEach(d=>{if(byG[gid].includes(d.debtId)){d.transactions.forEach(t=>{if(t.status==='PENDING'){t.status='NETTED';t.nettedBy=nid0;t.lastUpdated=now}});recompute(d)}})});
-    if(!ok){toast('Compensazione interrotta: riprova','err');return}
+    if(!ok)return stop('Compensazione interrotta: riprova');
   }
-  const doc={kind:'netting',status:'closed',scheduledAt:now,closedAt:now,createdAt:now,hostName:S.me.name,hostId:S.me.id,players:{},hist:[],
-    debts:P.tx.map((t,i)=>({debtId:'debt_n'+(i+1)+'_'+Math.random().toString(36).slice(2,6),fromPlayerName:t.from,toPlayerName:t.to,fromPlayerId:t.fromId,toPlayerId:t.toId,totalAmount:t.amt,paidAmount:0,remainingAmount:t.amt,transactions:[{subId:nid('s'),amount:t.amt,status:'PENDING',lastUpdated:now}]})),
-    replaced:P.old.map(x=>({gid:x.gid,debtId:x.d.debtId,amt:x.d.remainingAmount,from:pName(x.d.fromPlayerId,x.d.fromPlayerName),to:pName(x.d.toPlayerId,x.d.toPlayerName),at:x.g.scheduledAt}))};
-  try{await db.doc('games/'+nid0).set(doc);S.games[nid0]=doc}catch(e){toast(errMsg(e),'err');return}
-  go('detail',nid0);toast(`Fatto: ${P.old.length} debiti diventano ${P.tx.length} pagamenti`,'ok');
+  const debts=p.net?[{debtId:'debt_n1_'+Math.random().toString(36).slice(2,6),fromPlayerName:nmP(p.from),toPlayerName:nmP(p.to),fromPlayerId:p.from,toPlayerId:p.to,totalAmount:p.net,paidAmount:0,remainingAmount:p.net,transactions:[{subId:nid('s'),amount:p.net,status:'PENDING',lastUpdated:now}]}]:[];
+  const doc={kind:'netting',pair:[r.from,r.to],status:'closed',scheduledAt:now,closedAt:now,createdAt:now,requestedAt:r.at,hostName:nmP(r.from),hostId:r.from,acceptedBy:S.me.id,players:{},hist:[],debts,
+    replaced:p.old.map(x=>({gid:x.gid,debtId:x.d.debtId,amt:x.d.remainingAmount,from:pName(x.d.fromPlayerId,x.d.fromPlayerName),to:pName(x.d.toPlayerId,x.d.toPlayerName),at:x.g.scheduledAt}))};
+  try{await db.doc('games/'+nid0).set(doc);S.games[nid0]=doc}catch(e){return stop(errMsg(e))}
+  try{await db.doc('netreq/'+pairId(r.from,r.to)).delete();delete S.netreq[pairId(r.from,r.to)]}catch(e){}
+  F.netBusy=false;F.pinp='';
+  go('detail',nid0);toast(p.net?`Fatto: resta un solo debito di ${eur(p.net)}`:'Fatto: siete pari','ok');
+  const {iO,tO}=pairView(p);
+  pushSend({to:[r.from],title:`${S.me.name} ha accettato la compensazione ✓`,body:p.net?`Resta un solo debito: ${netMsg(tO,iO)}.`:'Siete pari: nessuno deve più niente.',url:deepUrl('detail',nid0),tag:'net-'+pairId(r.from,r.to)});
 }
+async function dropNetReq(o,reject){
+  const r=reqWith(o);if(!r)return;
+  if(reject&&!arm('netno'))return;
+  try{await db.doc('netreq/'+pairId(r.from,r.to)).delete();delete S.netreq[pairId(r.from,r.to)]}catch(e){toast(errMsg(e),'err');return}
+  if(reject){toast('Richiesta rifiutata','ok');pushSend({to:[r.from],title:`${S.me.name} ha rifiutato la compensazione`,body:'I debiti tra voi restano come prima.',url:deepUrl('net',S.me.id),tag:'net-'+pairId(r.from,r.to)})}
+  else toast('Richiesta annullata','ok');
+  go('home');
+}
+const canUndoNet=n=>isManager()||!!(S.me&&(n.pair||[]).includes(S.me.id));
 async function undoNetting(gid){
-  const n=S.games[gid];if(!n||n.kind!=='netting'||!isManager())return;
-  if((n.debts||[]).some(d=>d.paidAmount>0)){toast('Qualcuno ha già segnato un pagamento: annulla prima quello.','err');return}
+  const n=S.games[gid];if(!n||n.kind!=='netting'||!canUndoNet(n))return;
+  if((n.debts||[]).some(d=>d.paidAmount>0)){toast('È già stato segnato un pagamento: annulla prima quello.','err');return}
   if(!arm('netundo'))return;
   const byG={};(n.replaced||[]).forEach(r=>(byG[r.gid]=byG[r.gid]||[]).push(r.debtId));
   for(const g0 of Object.keys(byG)){
@@ -2079,18 +2154,19 @@ async function undoNetting(gid){
   try{await db.doc('games/'+gid).delete();delete S.games[gid]}catch(e){toast(errMsg(e),'err');return}
   go('home');toast('Compensazione annullata: tornano i debiti di prima','ok');
 }
+const netTitle=g=>g.pair?`${nmP(g.pair[0])} ↔ ${nmP(g.pair[1])}`:'Compensazione saldi';
 function vNettingDetail(){
-  const gid=V.gid,g=S.games[gid],D=g.debts||[],R=g.replaced||[],M=isManager();
+  const gid=V.gid,g=S.games[gid],D=g.debts||[],R=g.replaced||[];
   const nDone=D.filter(d=>d.remainingAmount===0).length;
   return `<div class="wrap">${backBtn('home','Home')}
-<h1>Compensazione dei saldi</h1><div class="mut sm" style="margin-top:4px">${dDay(g.scheduledAt)} ${dMon(g.scheduledAt)} · fatta da ${esc(g.hostName)}</div>
-<div class="note" style="margin:14px 0 0">${R.length} debiti di ${new Set(R.map(r=>r.gid)).size} serate sono stati sostituiti da questi ${D.length} pagamenti.</div>
-<div class="sec">Saldo finale <small>${nDone} di ${D.length} pagat${D.length===1?'o':'i'}</small></div>
-<div class="mut xs" style="margin:-2px 4px 8px">Ogni pagamento lo segna chi riceve i soldi.</div>
-<div class="card stack" style="gap:0;padding:8px 16px 10px">${D.slice().sort((a,b)=>(a.remainingAmount===0)-(b.remainingAmount===0)||(meIsFrom(b)||isCreditor(b))-(meIsFrom(a)||isCreditor(a))).map(d=>debtRow(gid,d)).join('')}</div>
-<details class="card" style="margin-top:12px"><summary class="mut sm" style="cursor:pointer">Debiti sostituiti (${R.length})</summary><div class="stack" style="gap:6px;margin-top:10px">${R.map(r=>`<div class="row sp sm"><span>${esc(r.from)} → ${esc(r.to)} <span class="mut xs">· ${dDay(r.at)} ${dMon(r.at)}</span></span><b class="num">${eur(r.amt)}</b></div>`).join('')}</div></details>
+<h1>Compensazione</h1><div class="mut sm" style="margin-top:4px">${g.pair?esc(netTitle(g))+' · ':''}${dDay(g.scheduledAt)} ${dMon(g.scheduledAt)}</div>
+<div class="note" style="margin:14px 0 0">${g.acceptedBy?`Chiesta da ${esc(nmP(g.hostId))}, accettata da ${esc(nmP(g.acceptedBy))}. `:''}${R.length} debiti incrociati ${D.length?(D.length===1?'sono diventati un solo debito.':'sono diventati '+D.length+' pagamenti.'):'si sono annullati: erano pari.'}</div>
+${D.length?`<div class="sec">Saldo finale <small>${nDone} di ${D.length} pagat${D.length===1?'o':'i'}</small></div>
+<div class="mut xs" style="margin:-2px 4px 8px">Il pagamento lo segna chi riceve i soldi.</div>
+<div class="card stack" style="gap:0;padding:8px 16px 10px">${D.slice().sort((a,b)=>(a.remainingAmount===0)-(b.remainingAmount===0)||(meIsFrom(b)||isCreditor(b))-(meIsFrom(a)||isCreditor(a))).map(d=>debtRow(gid,d)).join('')}</div>`:`<div class="box g" style="margin-top:12px;text-align:center"><b>Pari</b> · nessuno deve più niente</div>`}
+<details class="card" style="margin-top:12px"><summary class="mut sm" style="cursor:pointer">Debiti compensati (${R.length})</summary><div class="stack" style="gap:6px;margin-top:10px">${R.map(r=>`<div class="row sp sm"><span>${esc(r.from)} → ${esc(r.to)} <span class="mut xs">· ${dDay(r.at)} ${dMon(r.at)}</span></span><b class="num">${eur(r.amt)}</b></div>`).join('')}</div></details>
 ${histBlock(g,'detail')}
-${M?`<div style="text-align:center;margin-top:14px"><button class="link" data-act="netundo" data-gid="${gid}">${armed.netundo?'Confermi? Tocca di nuovo':'Annulla la compensazione'}</button></div>`:''}</div>`;
+${canUndoNet(g)?`<div style="text-align:center;margin-top:14px"><button class="link" data-act="netundo" data-gid="${gid}">${armed.netundo?'Confermi? Tocca di nuovo':'Annulla la compensazione'}</button></div>`:''}</div>`;
 }
 
 /* ---------- 5. Resoconto come immagine ---------- */
@@ -2358,7 +2434,7 @@ tabSerata=function(D){
   const up=upcomingCards();
   if(up)h=h.replace(/(<\/section>)/,`$1<div class="sec">In programma</div>${up}`);
   if(!D.live)h=h.replace(`${ico('plus',18)} Nuova partita</button></section>`,`${ico('plus',18)} Nuova partita</button><button class="btn ghost" data-act="plan">${ico('cal',18)} Programma una serata</button></section>`);
-  const nb=nettingBanner();if(nb)h+=nb;
+  const nb=nettingBanner();if(nb)h=h.replace(/(<\/section>)/,'$1<div class="stack" style="gap:10px;margin-top:14px">'+nb+'</div>');
   return h;
 };
 const _tabClassF=tabClassifica;
@@ -2369,8 +2445,8 @@ tabStorico=function(D){
   let h=_tabStoricoF(D2);
   D2.gs.filter(g=>g.kind==='netting').forEach(g=>{
     const re=new RegExp('<button class="li tall" data-act="detail" data-gid="'+g.id+'">[\\s\\S]*?</button>');
-    const o=(g.debts||[]).filter(d=>d.remainingAmount>0).length;
-    h=h.replace(re,`<button class="li tall" data-act="detail" data-gid="${g.id}"><span class="dtile sm"><b>${dDay(g.scheduledAt)}</b><span>${dMon(g.scheduledAt)}</span></span><span class="grow"><b>Compensazione saldi</b><span class="mut xs" style="display:block">${(g.replaced||[]).length} debiti → ${(g.debts||[]).length} pagamenti</span></span>${o?`<span class="badge pend num">${o} da saldare</span>`:'<span class="badge paid">Saldata</span>'}</button>`);
+    const o=(g.debts||[]).filter(d=>d.remainingAmount>0).length,D0=g.debts||[];
+    h=h.replace(re,`<button class="li tall" data-act="detail" data-gid="${g.id}"><span class="dtile sm"><b>${dDay(g.scheduledAt)}</b><span>${dMon(g.scheduledAt)}</span></span><span class="grow" style="min-width:0"><b class="ell" style="display:block">Compensazione${g.pair?' '+esc(netTitle(g)):''}</b><span class="mut xs" style="display:block">${(g.replaced||[]).length} debiti → ${g.pair?(D0.length?'resta '+eur(D0[0].totalAmount):'pari'):D0.length+' pagamenti'}</span></span>${o?`<span class="badge pend num">${o} da saldare</span>`:`<span class="badge paid">${D0.length?'Saldata':'Pari'}</span>`}</button>`);
   });
   D2.gs.filter(g=>g.kind==='tournament').forEach(g=>{h=h.replace(new RegExp('(data-gid="'+g.id+'">[\\s\\S]*?<span class="mut sm"> montepremi</span>)'),'$1 <span class="badge grey" style="padding:2px 8px;font-size:11.5px">Torneo</span>')});
   return h;
@@ -2393,8 +2469,11 @@ vNew=function(){
 };
 /* ---------- azioni ---------- */
 Object.assign(H,{
-  netting(){go('netting')},
-  netok(){applyNetting()},
+  netting(d){F.pinp='';F.netBusy=false;go('netting',null,{pid:d.pid})},
+  netok(){acceptNetReq()},
+  netsend(){sendNetReq()},
+  netno(d){dropNetReq(d.pid,true)},
+  netdel(d){dropNetReq(d.pid,false)},
   netundo(d){undoNetting(d.gid)},
   shareimg(d){shareCard(d.gid)},
   nkind(d){F.ng.kind=d.k;render()},
@@ -2466,17 +2545,17 @@ afterData=async function(){
   await _afterDataF();
   if(S.deep&&S.me&&S.table&&S.table.id===S.deep.t&&S.loaded.games){
     const d=S.deep;S.deep=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
-    if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g);
+    if(d.v==='net'){F.pinp='';go('netting',null,{pid:d.g})}else if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g);
   }
 };
 window.addEventListener('hashchange',()=>{const d=deepLink();if(!d||!S.acct||S.locked)return;
-  if(S.table&&S.table.id===d.t){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g)}
+  if(S.table&&S.table.id===d.t){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(d.v==='net'){F.pinp='';go('netting',null,{pid:d.g})}else if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g)}
   else{S.deepTried=false;backToTables()}});
 navigator.serviceWorker&&navigator.serviceWorker.addEventListener&&navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.url){location.hash=new URL(e.data.url,location.href).hash}});
 setTimeout(async()=>{S.pushOn=await pushState()},1500);
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791813835902';
+const APP_VERSION='1791816596444';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
