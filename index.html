@@ -234,6 +234,67 @@ body.noscroll #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))}
 .pacts .btn-s{min-height:40px;padding:6px 8px;font-size:13.5px;white-space:normal;line-height:1.15;text-align:center}
 .upd{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:90;display:flex;align-items:center;gap:12px;width:min(calc(100% - 24px),440px);padding:10px 10px 10px 18px;border-radius:999px;background:var(--gold);color:var(--on-acc);font-weight:600;font-size:15px;box-shadow:0 14px 34px rgba(0,0,0,.5);animation:toastIn .42s var(--ease) both}
 .upd span{flex:1}.upd button{background:var(--on-acc);color:#fff;border-radius:999px;padding:10px 16px;font-weight:700}
+/* ===== rifinitura: liste raggruppate, podio, righe compatte ===== */
+.app{padding-bottom:calc(132px + env(safe-area-inset-bottom,0px))}
+.list{background:var(--card);border-radius:22px;overflow:hidden;display:flex;flex-direction:column}
+.sheet .list{background:#232733}
+.list.in{background:rgba(255,255,255,.04);border-radius:16px}
+.li{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:8px 16px;text-align:left;color:var(--ivory);text-decoration:none;font-size:16px;position:relative}
+.li+.li::before{content:"";position:absolute;top:0;left:16px;right:0;height:1px;background:var(--line2)}
+.li:active{background:rgba(255,255,255,.05);transform:none}
+.li>svg{color:var(--mut)}
+.li.tall{min-height:72px}
+.li b{font-weight:700}
+.lic{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(142,156,255,.16);color:var(--gold-l);flex:none}
+.sw{width:50px;height:30px;border-radius:99px;background:rgba(255,255,255,.14);position:relative;flex:none;transition:background-color .25s var(--ease)}
+.sw i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35);transition:transform .25s var(--ease)}
+.sw.on{background:var(--green)}.sw.on i{transform:translateX(20px)}
+.ava.xs{width:30px;height:30px;font-size:12px}
+.ava.xs::before{inset:2px;border-width:1.5px}.ava.xs::after{inset:6px}
+.mh{margin:14px 6px -2px;font-size:14px;font-weight:600;color:var(--mut);text-transform:capitalize}
+.dtile.sm{width:46px;height:50px;border-radius:14px}.dtile.sm b{font-size:20px}.dtile.sm span{font-size:11.5px}
+.tile{text-align:left;width:100%}.tval{font-family:var(--serif);font-weight:800;font-size:26px;letter-spacing:-.02em}
+.pinbar{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.07);border-radius:16px;padding:10px 14px;color:var(--mut);font-size:14.5px}
+.pinbar b{color:var(--ivory);font-family:var(--serif);font-size:24px;letter-spacing:.2em}
+/* classifica */
+.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:8px;margin:4px 0 6px}
+.pod{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.pod .pn{font-weight:700;font-size:14.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pod .pa{font-family:var(--serif);font-weight:800;font-size:16px;letter-spacing:-.01em}
+.pod .pb{width:100%;border-radius:16px 16px 6px 6px;display:grid;place-items:center;font-family:var(--serif);font-weight:800;font-size:26px}
+.pod.p1 .pb{height:92px;background:linear-gradient(180deg,rgba(242,201,76,.45),rgba(242,201,76,.08));color:#F2C94C}
+.pod.p2 .pb{height:66px;background:linear-gradient(180deg,rgba(203,209,220,.38),rgba(203,209,220,.06));color:#CBD1DC}
+.pod.p3 .pb{height:50px;background:linear-gradient(180deg,rgba(208,139,91,.4),rgba(208,139,91,.06));color:#D08B5B}
+.rk{padding:0;overflow:hidden}
+.rkh{width:100%;text-align:left;padding:12px 14px;gap:12px}
+.rk .nm{font-weight:700;font-size:16.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rkamt{font-family:var(--serif);font-weight:800;font-size:18px;letter-spacing:-.01em;white-space:nowrap}
+.rk .chv{transition:transform .25s var(--ease)}.rk.open .chv{transform:rotate(180deg)}
+.rk .medal{width:28px;height:28px;font-size:14px}
+.rkx{padding:0 14px 14px;display:flex;flex-direction:column;gap:8px;animation:fadeIn .25s ease-out both}
+.cap{font-size:13px;font-weight:600;color:var(--mut);margin:6px 2px 0}
+/* nuova partita */
+.pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pgrid .pick{padding:8px 10px;gap:8px;border-radius:16px;min-height:50px}
+.pgrid .pick .tick{width:22px;height:22px}
+.pnm{flex:1;min-width:0;font-weight:600;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* saldo finale */
+.debt .dn{font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.debt .amt{font-size:19px}
+.st{font-size:12.5px;font-weight:700}.st.ok{color:#5BE07D}.st.no{color:#FF6A60}
+.btn.sm{min-height:46px;font-size:16px;border-radius:16px;margin-top:10px}
+.meter.thin{height:6px}
+.bioln{display:flex;align-items:center;gap:12px;background:rgba(142,156,255,.12);border-radius:16px;padding:10px 12px}
+.cgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.cgrid .chip{padding:6px 4px;justify-content:center;min-height:46px;font-size:15px}
+.lp{padding:12px 14px}
+.lp .nm{font-weight:700;font-size:16.5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lp .pill{font-size:12px;padding:2px 8px}
+.lpst{font-family:var(--serif);font-size:19px;font-weight:800;letter-spacing:-.01em}
+.lpa{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.lpa .btn-s{min-height:44px;font-size:15px}
+.lpx{margin-top:8px;animation:fadeIn .25s ease-out both}
+.rk .xs{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 
 <div id="app"></div>
@@ -353,11 +414,13 @@ async function sha(s){
 /* ===== Icone e avatar ===== */
 const IP={plus:'M12 5v14M5 12h14',close:'M6 6l12 12M18 6L6 18',trash:'M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3',chev:'M6 9l6 6 6-6',chevu:'M6 15l6-6 6 6',chevr:'M9 6l6 6-6 6',back:'M15 6l-6 6 6 6',check:'M5 12l5 5 9-10',eye:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 100 6 3 3 0 000-6z',lock:'M7 11V8a5 5 0 0110 0v3M6 11h12v9H6z'};
 const ico=(k,s)=>`<svg width="${s||18}" height="${s||18}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${IP[k]}"/></svg>`;
-Object.assign(IP,{chip:'M12 3a9 9 0 100 18 9 9 0 000-18zM12 8a4 4 0 100 8 4 4 0 000-8z',list:'M4 6h16M4 12h16M4 18h10',bars:'M6 20V11M12 20V4M18 20v-6',cal:'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',pin:'M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11zM12 7a3 3 0 100 6 3 3 0 000-6z',coins:'M4 8c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 8v4c0 1.7 3.6 3 8 3s8-1.3 8-3V8M4 12v4c0 1.7 3.6 3 8 3s8-1.3 8-3v-4',share:'M12 15V3M8 7l4-4 4 4M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6',user:'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0'});
+Object.assign(IP,{chip:'M12 3a9 9 0 100 18 9 9 0 000-18zM12 8a4 4 0 100 8 4 4 0 000-8z',list:'M4 6h16M4 12h16M4 18h10',bars:'M6 20V11M12 20V4M18 20v-6',cal:'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',pin:'M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11zM12 7a3 3 0 100 6 3 3 0 000-6z',coins:'M4 8c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 8v4c0 1.7 3.6 3 8 3s8-1.3 8-3V8M4 12v4c0 1.7 3.6 3 8 3s8-1.3 8-3v-4',share:'M12 15V3M8 7l4-4 4 4M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6',user:'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0',gear:'M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z',face:'M4 8V6a2 2 0 012-2h2M16 4h2a2 2 0 012 2v2M20 16v2a2 2 0 01-2 2h-2M8 20H6a2 2 0 01-2-2v-2M9 10v1M15 10v1M12 10v3h-1M9.5 15.5a3.5 3.5 0 005 0',key:'M15 7a4 4 0 11-3.9 5H9v2H7v2H4v-3l5.1-5.1A4 4 0 0115 7z',out:'M15 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3M10 17l5-5-5-5M15 12H4',link:'M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1'});
 const hueOf=s=>{let h=7;for(const c of String(s).toLowerCase())h=(h*31+c.charCodeAt(0))%360;return h};
 const inits=n=>{const w=String(n).trim().split(/\s+/);return ((w[0]||'?')[0]+(w.length>1?w[1][0]:'')).toUpperCase()};
 const ava=(n,s)=>`<span class="ava ${s||''}" style="--h:${hueOf(n)}"><i>${esc(inits(n))}</i></span>`;
 const dDay=iso=>new Date(iso).getDate();
+const sgnS=c=>(c>0?'+':c<0?'−':'')+eurS(Math.abs(c));
+const eurS=c=>(c%100===0?(c/100).toLocaleString('it-IT'):nf.format(c/100))+' €';
 const dMon=iso=>new Date(iso).toLocaleDateString('it-IT',{month:'short'}).replace('.','');
 const stackAva=(names,max)=>{const a=names.slice(0,max||5);return `<div class="stk">${a.map(n=>ava(n,'s')).join('')}${names.length>a.length?`<span class="more">+${names.length-a.length}</span>`:''}</div>`};
 const TAB=()=>{const t=LS.get('tab','serata');return ['serata','storico','classifica'].includes(t)?t:'serata'};
@@ -596,8 +659,12 @@ async function authDebt(did){
 }
 const bioMine=()=>{const b=LS.get('bio',null);return b&&S.me&&b.id===S.me.id?b:null};
 const bioFreshUi=()=>!!(F.bioOk&&Date.now()-F.bioOk<120000);
-const pinField=perm=>perm.needPin?`<label class="field"><span>Il tuo PIN · ${esc(perm.who)}</span><input class="in" id="pay-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="pinp" value="${esc(F.pinp)}" placeholder="PIN" autocomplete="off"></label>${bioMine()?(bioFreshUi()?'<div class="green sm" style="font-weight:600">Face ID confermato</div>':'<button class="btn-s go" data-act="bioauth">Usa Face ID</button>'):''}`:'';
-const pinReady=perm=>!perm.needPin||PIN_RE.test(F.pinp)||bioFreshUi();
+const pinField=perm=>{
+  if(!perm.needPin)return '';const b=bioMine();
+  if(b&&!F.usePin)return `<div class="bioln"><span class="lic">${ico('face',18)}</span><div class="grow"><b>Confermi con Face ID</b><div class="mut xs">Te lo chiede quando tocchi il pulsante</div></div><button class="link" style="min-height:36px" data-act="usepin">Usa il PIN</button></div>`;
+  return `<label class="field"><span>Il tuo PIN</span><input class="in" id="pay-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="pinp" value="${esc(F.pinp)}" placeholder="PIN" autocomplete="off"></label>${b?`<button class="link" style="align-self:flex-start;min-height:36px" data-act="usebio">Usa Face ID</button>`:''}`;
+};
+const pinReady=perm=>!perm.needPin||PIN_RE.test(F.pinp)||(!!bioMine()&&!F.usePin)||bioFreshUi();
 const meCard=()=>'';
 function myCredits(gs){const out=[];gs.filter(g=>g.status==='closed').forEach(g=>(g.debts||[]).forEach(d=>{if(d.remainingAmount>0&&isCreditor(d))out.push({g,d})}));return out}
 function vGate(){return `<div class="wrap">${topbar()}
@@ -711,12 +778,15 @@ ${M?`<button class="btn" data-act="setsave">Salva</button>`:''}</div>
 }
 function rankRow(r,i,bal){
   const k=r.name.trim().toLowerCase(),b=bal[k]||{give:[],get:[]};
-  const give=sum(b.give.map(x=>x.amt)),get=sum(b.get.map(x=>x.amt)),has=give+get>0,open=!!F.open['rk:'+k];
-  const items=(list,cls,amtCls)=>list.slice().sort((x,y)=>String(y.at).localeCompare(String(x.at))).map(x=>`<button class="tr ${cls}" data-act="detail" data-gid="${x.gid}"><div class="row sp"><span><b>${esc(x.who)}</b><span class="mut xs"> · partita del ${dShort(x.at)}</span></span><b class="num ${amtCls}">${eur(x.amt)}</b></div></button>`).join('');
-  return `<div class="card">
-<div class="row" data-act="rk" data-k="${esc(k)}" style="cursor:pointer"><span class="medal ${i<3?'m'+(i+1):''}">${i+1}</span>${ava(r.name)}<div class="grow"><div style="font-weight:700;font-size:17px">${esc(r.name)}</div><div class="mut xs">${r.n} partit${r.n===1?'a':'e'} · ${r.w} vint${r.w===1?'a':'e'}</div></div><b class="num ${r.tot>=0?'green':'red'}" style="font-family:var(--serif);font-weight:800;font-size:21px;letter-spacing:-.02em">${sgn(r.tot)}</b><span class="mut">${ico(open?'chevu':'chev',18)}</span></div>
-<div class="chips" style="gap:6px;margin-top:12px">${get>0?`<span class="badge paid num">A credito ${eur(get)}</span>`:''}${give>0?`<span class="badge pend num">A debito ${eur(give)}</span>`:''}${has?'':'<span class="badge grey">Nessun saldo aperto</span>'}</div>
-${open?`<div class="stack" style="gap:8px;margin-top:14px"><button class="btn-s go" data-act="pstats" data-k="${esc(k)}">${ico('bars',18)} Statistiche di ${esc(r.name)}</button>${b.get.length?`<div class="mut sm" style="font-weight:600;margin-top:6px">Da chi riscuotere</div>${items(b.get,'paid','green')}`:''}${b.give.length?`<div class="mut sm" style="font-weight:600;margin-top:8px">A chi dare</div>${items(b.give,'pend','red')}`:''}</div>`:''}</div>`;
+  const give=sum(b.give.map(x=>x.amt)),get=sum(b.get.map(x=>x.amt)),open=!!F.open['rk:'+k];
+  const items=(list,cls)=>list.slice().sort((x,y)=>String(y.at).localeCompare(String(x.at))).map(x=>`<button class="li" data-act="detail" data-gid="${x.gid}">${ava(x.who,'xs')}<span class="grow"><b>${esc(x.who)}</b><span class="mut xs"> · ${dDay(x.at)} ${dMon(x.at)}</span></span><b class="num ${cls}">${eur(x.amt)}</b></button>`).join('');
+  const sub=[`${r.n} partit${r.n===1?'a':'e'}`,`${r.w} vint${r.w===1?'a':'e'}`];
+  return `<div class="card rk ${open?'open':''}">
+<button class="row rkh" data-act="rk" data-k="${esc(k)}"><span class="medal ${i<3?'m'+(i+1):''}">${i+1}</span>${ava(r.name,'s')}<div class="grow" style="min-width:0"><div class="nm">${esc(r.name)}</div><div class="mut xs">${sub.join(' · ')}</div>${get||give?`<div class="xs" style="margin-top:1px">${get?`<span class="green">riceve ${eurS(get)}</span>`:''}${get&&give?'<span class="mut"> · </span>':''}${give?`<span class="red">deve ${eurS(give)}</span>`:''}</div>`:''}</div><b class="num rkamt ${r.tot>0?'green':r.tot<0?'red':'mut'}">${sgnS(r.tot)}</b><span class="mut chv">${ico('chev',16)}</span></button>
+${open?`<div class="rkx"><button class="btn-s go" style="width:100%" data-act="pstats" data-k="${esc(k)}">${ico('bars',16)} Statistiche di ${esc(r.name)}</button>
+${b.get.length?`<div class="cap">Deve ricevere ${eur(get)} da</div><div class="list in">${items(b.get,'green')}</div>`:''}
+${b.give.length?`<div class="cap">Deve dare ${eur(give)} a</div><div class="list in">${items(b.give,'red')}</div>`:''}
+${!b.get.length&&!b.give.length?'<div class="mut sm" style="padding:4px 2px">Nessun saldo aperto.</div>':''}</div>`:''}</div>`;
 }
 function homeData(){
   const gs=Object.entries(S.games).map(([id,g])=>Object.assign({id},g)).sort((a,b)=>String(b.scheduledAt).localeCompare(String(a.scheduledAt)));
@@ -735,31 +805,35 @@ function tabSerata(D){
   const {gs,live,mine}=D,cr=myCredits(gs);
   const get=sum(mine.get.map(x=>x.amt)),give=sum(mine.give.map(x=>x.amt));
   let h='';
-  if(live){const L=plist(live);
-    h+=`<section class="hero stack" style="gap:18px"><div class="row sp"><span class="badge live"><i class="dot"></i>In corso</span><span class="xs mut">${dLong(live.scheduledAt)}</span></div>
+  if(live){const L=plist(live),A=isAdmin(live.id);
+    h+=`<section class="hero stack" style="gap:16px"><div class="row sp"><span class="badge live"><i class="dot"></i>In corso</span><span class="xs mut">${dDay(live.scheduledAt)} ${dMon(live.scheduledAt)} · ${tHM(live.scheduledAt)}</span></div>
 <div><div class="mut sm">Montepremi</div><div class="bignum">${eur(netPot(live))}</div></div>
 <div class="row sp">${stackAva(L.map(p=>p.playerName))}<span class="mut sm">${L.length} al tavolo</span></div>
-${isAdmin(live.id)?`<div class="row sp" style="background:rgba(255,255,255,.06);border-radius:16px;padding:10px 14px"><span class="mut sm">PIN Admin</span><b class="num" style="letter-spacing:.18em;font-size:22px;font-family:var(--serif)">${esc(adminPinOf(live.id)||'----')}</b></div>`:''}
-<div class="stack"><button class="btn" data-act="live" data-gid="${live.id}">Riprendi partita in corso</button><button class="btn ghost" data-act="newgame">${ico('plus',18)} Nuova Partita</button></div></section>`;
+${A?`<div class="pinbar"><span class="row" style="gap:8px">${ico('key',16)}<span>PIN Admin</span></span><b class="num">${esc(adminPinOf(live.id)||'----')}</b></div>`:''}
+<button class="btn" data-act="live" data-gid="${live.id}">Apri la cassa live</button></section>`;
   }else{
-    h+=`<section class="hero stack" style="gap:16px"><div><h2 style="font-size:30px;line-height:1.1">Pronti a giocare?</h2><p class="mut" style="margin:10px 0 0">Apri un tavolo, scegli i giocatori registrati e tieni la cassa sempre sotto controllo.</p></div><button class="btn" data-act="newgame">${ico('plus',18)} Nuova Partita</button></section>`;
+    h+=`<section class="hero stack" style="gap:16px"><div><h2 style="font-size:30px;line-height:1.08">Pronti a giocare?</h2><p class="mut" style="margin:8px 0 0">${gs.length?`Ultima serata: ${dDay(gs[0].scheduledAt)} ${dMon(gs[0].scheduledAt)}, ${eur(netPot(gs[0]))} di montepremi.`:'Apri il tavolo, scegli chi gioca e la cassa si tiene da sola.'}</p></div><button class="btn" data-act="newgame">${ico('plus',18)} Nuova partita</button></section>`;
   }
-  if(get>0||give>0)h+=`<div class="two"><div class="card tight"><div class="mut xs">Da riscuotere</div><div class="num green" style="font-family:var(--serif);font-weight:800;font-size:26px;letter-spacing:-.02em">${eur(get)}</div></div><div class="card tight"><div class="mut xs">Da dare</div><div class="num ${give>0?'red':'mut'}" style="font-family:var(--serif);font-weight:800;font-size:26px;letter-spacing:-.02em">${eur(give)}</div></div></div>`;
-  if(cr.length)h+=`<div class="sec">Da riscuotere</div>${cr.map(x=>`<button class="card tap gcard" data-act="detail" data-gid="${x.g.id}"><span class="suit">${ico('coins',22)}</span><div class="grow"><div style="font-weight:600">${esc(x.d.fromPlayerName)} ti deve <span class="gold num">${eur(x.d.remainingAmount)}</span></div><div class="mut xs">Partita del ${dShort(x.g.scheduledAt)}</div></div><span class="mut">${ico('chevr',18)}</span></button>`).join('')}`;
-  if(mine.give.length)h+=`<div class="sec">Da dare</div>${mine.give.slice().sort((a,b)=>String(b.at).localeCompare(String(a.at))).map(x=>`<button class="card tap gcard" data-act="detail" data-gid="${x.gid}"><span class="suit" style="background:var(--red-bg);color:#FF6A60">${ico('coins',22)}</span><div class="grow"><div style="font-weight:600">Devi <span class="red num">${eur(x.amt)}</span> a ${esc(x.who)}</div><div class="mut xs">Partita del ${dShort(x.at)}</div></div><span class="mut">${ico('chevr',18)}</span></button>`).join('')}`;
-  h+=`<a class="card tap gcard" style="margin-top:6px;text-decoration:none;color:inherit" href="${inviteFriends()}" target="_blank" rel="noopener"><span class="suit">${ico('share',22)}</span><div class="grow"><div style="font-weight:600">Invita gli amici</div><div class="mut sm">Per sedersi al tavolo devono registrarsi</div></div><span class="mut">${ico('chevr',18)}</span></a>`;
+  if(get>0||give>0)h+=`<div class="two"><button class="card tight tile" data-act="tab" data-t="classifica"><div class="mut xs">Da riscuotere</div><div class="num tval ${get>0?'green':'mut'}">${eur(get)}</div></button><button class="card tight tile" data-act="tab" data-t="classifica"><div class="mut xs">Da dare</div><div class="num tval ${give>0?'red':'mut'}">${eur(give)}</div></button></div>`;
+  if(cr.length)h+=`<div class="sec">Da riscuotere <small class="num">${eur(get)}</small></div><div class="list">${cr.map(x=>`<button class="li" data-act="detail" data-gid="${x.g.id}">${ava(x.d.fromPlayerName,'xs')}<span class="grow"><b>${esc(x.d.fromPlayerName)}</b><span class="mut xs"> · ${dDay(x.g.scheduledAt)} ${dMon(x.g.scheduledAt)}</span></span><b class="num green">${eur(x.d.remainingAmount)}</b>${ico('chevr',16)}</button>`).join('')}</div>`;
+  if(mine.give.length)h+=`<div class="sec">Da dare <small class="num">${eur(give)}</small></div><div class="list">${mine.give.slice().sort((a,b)=>String(b.at).localeCompare(String(a.at))).map(x=>`<button class="li" data-act="detail" data-gid="${x.gid}">${ava(x.who,'xs')}<span class="grow"><b>${esc(x.who)}</b><span class="mut xs"> · ${dDay(x.at)} ${dMon(x.at)}</span></span><b class="num red">${eur(x.amt)}</b>${ico('chevr',16)}</button>`).join('')}</div>`;
+  if(live)h+=`<button class="btn ghost" style="margin-top:4px" data-act="newgame">${ico('plus',18)} Nuova partita</button>`;
+  h+=`<div class="list" style="margin-top:10px"><a class="li" href="${inviteFriends()}" target="_blank" rel="noopener"><span class="lic">${ico('share',17)}</span><span class="grow">Invita gli amici nell'app</span>${ico('chevr',16)}</a></div>`;
   return h;
 }
 function tabStorico(D){
   const {gs}=D;
-  const ex=gs.length?`<button class="btn-s" data-act="export" style="align-self:flex-start">${ico('share',18)} Esporta in Excel o backup</button>`:'';
   if(!gs.length)return `<div class="card"><b>Ancora nessuna partita</b><p class="mut sm" style="margin:6px 0 0">Quando ne chiudi una, la trovi qui con tutti i saldi.</p></div>`;
-  return ex+gs.map(g=>{const n=plist(g).length,lv=g.status==='live';return `<button class="card tap gcard" data-act="${lv?'live':'detail'}" data-gid="${g.id}"><span class="dtile ${lv?'live':''}"><b>${dDay(g.scheduledAt)}</b><span>${dMon(g.scheduledAt)}</span></span><div class="grow"><div class="num" style="font-weight:700;font-size:17px">${eur(netPot(g))} di montepremi</div><div class="mut sm">${n} giocator${n===1?'e':'i'} · ${esc(g.hostName)}</div></div>${lv?'<span class="badge live"><i class="dot"></i>In corso</span>':`<span class="badge grey">Conclusa</span>`}</button>`}).join('');
+  const groups=[];gs.forEach(g=>{const m=new Date(g.scheduledAt).toLocaleDateString('it-IT',{month:'long',year:'numeric'});let G=groups[groups.length-1];if(!G||G.m!==m)groups.push(G={m,list:[]});G.list.push(g)});
+  const open=g=>(g.debts||[]).filter(d=>d.remainingAmount>0).length;
+  return groups.map(G=>`<div class="mh">${G.m}</div><div class="list">${G.list.map(g=>{const n=plist(g).length,lv=g.status==='live',o=open(g);return `<button class="li tall" data-act="${lv?'live':'detail'}" data-gid="${g.id}"><span class="dtile sm ${lv?'live':''}"><b>${dDay(g.scheduledAt)}</b><span>${dMon(g.scheduledAt)}</span></span><span class="grow" style="min-width:0"><b class="num" style="font-size:17px">${eur(netPot(g))}</b><span class="mut sm"> montepremi</span><span class="mut xs" style="display:block">${n} giocator${n===1?'e':'i'} · ${esc(g.hostName)}</span></span>${lv?'<span class="badge live"><i class="dot"></i>Live</span>':o?`<span class="badge pend num" title="Saldi da fare">${o} da saldare</span>`:'<span class="badge paid">Saldata</span>'}</button>`}).join('')}</div>`).join('')+`<button class="link" style="align-self:center;margin-top:6px" data-act="export">${ico('share',16)}&nbsp;Esporta in Excel o backup</button>`;
 }
 function tabClassifica(D){
   const {rank,bal}=D;
   if(!rank.length)return `<div class="card"><b>La classifica parte dalla prima partita</b><p class="mut sm" style="margin:6px 0 0">Dopo la chiusura vedrai chi è in vantaggio e chi deve ancora saldare.</p></div>`;
-  return `<div class="mut sm" style="margin:0 4px">Tocca un giocatore per le sue statistiche e per vedere da chi riscuotere e a chi dare.</div>`+rank.map((r,i)=>rankRow(r,i,bal)).join('');
+  let pod='';
+  if(rank.length>=3){const o=[1,0,2];pod=`<div class="podium">${o.map(i=>{const r=rank[i];return `<button class="pod p${i+1}" data-act="pstats" data-k="${esc(r.name.trim().toLowerCase())}">${ava(r.name,i===0?'l':'')}<div class="pn">${esc(r.name)}</div><div class="num pa ${r.tot>=0?'green':'red'}">${sgnS(r.tot)}</div><div class="pb"><span>${i+1}</span></div></button>`}).join('')}</div>`}
+  return pod+`<div class="mut xs" style="margin:2px 4px 0">Tocca un nome per i suoi saldi e le statistiche.</div>`+rank.map((r,i)=>rankRow(r,i,bal)).join('');
 }
 function vHome(){
   const D=homeData(),t=TAB();
@@ -796,28 +870,28 @@ function ngVals(){
   return {buy,chips,seats,ok:!!ok};
 }
 function vNew(){
-  const n=F.ng,v=ngVals(),ts=targetsFrom(n.sel),rb=rubrica().filter(p=>p.reg);
+  const n=F.ng,v=ngVals(),ts=targetsFrom(n.sel),rb=rubrica().filter(p=>p.reg),all=rb.length&&rb.every(p=>n.sel[p.id]);
   return `<div class="wrap">${backBtn('home','Indietro')}
-<h1>Nuova partita</h1><p class="mut" style="margin:6px 0 0">Imposta la serata e scegli chi gioca.</p>
-<div class="stack" style="margin-top:18px;gap:14px">
-<div class="card stack" style="gap:14px"><div class="lbl in">Serata</div>
-<label class="field"><span>Chi avvia la partita?</span><input class="in" id="ng-host" data-bind="ng.host" value="${esc(n.host)}" placeholder="Il tuo nome" autocomplete="given-name"><span class="xs">All'avvio ricevi un PIN a 4 cifre: solo chi lo conosce può modificare la partita mentre è in corso.</span></label>
+<h1>Nuova partita</h1>
+<div class="stack" style="margin-top:16px;gap:14px">
+<div class="card stack" style="gap:12px"><div class="row sp"><div class="lbl in">Chi gioca</div><button class="link" style="min-height:36px" data-act="nselall">${all?'Nessuno':'Tutti'}</button></div>
+${rb.length?`<div class="pgrid">${rb.map(p=>`<button class="pick ${n.sel[p.id]?'on':''}" data-act="nsel" data-id="${p.id}">${ava(p.name,'xs')}<span class="pnm">${esc(p.name)}</span><span class="tick">${ico('check',14)}</span></button>`).join('')}</div>`:''}
+${rb.length<2?`<div class="box o sm">Per giocare servono almeno 2 giocatori registrati nel tavolo.</div>`:''}
+<a class="link" style="align-self:flex-start;min-height:36px" href="${inviteFriends()}" target="_blank" rel="noopener">${ico('share',16)}&nbsp;Invita qualcuno nell'app</a></div>
+<div class="card stack" style="gap:14px"><div class="lbl in">Buy-in</div>
+<div class="cgrid">${[500,1000,2000,5000].map(c=>`<button class="chip t ${!n.custom&&n.buy===c?'on':''}" data-act="nbuy" data-v="${c}">${c/100} €</button>`).join('')}<button class="chip t ${n.custom?'on':''}" data-act="nbuy" data-v="custom">Altro</button></div>
+${n.custom?`<input class="in" id="ng-cv" inputmode="decimal" data-bind="ng.cv" value="${esc(n.cv)}" placeholder="Importo in euro, es. 15,50">`:''}
+<label class="field"><span>Fiches per buy-in</span><input class="in" id="ng-chips" inputmode="numeric" data-bind="ng.chips" value="${esc(n.chips)}"><span class="xs num">${v.buy>0&&v.chips>0?`${eur(v.buy)} = ${fch(v.chips)} fiches`:'Inserisci importo e fiches validi'}</span></label>
+<div class="field"><span>Il primo buy-in è</span><div class="seg" style="align-self:stretch"><button class="${n.pstatus==='PAID'?'on':''}" style="flex:1" data-act="nst" data-s="PAID">Già pagato</button><button class="${n.pstatus==='PENDING'?'on':''}" style="flex:1" data-act="nst" data-s="PENDING">Da pagare</button></div></div></div>
+<div class="card"><button class="row sp" style="width:100%;text-align:left;min-height:40px" data-act="ngmore"><span><span class="lbl in" style="margin:0;display:block">Dettagli serata</span><span class="mut sm">${esc(dDay(n.date+'T12:00'))} ${esc(dMon(n.date+'T12:00'))} · ${esc(n.time)}${n.loc?' · '+esc(n.loc):''}</span></span><span class="gold">${ico(F.ngMore?'chevu':'chev',20)}</span></button>
+${F.ngMore?`<div class="stack" style="gap:14px;margin-top:14px">
 <div class="two"><label class="field"><span>Data</span><input class="in" id="ng-date" type="date" data-bind="ng.date" data-ev="change" value="${esc(n.date)}"></label>
 <label class="field"><span>Ora</span><input class="in" id="ng-time" type="time" data-bind="ng.time" data-ev="change" value="${esc(n.time)}"></label></div>
 <label class="field"><span>Luogo (opzionale)</span><input class="in" id="ng-loc" data-bind="ng.loc" value="${esc(n.loc)}" placeholder="Casa di Giovanni, via Roma 1"></label>
-<label class="field"><span>Posti al tavolo (opzionale)</span><input class="in" id="ng-seats" inputmode="numeric" data-bind="ng.seats" value="${esc(n.seats)}" placeholder="Da 2 a 50"></label></div>
-<div class="card stack" style="gap:14px"><div class="lbl in">Buy-in</div>
-<div class="field"><span>Valore buy-in</span><div class="chips">${[500,1000,2000,5000].map(c=>`<button class="chip t ${!n.custom&&n.buy===c?'on':''}" data-act="nbuy" data-v="${c}">${c/100} €</button>`).join('')}<button class="chip t ${n.custom?'on':''}" data-act="nbuy" data-v="custom">Altro…</button></div>
-${n.custom?`<input class="in" id="ng-cv" inputmode="decimal" data-bind="ng.cv" value="${esc(n.cv)}" placeholder="Importo in euro, es. 15,50">`:''}</div>
-<label class="field"><span>Fiches per buy-in</span><input class="in" id="ng-chips" inputmode="numeric" data-bind="ng.chips" value="${esc(n.chips)}"><span class="xs num">${v.buy>0&&v.chips>0?`${eur(v.buy)} = ${fch(v.chips)} fiches`:'Inserisci importo e fiches validi'}</span></label></div>
-<div class="card stack" style="gap:14px"><div class="row sp"><div class="lbl in">Giocatori</div><span class="badge ${ts.length>1?'paid':'grey'}">${ts.length} al tavolo</span></div>
-<p class="mut sm" style="margin:0">Possono giocare solo i giocatori registrati: ognuno parte con il suo primo buy-in.</p>
-${rb.length?`<div class="stack" style="gap:8px">${rb.map(p=>`<button class="pick ${n.sel[p.id]?'on':''}" data-act="nsel" data-id="${p.id}">${ava(p.name,'s')}<span style="font-weight:600">${esc(p.name)}${S.me&&p.id===S.me.id?' <span class="mut">(tu)</span>':''}</span><span class="tick">${ico('check',16)}</span></button>`).join('')}</div>`:''}
-${rb.length<2?`<div class="box o sm">Per giocare servono almeno 2 giocatori registrati. Ognuno si registra dal proprio telefono con nome utente e PIN.</div>`:''}
-<a class="btn-s" href="${inviteFriends()}" target="_blank" rel="noopener">${ico('share',18)} Invita gli amici a registrarsi</a>
-${ts.length?`<div class="hr"></div><div class="field"><span>Come pagano il primo buy-in? (${eur(v.buy>0?v.buy:0)} a testa)</span><div class="pay2"><button class="big ${n.pstatus==='PAID'?'sel-g':''}" data-act="nst" data-s="PAID">Pagato subito</button><button class="big ${n.pstatus==='PENDING'?'sel-r':''}" data-act="nst" data-s="PENDING">Da pagare</button></div></div>
-<div class="mut sm num">${ts.length} giocator${ts.length===1?'e':'i'} · ${v.buy>0?eur(v.buy*ts.length):'—'} di buy-in iniziali</div>`:''}</div>
-<button class="btn" data-act="creategame" ${v.ok&&ts.length>=2&&canWrite?'':'disabled'}>Crea partita e apri la cassa</button></div></div>`;
+<label class="field"><span>Posti al tavolo (opzionale)</span><input class="in" id="ng-seats" inputmode="numeric" data-bind="ng.seats" value="${esc(n.seats)}" placeholder="Da 2 a 50"></label>
+<label class="field"><span>Chi gestisce la cassa</span><input class="in" id="ng-host" data-bind="ng.host" value="${esc(n.host)}" placeholder="Il tuo nome"><span class="xs">Riceve il PIN Admin per modificare la partita.</span></label></div>`:''}</div>
+</div></div>
+<div class="bar"><div class="bar-in"><button class="btn" data-act="creategame" ${v.ok&&ts.length>=2&&canWrite?'':'disabled'}>${ts.length>=2?`Inizia con ${ts.length} giocatori · ${v.buy>0?eur(v.buy*ts.length):'—'}`:'Scegli almeno 2 giocatori'}</button></div></div>`;
 }
 async function createGame(){
   const v=ngVals();if(!v.ok||!db)return;
@@ -883,45 +957,45 @@ function vLive(){
   const gid=V.gid,g=S.games[gid];if(!g)return notFound();
   if(g.status==='closed')return `<div class="wrap">${topbar()}<h1 style="margin-top:20px">Partita già conclusa</h1><p class="mut">Questa serata è chiusa: trovi tutti i dati nel resoconto.</p><button class="btn" data-act="detail" data-gid="${gid}">Vai al resoconto</button></div>`;
   const A=isAdmin(gid),L=plist(g),total=grossOf(g),paid=sum(L.map(p=>sum(p.buyIns.filter(b=>b.paymentStatus==='PAID').map(b=>b.amountCents)))),pend=sum(L.map(pendOf)),safe=sum(L.map(safeOf));
-  const inPlay=Math.max(0,toChips(total-safe,g));
-  const pin=adminPinOf(gid);
-  const R=resSorted();
+  const inPlay=Math.max(0,toChips(total-safe,g)),pin=adminPinOf(gid),R=resSorted(),so=!!F.open['serata:'+gid];
   return `<div class="wrap">${backBtn('home','Home')}
-<div class="row sp" style="align-items:flex-start"><div class="grow"><h1>Cassa live</h1><div class="mut sm" style="margin-top:2px">${dLong(g.scheduledAt)}</div></div><span class="badge ${A?'paid':'grey'}" style="margin-top:6px">${A?'Admin':'Sola lettura'}</span></div>
-<div class="stack" style="margin-top:16px">
+<div class="row sp" style="align-items:flex-start"><div class="grow"><h1>Cassa live</h1><div class="mut sm" style="margin-top:2px">${dDay(g.scheduledAt)} ${dMon(g.scheduledAt)} · ${tHM(g.scheduledAt)}${g.location?' · '+esc(g.location):''}</div></div><span class="badge ${A?'paid':'grey'}" style="margin-top:6px">${A?'Admin':'Sola lettura'}</span></div>
+<div class="stack" style="margin-top:14px">
 <div class="hero cassa stack" style="gap:14px">
-<div><div class="mut sm">Cassa</div><div class="bignum num">${eur(total)}</div><div class="mut sm" style="margin-top:6px">buy-in raccolti da ${L.length} giocator${L.length===1?'e':'i'}</div></div>
+<div><div class="mut sm">Cassa · ${L.length} giocator${L.length===1?'e':'i'}</div><div class="bignum num">${eur(total)}</div></div>
 ${total>0?`<div class="meter" role="img" aria-label="Incassato ${eur(paid)}, da pagare ${eur(pend)}"><i class="m-g" style="flex:${paid} 1 0"></i><i class="m-r" style="flex:${pend} 1 0"></i></div>`:''}
-<div class="kpis" style="margin-top:0"><div class="kpi"><div class="k">Incassato</div><div class="v num green">${eur(paid)}</div></div>
-<div class="kpi"><div class="k">Da pagare</div><div class="v num" style="color:${pend>0?'#FF6A60':'var(--mut)'}">${eur(pend)}</div></div>
-<div class="kpi"><div class="k">Fiches in gioco</div><div class="v num gold">${fch(inPlay)}</div>${safe>0?`<div class="s num">${eur(safe)} al sicuro</div>`:''}</div></div></div>
-${A?`<div class="card row sp" style="min-height:64px"><span class="row" style="gap:12px"><span class="gold">${ico('lock',20)}</span><div><b>PIN Admin</b><div class="mut xs">Serve per modificare la partita</div></div></span><b class="num" style="letter-spacing:.18em;font-size:28px;font-family:var(--serif)">${esc(pin||'----')}</b></div>`:pinBox(gid,'Puoi guardare la cassa in tempo reale. Per aggiungere giocatori, registrare re-buy, cash out o chiudere la partita serve il PIN Admin a 4 cifre.')}
-<div class="card stack" style="gap:14px"><div class="lbl in">Serata</div>
+<div class="kpis" style="margin-top:0"><div class="kpi"><div class="k">Incassato</div><div class="v num green">${eurS(paid)}</div></div>
+<div class="kpi"><div class="k">Da pagare</div><div class="v num" style="color:${pend>0?'#FF6A60':'var(--mut)'}">${eurS(pend)}</div></div>
+<div class="kpi"><div class="k">Fiches</div><div class="v num gold">${fch(inPlay)}</div>${safe>0?`<div class="s num">${eurS(safe)} al sicuro</div>`:''}</div></div>
+${A?`<div class="pinbar"><span class="row" style="gap:8px">${ico('key',16)}<span>PIN Admin</span></span><b class="num">${esc(pin||'----')}</b></div>`:''}</div>
+${A?'':pinBox(gid,'Puoi guardare la cassa in tempo reale. Per registrare re-buy, cash out o chiudere la partita serve il PIN Admin.')}
+<div class="sec" style="margin-top:8px">Al tavolo <small>${L.length}</small></div>
+<div class="stack" style="gap:8px">${L.length?L.map(p=>livePlayer(g,p,A)).join(''):'<div class="card mut sm">Nessun giocatore al tavolo.</div>'}
+${A?`<button class="btn dash" data-act="addpl">${ico('plus',18)} Aggiungi giocatori</button>`:''}</div>
+<div class="card" style="margin-top:4px"><button class="row sp" style="width:100%;min-height:40px" data-act="serataopen" data-gid="${gid}"><span><b>Serata e inviti</b><span class="mut sm" style="display:block">${seatsText(g,R.length)}</span></span><span class="gold">${ico(so?'chevu':'chev',20)}</span></button>
+${so?`<div class="stack" style="gap:12px;margin-top:12px">
 <div class="ir"><span class="ic">${ico('cal',20)}</span><div>${dLong(g.scheduledAt)} · ore ${tHM(g.scheduledAt)}</div></div>
 <div class="ir"><span class="ic">${ico('pin',20)}</span><div>${esc(g.location||g.hostName)}</div></div>
-<div><div class="mut sm num" style="margin-bottom:8px">${seatsText(g,R.length)}</div>${g.maxSeats?`<div class="meter"><i class="m-o" style="flex:${Math.min(R.length,g.maxSeats)} 1 0"></i><i style="flex:${Math.max(g.maxSeats-R.length,0)} 1 0"></i></div>`:''}</div>
+${g.maxSeats?`<div class="meter"><i class="m-o" style="flex:${Math.min(R.length,g.maxSeats)} 1 0"></i><i style="flex:${Math.max(g.maxSeats-R.length,0)} 1 0"></i></div>`:''}
 <a class="btn wa" href="${waHref(inviteText(gid))}" target="_blank" rel="noopener">Invita su WhatsApp</a>
-<button class="row sp" data-act="resopen" style="min-height:48px"><b>Prenotazioni (${R.length})</b><span class="gold">${ico(F.resOpen?'chevu':'chev',20)}</span></button>
-${F.resOpen?`<div class="stack" style="gap:0">${resList(g,A)}</div>`:''}</div>
-</div>
-<div class="sec">Al tavolo <small>${L.length}</small></div>
-<div class="stack">${L.length?L.map(p=>livePlayer(g,p,A)).join(''):'<div class="card mut sm">Nessun giocatore al tavolo. Aggiungi i giocatori e registra il loro buy-in.</div>'}
-${A?`<button class="btn dash" data-act="addpl">${ico('plus',18)} Aggiungi giocatori</button>`:''}</div>${histBlock(g,'live')}</div>
-<div class="bar"><div class="bar-in">${A?`<button class="btn" data-act="startclose" ${closable(g)&&canWrite?'':'disabled'}>Chiudi partita · Conta le fiches</button>
-${closable(g)?'':'<div class="mut xs" style="padding-top:6px">Servono almeno 2 giocatori per chiudere la partita.</div>'}
-<button class="link" data-act="delgame" style="min-height:44px">${armed.delgame?'Confermi? Tocca di nuovo':'Elimina partita'}</button>`:'<div class="mut sm" style="text-align:center;padding:6px 0">Sola lettura: inserisci il PIN Admin per chiudere o modificare questa partita.</div>'}</div></div>`;
+<div class="stack" style="gap:0">${resList(g,A)}</div>
+${A?`<button class="link" style="align-self:center;color:#FF6A60" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Elimina partita'}</button>`:''}</div>`:''}</div>
+${histBlock(g,'live')}</div></div>
+<div class="bar"><div class="bar-in">${A?`<button class="btn" data-act="startclose" ${closable(g)&&canWrite?'':'disabled'}>Chiudi partita e conta le fiches</button>
+${closable(g)?'':'<div class="mut xs" style="padding-top:6px">Servono almeno 2 giocatori per chiudere la partita.</div>'}`:'<div class="mut sm" style="text-align:center;padding:6px 0">Sola lettura: serve il PIN Admin per modificare.</div>'}</div></div>`;
 }
 function livePlayer(g,p,A){
   const i=inv(p),s=safeOf(p),pe=pendOf(p),stack=Math.max(0,toChips(i-s,g)),open=!!F.open[p.playerId];
-  return `<div class="card"><div class="row" data-act="tgl" data-pid="${p.playerId}" style="cursor:pointer">
-${ava(p.playerName)}<div class="grow"><div class="pl-name">${esc(p.playerName)}${pe>0?`<span class="pill red num">da pagare ${eur(pe)}</span>`:''}</div>
-<div class="mut sm num">${p.buyIns.length} ingress${p.buyIns.length===1?'o':'i'} · investiti ${eur(i)}</div></div><span class="mut">${ico(open?'chevu':'chev',20)}</span></div>
-<div class="pcs"><div><span>stack attivo</span><b class="num">${fch(stack)} fiches</b></div><div><span>al sicuro</span><b class="num ${s>0?'gold':'mut'}">${s>0?'💰 ':''}${eur(s)}</b></div></div>
-${A?`<div class="two" style="margin-top:10px"><button class="btn-s go" data-act="cashout" data-pid="${p.playerId}">💰 Cash Out</button><button class="btn-s" data-act="rebuy" data-pid="${p.playerId}">+ Re-buy</button></div>`:'<div class="mut xs" style="margin-top:10px">🔒 Solo l\'Admin può registrare movimenti</div>'}
-${open?`<div style="margin-top:10px">${p.buyIns.map((b,k)=>`<div class="mv"><i class="dt" style="background:${b.paymentStatus==='PAID'?'var(--green)':'var(--red)'}"></i><span class="num">#${k+1} · Ore ${tHM(b.timestamp)}</span>
+  return `<div class="card lp ${open?'open':''}"><button class="row" style="width:100%;text-align:left;gap:12px" data-act="tgl" data-pid="${p.playerId}">
+${ava(p.playerName,'s')}<div class="grow" style="min-width:0"><div class="nm">${esc(p.playerName)}${pe>0?` <span class="pill red num">${eurS(pe)} da pagare</span>`:''}</div>
+<div class="mut xs num">${p.buyIns.length} ingress${p.buyIns.length===1?'o':'i'} · ${eurS(i)}${s>0?` · <span class="gold">${eurS(s)} al sicuro</span>`:''}</div></div>
+<div style="text-align:right;flex:none"><b class="num lpst">${fch(stack)}</b><div class="mut xs">fiches</div></div></button>
+${A?`<div class="lpa"><button class="btn-s" data-act="rebuy" data-pid="${p.playerId}">${ico('plus',16)} Re-buy</button><button class="btn-s go" data-act="cashout" data-pid="${p.playerId}">${ico('coins',16)} Cash out</button></div>`:''}
+${open?`<div class="lpx">${p.buyIns.map((b,k)=>`<div class="mv"><i class="dt" style="background:${b.paymentStatus==='PAID'?'var(--green)':'var(--red)'}"></i><span class="num">${k?'Re-buy':'Buy-in'} · ${tHM(b.timestamp)}</span>
 ${A?`<button class="bdg-btn" data-act="flip" data-pid="${p.playerId}" data-bid="${b.buyInId}">${stBadge(b.paymentStatus)}</button>`:stBadge(b.paymentStatus)}
 <b class="num grow" style="text-align:right">${eur(b.amountCents)}</b>${A?`<button class="x" data-act="delbi" data-pid="${p.playerId}" data-bid="${b.buyInId}" aria-label="Elimina movimento">${armed['bi'+b.buyInId]?'<span class="red xs">Sicuro?</span>':ico('close',16)}</button>`:''}</div>`).join('')}
-${(p.cashOuts||[]).map(c=>`<div class="mv"><i class="dt" style="background:var(--gold)"></i><span class="gold">Cash out · 💰 messo al sicuro</span><b class="num grow gold" style="text-align:right">${eur(c.amountCents)}</b></div>`).join('')}</div>`:''}</div>`;
+${(p.cashOuts||[]).map(c=>`<div class="mv"><i class="dt" style="background:var(--gold)"></i><span class="gold">Cash out · ${tHM(c.createdAt||g.scheduledAt)}</span><b class="num grow gold" style="text-align:right">${eur(c.amountCents)}</b></div>`).join('')}
+${A?'':'<div class="mut xs" style="padding-top:8px">Solo chi ha il PIN Admin può registrare movimenti.</div>'}</div>`:''}</div>`;
 }
 
 /* --- Chiusura cassa --- */
@@ -1007,15 +1081,15 @@ const avaN=(n,s)=>n==='Dealer'?`<span class="ava ${s||''}" style="--h:45"><i>�
 const meIsFrom=d=>!!S.me&&(d.fromPlayerId?d.fromPlayerId===S.me.id:String(d.fromPlayerName).toLowerCase()===S.me.name.toLowerCase());
 function debtRow(gid,d){
   const perm=debtPerm(gid,d),done=d.remainingAmount===0,part=d.paidAmount>0&&!done,mine=meIsFrom(d),toMe=isCreditor(d);
-  const st=done?'<span class="badge paid">Pagato</span>':part?`<span class="badge pend num">Restano ${eur(d.remainingAmount)}</span>`:'<span class="badge pend">Da pagare</span>';
+  const st=done?'<span class="st ok">Pagato</span>':part?`<span class="st no num">Restano ${eur(d.remainingAmount)}</span>`:'<span class="st no">Da pagare</span>';
   return `<div class="debt ${done?'done':''} ${mine||toMe?'me':''}">
-<div class="row" style="gap:10px"><div class="pair">${avaN(d.fromPlayerName,'s')}<span class="arr">${ico('chevr',16)}</span>${avaN(d.toPlayerName,'s')}</div>
-<div class="grow"><div class="dl"><b>${mine?'Tu':esc(d.fromPlayerName)}</b> <span class="mut">${mine?'dai a':'dà a'}</span> <b>${toMe?'te':esc(d.toPlayerName)}</b></div><div style="margin-top:4px">${st}</div></div>
-<b class="num amt ${done?'green':''}">${eur(d.totalAmount)}</b></div>
-${part?`<div class="meter" style="margin-top:12px"><i class="m-g" style="flex:${d.paidAmount} 1 0"></i><i class="m-r" style="flex:${d.remainingAmount} 1 0"></i></div><div class="mut xs num" style="margin-top:6px">Ricevuti ${eur(d.paidAmount)} su ${eur(d.totalAmount)}</div>`:''}
-${perm.can?(done?`<button class="link" style="min-height:40px;margin-top:4px" data-act="settle" data-did="${d.debtId}">Modifica</button>`:`<button class="btn green" style="margin-top:12px;min-height:50px" data-act="settle" data-did="${d.debtId}">${ico('check',18)} Segna come ricevuto</button>`):''}
-${mine&&!done?`<div class="stack" style="margin-top:12px;gap:8px">${payBlock(d)}</div>`:''}
-${!perm.can&&!done&&!mine?`<div class="mut xs" style="margin-top:8px">Lo segna come ricevuto ${isDealerD(d)?'chi ha avviato la partita':esc(d.toPlayerName)}.</div>`:''}</div>`;
+<div class="row" style="gap:12px"><div class="pair">${avaN(d.fromPlayerName,'xs')}<span class="arr">${ico('chevr',14)}</span>${avaN(d.toPlayerName,'xs')}</div>
+<div class="grow" style="min-width:0"><div class="dn">${mine?'<b>Tu</b>':`<b>${esc(d.fromPlayerName)}</b>`}</div><div class="mut sm ell">${toMe?'a <b class="gold">te</b>':'a '+esc(d.toPlayerName)}</div></div>
+<div style="text-align:right;flex:none"><b class="num amt">${eur(d.totalAmount)}</b><div>${st}</div></div></div>
+${part?`<div class="meter thin" style="margin-top:10px"><i class="m-g" style="flex:${d.paidAmount} 1 0"></i><i class="m-r" style="flex:${d.remainingAmount} 1 0"></i></div>`:''}
+${perm.can&&!done?`<button class="btn green sm" data-act="settle" data-did="${d.debtId}">${ico('check',18)} ${toMe?'Li ho ricevuti':'Segna come ricevuto'}</button>`:''}
+${perm.can&&done?`<button class="link" style="min-height:34px;font-size:14px" data-act="settle" data-did="${d.debtId}">Modifica</button>`:''}
+${mine&&!done?`<div class="stack" style="margin-top:10px;gap:8px">${payBlock(d)}</div>`:''}</div>`;
 }
 function vDetail(){
   const gid=V.gid,g=S.games[gid];if(!g)return notFound();
@@ -1027,11 +1101,11 @@ function vDetail(){
   const resRow=(p,i)=>{const open=!!F.open['res:'+gid+p.playerId],net=p.netCents||0;return `<div class="rrow"><button class="row" style="width:100%;text-align:left;gap:12px;min-height:56px" data-act="resopen" data-k="${gid+p.playerId}">${closed?`<span class="mut num" style="width:16px;text-align:center;font-weight:700">${i+1}</span>`:''}${ava(p.playerName,'s')}<div class="grow"><div style="font-weight:600">${esc(p.playerName)}</div><div class="mut xs num">${eur(inv(p))} investiti${closed?` · ${eur(p.cashOutCents||0)} incassati`:''}</div></div>${closed?`<b class="num ${net>0?'green':net<0?'red':'mut'}" style="font-family:var(--serif);font-size:19px">${sgn(net)}</b>`:''}<span class="mut">${ico(open?'chevu':'chev',16)}</span></button>
 ${open?`<div class="chips" style="gap:6px;padding:0 0 12px 28px">${p.buyIns.map((b,k)=>`<span class="badge ${b.paymentStatus==='PAID'?'paid':'pend'} num">${k?'Re-buy':'Buy-in'} ${eur(b.amountCents)} · ${b.paymentStatus==='PAID'?'pagato':'da pagare'}</span>`).join('')}${(p.cashOuts||[]).map(c=>`<span class="badge grey num">Cash out ${eur(c.amountCents)}</span>`).join('')}</div>`:''}</div>`};
   return `<div class="wrap">${backBtn('home','Home')}
-<div class="row sp" style="align-items:flex-start"><div class="grow"><h1>Serata del ${dShort(g.scheduledAt)}</h1><div class="mut sm" style="margin-top:4px">${dLong(g.scheduledAt)} · avviata da ${esc(g.hostName)}</div></div><span style="margin-top:6px">${closed?'<span class="badge grey">Conclusa</span>':'<span class="badge live"><i class="dot"></i>In corso</span>'}</span></div>
+<div class="row sp" style="align-items:flex-start"><div class="grow"><h1>${(t=>t[0].toUpperCase()+t.slice(1))(new Date(g.scheduledAt).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}))}</h1><div class="mut sm" style="margin-top:4px">${new Date(g.scheduledAt).getFullYear()} · cassa di ${esc(g.hostName)}</div></div><span style="margin-top:6px">${closed?'<span class="badge grey">Conclusa</span>':'<span class="badge live"><i class="dot"></i>In corso</span>'}</span></div>
 ${closed?'':`<button class="btn" style="margin-top:14px" data-act="live" data-gid="${gid}">Torna alla cassa live</button>`}
 ${closed&&me?`<div class="hero" style="margin-top:16px;padding:20px"><div class="mut sm">Il tuo risultato</div><div class="bignum num ${(me.netCents||0)>0?'green':(me.netCents||0)<0?'red':''}" style="font-size:46px">${sgn(me.netCents||0)}</div><div class="mut sm num" style="margin-top:6px">${eur(inv(me))} investiti · ${eur(me.cashOutCents||0)} incassati</div></div>`:''}
 ${closed?`<div class="sec">Saldo finale ${D.length?`<small>${nDone} di ${D.length} pagat${D.length===1?'o':'i'}</small>`:''}</div>
-${D.length?`<div class="card stack" style="gap:0;padding:8px 16px 14px">${D.length>1?`<div style="padding:8px 0 4px"><div class="meter"><i class="m-g" style="flex:${paidD} 1 0"></i><i style="flex:${totD-paidD} 1 0"></i></div></div>`:''}
+${D.length?`<div class="mut xs" style="margin:-2px 4px 8px">Ogni pagamento lo segna chi riceve i soldi.</div><div class="card stack" style="gap:0;padding:8px 16px 10px">${D.length>1?`<div style="padding:8px 0 4px"><div class="meter"><i class="m-g" style="flex:${paidD} 1 0"></i><i style="flex:${totD-paidD} 1 0"></i></div></div>`:''}
 ${!A&&D.some(d=>isDealerD(d)&&d.remainingAmount>0)?`<div style="padding-top:8px">${pinBox(gid,'Le mance al Dealer le segna chi ha avviato la partita, con il PIN Admin.')}</div>`:''}
 ${D.slice().sort((a,b)=>(a.remainingAmount===0)-(b.remainingAmount===0)||(meIsFrom(b)||isCreditor(b))-(meIsFrom(a)||isCreditor(a))).map(d=>debtRow(gid,d)).join('')}</div>`:`<div class="card row" style="gap:12px"><span class="suit" style="background:var(--green-bg);color:#5BE07D">${ico('check',22)}</span><div><b>Tutti pari</b><div class="mut sm">Nessuno deve niente a nessuno.</div></div></div>`}`:''}
 <div class="sec">Risultati</div>
@@ -1712,23 +1786,22 @@ const _sheet0=sheetHtml;
 sheetHtml=function(){
   const s=SH;if(!s)return '';let title='',body='';
   const bioRow=()=>S.bioOk?(acctBio()?'<button class="btn ghost" data-act="biooff">Disattiva Face ID su questo telefono</button>':'<button class="btn" data-act="bioask">Attiva Face ID</button>'):'';
+  const li=(icon,label,act,attrs,trail)=>`<button class="li" data-act="${act}" ${attrs||''}><span class="lic">${ico(icon,17)}</span><span class="grow">${label}</span>${trail!=null?trail:ico('chevr',16)}</button>`;
+  const bioLi=()=>S.bioOk?li('face','Accesso con Face ID',acctBio()?'biooff':'bioask','',`<span class="sw ${acctBio()?'on':''}"><i></i></span>`):'';
   if(s.type==='me'&&S.me){
-    title='Il mio profilo';
-    body=`<div class="row" style="gap:14px">${ava(S.me.name,'l')}<div class="grow"><div class="pl-name">${esc(S.me.name)}</div><div class="mut sm">Tavolo: ${esc(S.table?S.table.name:'')}</div></div></div>
-<button class="btn" data-act="tables">${ico('chip',18)} I miei tavoli</button>
-<button class="btn ghost" data-act="pstats" data-k="${esc(S.me.name.trim().toLowerCase())}">${ico('bars',18)} Le mie statistiche</button>
-<button class="btn ghost" data-act="paym">${ico('coins',18)} Come vuoi essere pagato</button>
-${legacyProfiles().length?`<button class="btn ghost" data-act="relink">Collega il mio vecchio profilo</button>`:''}
-<button class="btn ghost" data-act="settings">Impostazioni tavolo</button>
-<button class="btn ghost" data-act="export">${ico('share',18)} Esporta i dati</button>
-${bioRow()}<button class="btn ghost" data-act="chpin">Cambia PIN</button><button class="btn redb" data-act="logout">${acctBio()?'Blocca':'Esci'}</button>
-<button class="link" style="align-self:center;color:#FF6A60" data-act="delme">Esci da questo tavolo</button>`;
+    title='Profilo';
+    body=`<div class="row" style="gap:14px">${ava(S.me.name,'l')}<div class="grow"><div class="pl-name">${esc(S.me.name)}</div><div class="mut sm">${esc(S.table?S.table.name:'')}${isManager()?' · gestore':''}</div></div></div>
+<div class="list">${li('chip','I miei tavoli','tables')}${li('bars','Le mie statistiche','pstats',`data-k="${esc(S.me.name.trim().toLowerCase())}"`)}${li('coins','Come vuoi essere pagato','paym')}</div>
+<div class="list">${li('gear','Impostazioni tavolo','settings')}${li('share','Esporta i dati','export')}${legacyProfiles().length?li('link','Collega il mio vecchio profilo','relink'):''}</div>
+<div class="list">${bioLi()}${li('key','Cambia PIN','chpin')}</div>
+<button class="btn ghost" data-act="logout">${acctBio()?'Blocca l\'app':'Esci dall\'account'}</button>
+<button class="link" style="align-self:center;color:#FF6A60;min-height:40px" data-act="delme">Esci da questo tavolo</button>`;
   }else if(s.type==='acct'&&S.acct){
-    const n=(S.acct.tables||[]).length;title='Il mio account';
+    const n=(S.acct.tables||[]).length;title='Account';
     body=`<div class="row" style="gap:14px">${ava(S.acct.name,'l')}<div class="grow"><div class="pl-name">${esc(S.acct.name)}</div><div class="mut sm">${n} tavol${n===1?'o':'i'}</div></div></div>
-${bioRow()}<button class="btn ghost" data-act="chpin">Cambia PIN</button>
-${acctBio()?'<button class="btn ghost" data-act="logout">Blocca</button>':''}<button class="btn redb" data-act="fulllogout">Esci da questo telefono</button>
-<button class="link" style="align-self:center;color:#FF6A60" data-act="delacct">Elimina il mio account</button>`;
+<div class="list">${bioLi()}${li('key','Cambia PIN','chpin')}</div>
+${acctBio()?'<button class="btn ghost" data-act="logout">Blocca l\'app</button>':''}<button class="btn ghost" style="color:#FF6A60" data-act="fulllogout">Esci da questo telefono</button>
+<button class="link" style="align-self:center;color:#FF6A60;min-height:40px" data-act="delacct">Elimina il mio account</button>`;
   }else if(s.type==='bio'&&S.acct){
     title='Attiva Face ID';
     body=`<p class="mut sm" style="margin:0">Aprendo l'app entri con il volto o l'impronta e confermi i pagamenti senza scrivere il PIN. Conferma ora il tuo PIN.</p>
@@ -1756,8 +1829,11 @@ authDebt=async function(did){
   const perm=debtPerm(V.gid,d);
   if(!perm.can){toast('Solo '+perm.who+' può modificare questo saldo','err');return false}
   if(perm.needPin){
-    if(await bioFresh()){F.bioOk=0}
-    else{const ok=await checkMyPin(F.pinp);if(ok===null)return false;if(!ok){toast('PIN errato, riprova.','err');return false}}
+    const b=bioMine();
+    if(bioFreshUi()){F.bioOk=0}
+    else if(b&&!F.usePin&&!PIN_RE.test(F.pinp)){
+      try{await bioAssert(b.cred)}catch(e){F.usePin=true;render();toast('Face ID non riuscito'+(e&&e.name&&e.name!=='Error'?' ('+e.name+')':'')+': scrivi il PIN','err');return false}
+    }else{const ok=await checkMyPin(F.pinp);if(ok===null)return false;if(!ok){toast('PIN errato, riprova.','err');return false}}
   }
   F.pinp='';return true;
 };
@@ -1854,6 +1930,11 @@ Object.assign(H,{
   acctopen(){openSheet({type:'acct'})},
   opentable(d){const t=(S.acct.tables||[]).find(x=>x.id===d.id);if(t)openTable(t)},
   tbshow(d){F.tbOpen=true;F.tb.mode=d.m;F.tb.err='';render()},
+  usepin(){F.usePin=true;F.pinp='';render();setTimeout(()=>{const i=$('#pay-pin');if(i)i.focus()},50)},
+  usebio(){F.usePin=false;F.pinp='';render()},
+  serataopen(d){const k='serata:'+d.gid;F.open[k]=!F.open[k];render()},
+  ngmore(){F.ngMore=!F.ngMore;render()},
+  nselall(){const rb=rubrica().filter(p=>p.reg),all=rb.every(p=>F.ng.sel[p.id]);rb.forEach(p=>{F.ng.sel[p.id]=!all});if(all&&S.me)F.ng.sel[S.me.id]=true;render()},
   clother(){F.clm.other=true;F.clm.pick=null;F.clm.err='';F.clm.pin='';render()},
   clpick(d){F.clm.pick=d.id;F.clm.other=false;F.clm.err='';F.clm.pin='';render()},
   async clnew(){F.clm.busy=true;render();await linkAs(null,S.acct.name,null);F.clm.busy=false;render()},
@@ -1910,8 +1991,11 @@ render=function(){
   }
 };
 
+/* ogni foglio che chiede conferma parte da Face ID, se attivo */
+['settle','subtap','histundo','delme'].forEach(k=>{const f=H[k];if(f)H[k]=function(d,e){F.usePin=false;F.bioOk=0;return f.call(this,d,e)}});
+
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791810944389';
+const APP_VERSION='1791812274153';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
