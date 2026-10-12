@@ -295,6 +295,9 @@ body.noscroll #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))}
 .lpa .btn-s{min-height:44px;font-size:15px}
 .lpx{margin-top:8px;animation:fadeIn .25s ease-out both}
 .rk .xs{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* le liste non devono mai restringersi dentro i fogli (iOS) */
+.sheet-body>*{flex-shrink:0}
+.list,.li{flex-shrink:0}
 </style>
 
 <div id="app"></div>
@@ -1995,7 +1998,7 @@ render=function(){
 ['settle','subtap','histundo','delme'].forEach(k=>{const f=H[k];if(f)H[k]=function(d,e){F.usePin=false;F.bioOk=0;return f.call(this,d,e)}});
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791812274153';
+const APP_VERSION='1791812665863';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
