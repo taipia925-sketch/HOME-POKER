@@ -1631,18 +1631,18 @@ afterData=async function(){
 };
 /* ---- schermate ---- */
 function vAccount(){
-  const a=F.ac;if(a.mode===null)a.mode=LS.get('hadacct',null)?'login':'reg';
+  const a=F.ac;if(a.mode===null)a.mode='login';
   const reg=a.mode==='reg';
   return `<div class="wrap">${topbar()}
 <form id="f-acct" class="hero stack" style="margin-top:12px;gap:16px">
-<div><h1>${reg?'Crea il tuo account':'Accedi'}</h1><p class="mut" style="margin:8px 0 0">${reg?'Un solo nome utente e un PIN per tutti i tuoi tavoli.':'Entra con il tuo nome utente e il tuo PIN.'}</p></div>
+<div><h1>${reg?'Crea il tuo account':'Accedi'}</h1><p class="mut" style="margin:8px 0 0">${reg?'Un solo nome utente e un PIN per tutti i tuoi tavoli.':'Entra con il tuo nome utente e il tuo PIN: se giocavi già in un tavolo, usa gli stessi di prima.'}</p></div>
 <div class="seg" style="align-self:stretch"><button type="button" class="${!reg?'on':''}" style="flex:1" data-act="acmode" data-m="login">Accedi</button><button type="button" class="${reg?'on':''}" style="flex:1" data-act="acmode" data-m="reg">Registrati</button></div>
 <label class="field"><span>Nome utente</span><input class="in" id="ac-name" data-bind="ac.name" value="${esc(a.name)}" autocomplete="username" maxlength="24" autocapitalize="words"></label>
 <label class="field"><span>PIN (da 4 a 6 cifre)</span><input class="in" id="ac-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="ac.pin" value="${esc(a.pin)}" autocomplete="${reg?'new-password':'current-password'}"></label>
 ${reg?`<label class="field"><span>Ripeti il PIN</span><input class="in" id="ac-pin2" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="ac.pin2" value="${esc(a.pin2)}" autocomplete="new-password"></label>`:''}
 ${a.err?`<div class="red sm">${esc(a.err)}</div>`:''}
 <button class="btn" type="submit" ${a.busy?'disabled':''}>${a.busy?'Un attimo…':reg?'Crea account':'Entra'}</button>
-<div class="mut xs">${reg?'Usa nome e cognome o un soprannome: il nome utente vale per tutti i tavoli. Dopo potrai attivare Face ID.':'Se avevi già un profilo in un tavolo, crea il tuo account: entrando nel tavolo ritroverai storico e saldi.'}</div></form></div>`;
+<div class="mut xs">${reg?'Usa nome e cognome o un soprannome: il nome utente vale per tutti i tavoli. Dopo potrai attivare Face ID.':'Prima volta nell\'app? Tocca Registrati.'}</div></form></div>`;
 }
 function vLock(){
   const u=F.ul;
@@ -1776,6 +1776,7 @@ async function doAcct(){
     if(st==='invalid')return fail('Controlla nome utente e PIN.');
     if(st==='not_found')return fail('Nome utente non trovato. Se è la prima volta, tocca Registrati.');
     if(st==='bad_pin')return fail('Nome utente o PIN errati.');
+    if(st==='too_many')return fail('Troppi tentativi sbagliati: riprova tra qualche minuto.');
     if(st!=='ok')return fail('Non è andata, riprova.');
     await refreshMe();LS.set('hadacct',1);S.locked=false;
     F.ac={mode:null,name:'',pin:'',pin2:'',err:'',busy:false};
@@ -1910,7 +1911,7 @@ render=function(){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791810112566';
+const APP_VERSION='1791810944389';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
