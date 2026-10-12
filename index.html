@@ -209,8 +209,31 @@ textarea.ta{width:100%;min-height:200px;border-radius:18px;border:0;background:v
 .pick.on{border-color:var(--gold);background:rgba(142,156,255,.14)}
 .pick .tick{margin-left:auto;width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.2);display:grid;place-items:center;color:transparent;flex:none;transition:all .2s var(--ease)}
 .pick.on .tick{background:var(--gold);border-color:var(--gold);color:var(--on-acc)}
+.t.u{pointer-events:auto;padding:8px 8px 8px 18px}
+.t .undo{margin-left:auto;padding:9px 16px;border-radius:999px;background:rgba(142,156,255,.24);color:var(--gold-l);font-weight:700;font-size:14.5px}
+.spark{display:block;touch-action:pan-y;overflow:visible;cursor:crosshair}
 @media (max-width:400px){.pg{padding-inline:14px}.bignum{font-size:50px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+body:has(.bar) #toast{bottom:calc(178px + env(safe-area-inset-bottom,0px))}
+body.noscroll #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))}
+
+/* saldo finale */
+.debt{padding:14px 0}
+.debt+.debt{border-top:1px solid var(--line2)}
+.debt.done .dl,.debt.done .amt{opacity:.55}
+.debt.me .dl b{color:var(--gold-l)}
+.debt .dl{font-size:16px;line-height:1.35}
+.debt .amt{font-family:var(--serif);font-size:21px;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
+.pair{display:flex;align-items:center;flex:none}
+.pair .arr{color:var(--mut);margin:0 -2px;position:relative;z-index:1}
+.rrow{border-top:1px solid var(--line2)}.rrow:first-child{border-top:0}
+.prow{padding:12px 0;border-top:1px solid var(--line2)}
+.sheet input.in,.sheet textarea.in{background:#262A36}
+.sheet input.in:focus,.sheet textarea.in:focus{background:#2A2F45}
+.pacts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:10px}
+.pacts .btn-s{min-height:40px;padding:6px 8px;font-size:13.5px;white-space:normal;line-height:1.15;text-align:center}
+.upd{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:90;display:flex;align-items:center;gap:12px;width:min(calc(100% - 24px),440px);padding:10px 10px 10px 18px;border-radius:999px;background:var(--gold);color:var(--on-acc);font-weight:600;font-size:15px;box-shadow:0 14px 34px rgba(0,0,0,.5);animation:toastIn .42s var(--ease) both}
+.upd span{flex:1}.upd button{background:var(--on-acc);color:#fff;border-radius:999px;padding:10px 16px;font-weight:700}
 </style>
 
 <div id="app"></div>
@@ -344,28 +367,101 @@ let db=null,canWrite=true,ENTER=false;
 const S={me:LS.get('me',null),games:{},players:{},res:[],cfg:null,loaded:{games:false,players:false,cfg:true},table:null,baseReady:false,bioOk:false,admin:{},reqHash:null,dbReady:undefined,booted:false,resGid:null,unsubRes:null};
 let V={name:'home'};
 let SH=null;
-const F={tb:{mode:null,name:'',pw:'',pw2:'',err:'',busy:false},bpin:'',bioOk:0,pw:'',pwErr:false,pin:'',pinErr:false,open:{},resOpen:false,pinShow:false,rname:'',ng:null,ap:{sel:{},names:''},bi:{},co:{},cl:null,pay:{},mod:{},npw:'',auth:{mode:null,name:'',pin:'',pin2:'',err:''},pinp:'',chpin:{old:'',nw:''}};
+const F={set:{},pm:{paypal:'',note:''},tb:{mode:null,name:'',pw:'',pw2:'',err:'',busy:false},bpin:'',bioOk:0,pw:'',pwErr:false,pin:'',pinErr:false,open:{},resOpen:false,pinShow:false,rname:'',ng:null,ap:{sel:{},names:''},bi:{},co:{},cl:null,pay:{},mod:{},npw:'',auth:{mode:null,name:'',pin:'',pin2:'',err:''},pinp:'',chpin:{old:'',nw:''}};
 const armed={};
 function arm(k){if(armed[k]){clearTimeout(armed[k]);delete armed[k];return true}armed[k]=setTimeout(()=>{delete armed[k];render()},3000);render();return false}
 function setPath(path,val){const k=path.split('.');let o=F;for(let i=0;i<k.length-1;i++){if(o[k[i]]==null||typeof o[k[i]]!=='object')o[k[i]]={};o=o[k[i]]}o[k[k.length-1]]=val}
 function toast(msg,kind){const el=document.createElement('div');el.className='t '+(kind||'ok');el.innerHTML=(kind==='err'?ico('close',16):ico('check',16))+'<span></span>';el.lastChild.textContent=msg;$('#toast').appendChild(el);setTimeout(()=>el.remove(),2900)}
 const errMsg=e=>e&&e.code==='invalid_argument'?'Il tuo account non può modificare questi dati. Chiedi di essere invitato come collaboratore.':(e&&e.message)||'Operazione non riuscita';
 const unlocked=()=>!!S.table;
-const isAdmin=gid=>!!S.admin[gid];
+const isAdmin=gid=>!!S.admin[gid]||!!(S.me&&S.games[gid]&&S.games[gid].hostId&&S.games[gid].hostId===S.me.id);
 const resSorted=()=>S.res.slice().sort((a,b)=>String(a.reservedAt).localeCompare(String(b.reservedAt))||a.id.localeCompare(b.id));
 
 /* ===== Scrittura partita (una alla volta per documento) ===== */
 const wq={};
-function saveGame(gid,fn){
+function saveGame(gid,fn,undoMsg){
   const prev=wq[gid]||Promise.resolve();
   const next=prev.then(async()=>{
     const cur=S.games[gid];if(!cur)throw new Error('Partita non trovata');
     const g=JSON.parse(JSON.stringify(cur));
     if(fn(g)===false)return false;
+    g.rev=(cur.rev||0)+1;
+    let entry=null;
+    if(undoMsg){
+      const ch=diffGame(cur,g);
+      if(ch.length){entry={id:nid('h'),at:new Date().toISOString(),by:S.me?S.me.name:'',msg:typeof undoMsg==='function'?undoMsg():undoMsg,ch};g.hist=(g.hist||[]).concat([entry]).slice(-80)}
+    }
     await db.doc('games/'+gid).set(g);
-    S.games[gid]=g;render();return true;
+    S.games[gid]=g;render();
+    if(entry)toastUndo(entry.msg,()=>undoEntry(gid,entry.id));
+    return true;
   }).catch(e=>{toast(errMsg(e),'err');return false});
   wq[gid]=next;return next;
+}
+function openStuffFor(id,name){
+  const lk=String(name).toLowerCase();
+  const live=Object.values(S.games).some(g=>g.status==='live'&&Object.values(g.players||{}).some(p=>p.playerId===id));
+  let get=0,give=0;
+  Object.values(S.games).forEach(g=>(g.debts||[]).forEach(d=>{if(!(d.remainingAmount>0))return;
+    if(d.fromPlayerId?d.fromPlayerId===id:String(d.fromPlayerName).toLowerCase()===lk)give+=d.remainingAmount;
+    if(d.toPlayerId?d.toPlayerId===id:String(d.toPlayerName).toLowerCase()===lk)get+=d.remainingAmount;}));
+  const w=[];if(live)w.push('è seduto a una partita in corso');if(get)w.push('deve ancora riscuotere '+eur(get));if(give)w.push('deve ancora dare '+eur(give));
+  return w;
+}
+function myOpenStuff(){
+  if(!S.me)return '';const w=openStuffFor(S.me.id,S.me.name).map(x=>x.replace('è seduto','sei seduto').replace('deve ancora','devi ancora'));
+  return w.length?'Non puoi eliminare il profilo adesso: '+w.join(', ')+'.':'';
+}
+/* --- Cronologia: ogni modifica si può annullare anche dopo --- */
+function diffGame(a,b){
+  const ch=[],J=JSON.stringify,pa=a.players||{},pb=b.players||{};
+  new Set([...Object.keys(pa),...Object.keys(pb)]).forEach(k=>{const x=pa[k]||null,y=pb[k]||null;if(J(x)!==J(y))ch.push({k:'p:'+k,b:x,a:y})});
+  const da={},dbb={};(a.debts||[]).forEach(d=>da[d.debtId]=d);(b.debts||[]).forEach(d=>dbb[d.debtId]=d);
+  new Set([...Object.keys(da),...Object.keys(dbb)]).forEach(k=>{const x=da[k]||null,y=dbb[k]||null;if(J(x)!==J(y))ch.push({k:'d:'+k,b:x,a:y})});
+  return ch;
+}
+const hGet=(g,k)=>{const id=k.slice(2);return k[0]==='p'?((g.players||{})[id]||null):((g.debts||[]).find(d=>d.debtId===id)||null)};
+function hSet(g,k,v){
+  const id=k.slice(2),c=v?JSON.parse(JSON.stringify(v)):null;
+  if(k[0]==='p'){g.players=g.players||{};if(c)g.players[id]=c;else delete g.players[id];return}
+  g.debts=g.debts||[];const i=g.debts.findIndex(d=>d.debtId===id);
+  if(c){if(i>=0)g.debts[i]=c;else g.debts.push(c)}else if(i>=0)g.debts.splice(i,1);
+}
+const hWho=c=>{const o=c.a||c.b||{};return c.k[0]==='p'?o.playerName:`${o.fromPlayerName} → ${o.toPlayerName}`};
+const hWhoAll=e=>[...new Set(e.ch.map(hWho))].join(', ');
+function undoWhy(g,e){
+  if(!e)return 'Modifica non trovata';
+  if(e.undone)return 'Questa modifica è già stata annullata';
+  if(g.status==='closed'&&e.ch.some(c=>c.k[0]==='p'))return 'La partita è chiusa: i movimenti della serata non si possono più annullare';
+  const J=JSON.stringify,idx=(g.hist||[]).indexOf(e);
+  for(const c of e.ch){
+    if(J(hGet(g,c.k))!==J(c.a)){
+      const later=(g.hist||[]).slice(idx+1).some(x=>!x.undone&&x.ch.some(y=>y.k===c.k));
+      return later?`Prima annulla le modifiche più recenti su ${hWho(c)}`:`${hWho(c)} è stato modificato nel frattempo: non posso annullare`;
+    }
+  }
+  return '';
+}
+function undoEntry(gid,hid){
+  let why='',msg='';
+  return saveGame(gid,g=>{
+    const e=(g.hist||[]).find(x=>x.id===hid);
+    why=undoWhy(g,e);if(why)return false;
+    e.ch.forEach(c=>hSet(g,c.k,c.b));msg=e.msg;
+    e.undone={at:new Date().toISOString(),by:S.me?S.me.name:''};
+  }).then(ok=>{if(ok)toast('Annullato: '+msg,'ok');else if(why)toast(why,'err');return ok});
+}
+function histCan(gid,g,e){
+  if(e.undone)return false;
+  if(e.ch.every(c=>c.k[0]==='d'))return e.ch.every(c=>debtPerm(gid,c.a||c.b).can);
+  return g.status==='live'&&isAdmin(gid);
+}
+function histBlock(g,mode){
+  const gid=V.gid,H0=(g.hist||[]).filter(e=>mode==='live'?true:e.ch.some(c=>c.k[0]==='d'));
+  if(!H0.length)return '';
+  const open=!!F.open['hist:'+gid],L=H0.slice().reverse();
+  return `<div class="card" style="margin-top:12px"><button class="row sp" data-act="histopen" style="width:100%;min-height:44px"><b>Cronologia modifiche (${H0.length})</b><span class="gold">${ico(open?'chevu':'chev',20)}</span></button>
+${open?`<div class="mut xs" style="margin:2px 0 6px">Puoi annullare una modifica in qualsiasi momento.${mode==='live'?' Serve la modalità Admin.':' I saldi li annulla solo chi li riscuote.'}</div>${L.map(e=>{const can=histCan(gid,g,e);return `<div class="row" style="min-height:56px;border-top:1px solid var(--line2);padding:6px 0;${e.undone?'opacity:.5':''}"><span class="mut xs num" style="width:42px">${tHM(e.at)}</span><div class="grow"><div style="font-weight:600;${e.undone?'text-decoration:line-through':''}">${esc(e.msg)}</div><div class="mut xs">${esc(hWhoAll(e))}${e.by?` · da ${esc(e.by)}`:''}${e.undone?` · annullata${e.undone.by?' da '+esc(e.undone.by):''}`:''}</div></div>${can?`<button class="btn-s" style="min-height:40px" data-act="histundo" data-hid="${e.id}">Annulla</button>`:''}</div>`}).join('')}`:''}</div>`;
 }
 
 /* ===== Navigazione ===== */
@@ -399,6 +495,7 @@ async function checkAdmin(){
     const g=S.games[gid];if(!g)continue;
     const ok=(await sha(gid+':'+pins[gid]))===g.pinHash;
     if(S.admin[gid]!==ok){S.admin[gid]=ok;ch=true}
+    if(ok&&S.me&&!g.hostId&&g.status==='live')saveGame(gid,x=>{if(x.hostId)return false;x.hostId=S.me.id;x.adminPin=pins[gid]});
   }
   if(ch)render();
 }
@@ -433,6 +530,8 @@ function view(){
     case 'close':return vClose();
     case 'detail':return vDetail();
     case 'book':return vBook();
+    case 'player':return vPlayer();
+    case 'settings':return vSettings();
     default:return vHome();
   }
 }
@@ -476,7 +575,7 @@ async function doAuth(){
   const id=ent?ent[0]:nid('p'),now=new Date().toISOString();
   const doc=Object.assign({},ent?ent[1]:{name,createdAt:now},{pinHash:await pinHash(id,a.pin),registeredAt:now});
   try{await db.doc('players/'+id).set(doc)}catch(e){return fail(errMsg(e))}
-  S.players[id]=doc;enterAs(id,doc.name);
+  S.players[id]=doc;if(!hasManagers())saveCfg({managers:((S.cfg&&S.cfg.managers)||[]).filter(x=>S.players[x]).concat([id])});enterAs(id,doc.name);
 }
 const isCreditor=d=>!!S.me&&(d.toPlayerId?d.toPlayerId===S.me.id:S.me.name.toLowerCase()===String(d.toPlayerName).toLowerCase());
 function debtPerm(gid,d){
@@ -532,14 +631,92 @@ ${t.err?`<div class="red sm">${esc(t.err)}</div>`:''}
 <button class="btn" type="submit" ${t.busy?'disabled':''}>${t.busy?'Un attimo…':create?'Crea il tavolo':'Entra'}</button>
 <div class="mut xs">${create?'Dopo aver creato il tavolo, ogni giocatore si registra con il proprio nome utente e PIN.':'Non hai un tavolo? Toccando Crea ne apri uno nuovo per il tuo gruppo.'}</div></form></div>`;
 }
+function playerStats(k){
+  const gs=Object.entries(S.games).map(([id,g])=>Object.assign({id},g)).filter(g=>g.status==='closed').sort((a,b)=>String(a.scheduledAt).localeCompare(String(b.scheduledAt)));
+  const rows=[];let name='';
+  gs.forEach(g=>{const p=plist(g).find(x=>x.playerName.trim().toLowerCase()===k);if(!p)return;name=p.playerName;rows.push({gid:g.id,at:g.scheduledAt,net:p.netCents||0,inv:inv(p),buys:p.buyIns.length,n:plist(g).length})});
+  const tot=sum(rows.map(r=>r.net)),wins=rows.filter(r=>r.net>0).length,invT=sum(rows.map(r=>r.inv));
+  let streak=0,sk=rows.length?Math.sign(rows[rows.length-1].net):0;
+  if(sk!==0)for(let i=rows.length-1;i>=0&&Math.sign(rows[i].net)===sk;i--)streak++;
+  const best=rows.reduce((a,r)=>!a||r.net>a.net?r:a,null),worst=rows.reduce((a,r)=>!a||r.net<a.net?r:a,null);
+  return {name,rows,tot,wins,invT,streak,sk,best,worst,avg:rows.length?Math.round(tot/rows.length):0,buys:rows.length?sum(rows.map(r=>r.buys))/rows.length:0};
+}
+function spark(rows){
+  const W=320,H=150,P={l:8,r:8,t:14,b:14};
+  let c=0;const pts=[{v:0,t:'Inizio',n:null}].concat(rows.map(r=>{c+=r.net;return {v:c,t:dShort(r.at),n:r.net}}));
+  const vs=pts.map(p=>p.v),mn=Math.min(0,...vs),mx=Math.max(0,...vs),rng=(mx-mn)||1;
+  const x=i=>P.l+(W-P.l-P.r)*(i/(pts.length-1)),y=v=>P.t+(H-P.t-P.b)*(1-(v-mn)/rng);
+  const data=pts.map((p,i)=>({x:+x(i).toFixed(1),y:+y(p.v).toFixed(1),t:p.t,v:p.v,n:p.n}));
+  const d=data.map((p,i)=>(i?'L':'M')+p.x+' '+p.y).join(' '),last=data[data.length-1],y0=y(0).toFixed(1);
+  return `<div class="mut sm" id="spk-read" style="min-height:22px">Tocca il grafico per vedere ogni serata</div>
+<svg class="spark" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Andamento del bilancio, oggi ${sgn(last.v)}" data-pts="${esc(JSON.stringify(data))}">
+<line x1="0" x2="${W}" y1="${y0}" y2="${y0}" stroke="rgba(255,255,255,.25)" stroke-width="1" stroke-dasharray="3 4"/>
+<path d="${d}" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="${last.x}" cy="${last.y}" r="5" fill="var(--gold)" stroke="#1B1F36" stroke-width="2"/>
+<circle class="spk-dot" r="6" cx="-30" cy="-30" fill="var(--ivory)" stroke="#1B1F36" stroke-width="2"/></svg>`;
+}
+function vPlayer(){
+  const st=playerStats(V.k||'');
+  if(!st.rows.length)return `<div class="wrap">${backBtn('home','Indietro')}<h1>Ancora nessuna statistica</h1><p class="mut">Le statistiche compaiono dopo la prima partita conclusa.</p></div>`;
+  const tile=(k,v,cls,sub)=>`<div class="kpi" style="text-align:left;padding:14px 14px 12px"><div class="k">${k}</div><div class="v num ${cls||''}">${v}</div>${sub?`<div class="mut xs" style="margin-top:2px">${sub}</div>`:''}</div>`;
+  const n=st.rows.length,pct=Math.round(st.wins*100/n);
+  const streakTxt=st.streak?`${st.streak} ${st.sk>0?'in positivo':'in negativo'}`:'—';
+  const roi=st.invT?(st.tot>=0?'+':'−')+Math.abs(Math.round(st.tot*100/st.invT))+'%':'—';
+  return `<div class="wrap">${backBtn('home','Indietro')}
+<div class="row" style="gap:14px;margin-top:4px">${ava(st.name,'l')}<div class="grow"><h1>${esc(st.name)}</h1><div class="mut sm">${n} partit${n===1?'a conclusa':'e concluse'}</div></div></div>
+<div class="hero stack" style="margin-top:16px;gap:10px"><div><div class="mut sm">Bilancio totale</div><div class="bignum num ${st.tot>=0?'green':'red'}">${sgn(st.tot)}</div></div>${spark(st.rows)}</div>
+<div class="kpis" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+${tile('Serate vinte',`${st.wins} su ${n}`,'',pct+'% delle serate')}${tile('Media a serata',sgn(st.avg),st.avg>=0?'green':'red')}
+${tile('Serata migliore',sgn(st.best.net),st.best.net>=0?'green':'red',dShort(st.best.at))}${tile('Serata peggiore',sgn(st.worst.net),st.worst.net<0?'red':'green',dShort(st.worst.at))}
+${tile('Serie attuale',streakTxt,st.sk>0?'green':st.sk<0?'red':'',st.streak>1?'serate di fila':'')}${tile('Ingressi a serata',st.buys.toFixed(1).replace('.',','),'','buy-in e re-buy')}
+${tile('Investito in totale',eur(st.invT))}${tile('Resa',roi,st.tot>=0?'green':'red','netto su investito')}</div>
+<div class="sec">Serata per serata</div><div class="stack" style="margin-top:10px">${st.rows.slice().reverse().map(r=>`<button class="card tap gcard" data-act="detail" data-gid="${r.gid}"><span class="dtile"><b>${dDay(r.at)}</b><span>${dMon(r.at)}</span></span><div class="grow"><div style="font-weight:600">${r.buys} ingress${r.buys===1?'o':'i'} · ${eur(r.inv)}</div><div class="mut sm">${r.n} giocatori al tavolo</div></div><b class="num ${r.net>=0?'green':'red'}" style="font-family:var(--serif);font-size:19px">${sgn(r.net)}</b></button>`).join('')}</div></div>`;
+}
+function payBlock(d){
+  if(!S.me||!(d.remainingAmount>0)||d.toPlayerId==='dealer'||String(d.toPlayerName)==='Dealer')return '';
+  const mine=d.fromPlayerId?d.fromPlayerId===S.me.id:String(d.fromPlayerName).toLowerCase()===S.me.name.toLowerCase();
+  if(!mine)return '';
+  const c=S.players[d.toPlayerId]||Object.values(S.players).find(p=>String(p.name).toLowerCase()===String(d.toPlayerName).toLowerCase());
+  const pay=(c&&c.pay)||{},amt=d.remainingAmount;let h='';
+  if(pay.paypal)h+=`<a class="btn" style="background:#0070E0;color:#fff" href="https://paypal.me/${encodeURIComponent(pay.paypal)}/${(amt/100).toFixed(2)}EUR" target="_blank" rel="noopener">Paga con PayPal · ${eur(amt)}</a>`;
+  if(pay.note)h+=`<div class="box o sm"><div class="mut xs">Altri metodi di ${esc(d.toPlayerName)}</div><div style="white-space:pre-wrap;overflow-wrap:anywhere;margin-top:2px">${esc(pay.note)}</div><button class="btn-s go" style="margin-top:10px;min-height:42px" data-act="copyraw" data-t="${esc(pay.note)}">Copia</button></div>`;
+  if(!h)return `<div class="mut xs">${esc(d.toPlayerName)} non ha ancora indicato come preferisce essere pagato.</div>`;
+  return h+`<div class="mut xs">Dopo il pagamento, ${esc(d.toPlayerName)} lo segna come ricevuto.</div>`;
+}
+const isReg=p=>!!(p&&p.pinHash);
+const defBuy=()=>(S.cfg&&S.cfg.defBuy)||2000;
+const isManager=()=>!!(S.me&&S.cfg&&(S.cfg.managers||[]).includes(S.me.id));
+const hasManagers=()=>!!(S.cfg&&(S.cfg.managers||[]).some(id=>S.players[id]));
+const isHost=gid=>!!(S.me&&S.games[gid]&&S.games[gid].hostId===S.me.id);
+const adminPinOf=gid=>(LS.get('pins',{}))[gid]||(isHost(gid)&&S.games[gid].adminPin)||'';
+async function saveCfg(ch){const c=Object.assign({},S.cfg||{},ch);try{await db.doc('settings/table').set(c);S.cfg=c;render();return true}catch(e){toast(errMsg(e),'err');return false}}
+function vSettings(){
+  const M=isManager(),mgr=(S.cfg&&S.cfg.managers)||[],st=F.set;
+  const players=Object.entries(S.players).filter(([id,p])=>isReg(p)).map(([id,p])=>({id,name:p.name,games:Object.values(S.games).filter(g=>Object.values(g.players||{}).some(x=>x.playerId===id)).length})).sort((a,b)=>a.name.localeCompare(b.name,'it'));
+  const buy=st.buy!=null?st.buy:defBuy(),chips=st.chips!=null?st.chips:String((S.cfg&&S.cfg.defChips)||2000);
+  return `<div class="wrap">${backBtn('home','Indietro')}
+<h1>Impostazioni tavolo</h1><div class="mut sm" style="margin-top:4px">${esc(S.table?S.table.name:'')}</div>
+<div class="stack" style="margin-top:18px;gap:14px">
+${!hasManagers()?`<div class="hero stack" style="gap:12px;padding:20px"><div><b style="font-size:18px">Il tavolo non ha ancora un gestore</b><p class="mut sm" style="margin:6px 0 0">Il gestore può rimuovere giocatori, azzerare i PIN dimenticati e scegliere il buy-in predefinito.</p></div><button class="btn" data-act="claimmgr">Diventa gestore</button></div>`:M?'':`<div class="note" style="margin:0">Solo i gestori del tavolo possono cambiare queste impostazioni.</div>`}
+<div class="card stack" style="gap:12px"><div class="lbl in">Giocatori registrati <span class="mut" style="font-weight:500">· ${players.length}</span></div>
+${players.map(p=>{const isM=mgr.includes(p.id),self=S.me&&p.id===S.me.id;return `<div class="prow"><div class="row" style="gap:12px">${ava(p.name,'s')}<div class="grow"><div style="font-weight:600">${esc(p.name)}${self?' <span class="mut">(tu)</span>':''}</div><div class="mut xs">${p.games} partit${p.games===1?'a':'e'}${isM?' · gestore':''}</div></div>${isM?'<span class="badge paid">Gestore</span>':''}</div>
+${M&&!self?`<div class="pacts"><button class="btn-s" data-act="mgrtoggle" data-id="${p.id}">${isM?'Togli gestore':'Rendi gestore'}</button><button class="btn-s" data-act="resetpin" data-id="${p.id}">${armed['rp'+p.id]?'Confermi?':'Azzera PIN'}</button><button class="btn-s" style="color:#FF6A60" data-act="rmplayer" data-id="${p.id}">${armed['rm'+p.id]?'Tocca di nuovo':'Rimuovi'}</button></div>`:''}</div>`}).join('')}
+<div class="mut xs">Chi viene rimosso può tornare quando vuole: basta registrarsi di nuovo al tavolo. Con "Azzera PIN" il giocatore sceglie un nuovo PIN registrandosi con lo stesso nome e tiene il suo storico.</div></div>
+<div class="card stack" style="gap:12px"><div class="lbl in">Nuova partita: valori predefiniti</div>
+<div class="field"><span>Buy-in</span><div class="chips">${[500,1000,2000,5000].map(c=>`<button class="chip t ${buy===c?'on':''}" data-act="setbuy" data-v="${c}" ${M?'':'disabled'}>${c/100} €</button>`).join('')}</div></div>
+<label class="field"><span>Fiches per buy-in</span><input class="in" id="set-chips" inputmode="numeric" data-bind="set.chips" value="${esc(chips)}" ${M?'':'disabled'}></label>
+${M?`<button class="btn" data-act="setsave">Salva</button>`:''}</div>
+<div class="card stack" style="gap:10px"><div class="lbl in">Dati del tavolo</div><p class="mut sm" style="margin:0">Scarica tutte le partite in Excel o come backup.</p><button class="btn ghost" data-act="export">${ico('share',18)} Esporta i dati</button></div>
+</div></div>`;
+}
 function rankRow(r,i,bal){
   const k=r.name.trim().toLowerCase(),b=bal[k]||{give:[],get:[]};
-  const give=sum(b.give.map(x=>x.amt)),get=sum(b.get.map(x=>x.amt)),has=give+get>0,open=has&&!!F.open['rk:'+k];
+  const give=sum(b.give.map(x=>x.amt)),get=sum(b.get.map(x=>x.amt)),has=give+get>0,open=!!F.open['rk:'+k];
   const items=(list,cls,amtCls)=>list.slice().sort((x,y)=>String(y.at).localeCompare(String(x.at))).map(x=>`<button class="tr ${cls}" data-act="detail" data-gid="${x.gid}"><div class="row sp"><span><b>${esc(x.who)}</b><span class="mut xs"> · partita del ${dShort(x.at)}</span></span><b class="num ${amtCls}">${eur(x.amt)}</b></div></button>`).join('');
   return `<div class="card">
-<div class="row" ${has?`data-act="rk" data-k="${esc(k)}" style="cursor:pointer"`:''}><span class="medal ${i<3?'m'+(i+1):''}">${i+1}</span>${ava(r.name)}<div class="grow"><div style="font-weight:700;font-size:17px">${esc(r.name)}</div><div class="mut xs">${r.n} partit${r.n===1?'a':'e'} · ${r.w} vint${r.w===1?'a':'e'}</div></div><b class="num ${r.tot>=0?'green':'red'}" style="font-family:var(--serif);font-weight:800;font-size:21px;letter-spacing:-.02em">${sgn(r.tot)}</b>${has?`<span class="mut">${ico(open?'chevu':'chev',18)}</span>`:''}</div>
+<div class="row" data-act="rk" data-k="${esc(k)}" style="cursor:pointer"><span class="medal ${i<3?'m'+(i+1):''}">${i+1}</span>${ava(r.name)}<div class="grow"><div style="font-weight:700;font-size:17px">${esc(r.name)}</div><div class="mut xs">${r.n} partit${r.n===1?'a':'e'} · ${r.w} vint${r.w===1?'a':'e'}</div></div><b class="num ${r.tot>=0?'green':'red'}" style="font-family:var(--serif);font-weight:800;font-size:21px;letter-spacing:-.02em">${sgn(r.tot)}</b><span class="mut">${ico(open?'chevu':'chev',18)}</span></div>
 <div class="chips" style="gap:6px;margin-top:12px">${get>0?`<span class="badge paid num">A credito ${eur(get)}</span>`:''}${give>0?`<span class="badge pend num">A debito ${eur(give)}</span>`:''}${has?'':'<span class="badge grey">Nessun saldo aperto</span>'}</div>
-${open?`<div class="stack" style="gap:8px;margin-top:14px">${b.get.length?`<div class="mut sm" style="font-weight:600">Da chi riscuotere</div>${items(b.get,'paid','green')}`:''}${b.give.length?`<div class="mut sm" style="font-weight:600;margin-top:${b.get.length?'8px':'0'}">A chi dare</div>${items(b.give,'pend','red')}`:''}</div>`:''}</div>`;
+${open?`<div class="stack" style="gap:8px;margin-top:14px"><button class="btn-s go" data-act="pstats" data-k="${esc(k)}">${ico('bars',18)} Statistiche di ${esc(r.name)}</button>${b.get.length?`<div class="mut sm" style="font-weight:600;margin-top:6px">Da chi riscuotere</div>${items(b.get,'paid','green')}`:''}${b.give.length?`<div class="mut sm" style="font-weight:600;margin-top:8px">A chi dare</div>${items(b.give,'pend','red')}`:''}</div>`:''}</div>`;
 }
 function homeData(){
   const gs=Object.entries(S.games).map(([id,g])=>Object.assign({id},g)).sort((a,b)=>String(b.scheduledAt).localeCompare(String(a.scheduledAt)));
@@ -562,7 +739,7 @@ function tabSerata(D){
     h+=`<section class="hero stack" style="gap:18px"><div class="row sp"><span class="badge live"><i class="dot"></i>In corso</span><span class="xs mut">${dLong(live.scheduledAt)}</span></div>
 <div><div class="mut sm">Montepremi</div><div class="bignum">${eur(netPot(live))}</div></div>
 <div class="row sp">${stackAva(L.map(p=>p.playerName))}<span class="mut sm">${L.length} al tavolo</span></div>
-${isAdmin(live.id)?`<div class="row sp" style="background:rgba(255,255,255,.06);border-radius:16px;padding:10px 14px"><span class="mut sm">PIN Admin</span><b class="num" style="letter-spacing:.18em;font-size:22px;font-family:var(--serif)">${esc((LS.get('pins',{}))[live.id]||'----')}</b></div>`:''}
+${isAdmin(live.id)?`<div class="row sp" style="background:rgba(255,255,255,.06);border-radius:16px;padding:10px 14px"><span class="mut sm">PIN Admin</span><b class="num" style="letter-spacing:.18em;font-size:22px;font-family:var(--serif)">${esc(adminPinOf(live.id)||'----')}</b></div>`:''}
 <div class="stack"><button class="btn" data-act="live" data-gid="${live.id}">Riprendi partita in corso</button><button class="btn ghost" data-act="newgame">${ico('plus',18)} Nuova Partita</button></div></section>`;
   }else{
     h+=`<section class="hero stack" style="gap:16px"><div><h2 style="font-size:30px;line-height:1.1">Pronti a giocare?</h2><p class="mut" style="margin:10px 0 0">Apri un tavolo, scegli i giocatori registrati e tieni la cassa sempre sotto controllo.</p></div><button class="btn" data-act="newgame">${ico('plus',18)} Nuova Partita</button></section>`;
@@ -575,13 +752,14 @@ ${isAdmin(live.id)?`<div class="row sp" style="background:rgba(255,255,255,.06);
 }
 function tabStorico(D){
   const {gs}=D;
+  const ex=gs.length?`<button class="btn-s" data-act="export" style="align-self:flex-start">${ico('share',18)} Esporta in Excel o backup</button>`:'';
   if(!gs.length)return `<div class="card"><b>Ancora nessuna partita</b><p class="mut sm" style="margin:6px 0 0">Quando ne chiudi una, la trovi qui con tutti i saldi.</p></div>`;
-  return gs.map(g=>{const n=plist(g).length,lv=g.status==='live';return `<button class="card tap gcard" data-act="${lv?'live':'detail'}" data-gid="${g.id}"><span class="dtile ${lv?'live':''}"><b>${dDay(g.scheduledAt)}</b><span>${dMon(g.scheduledAt)}</span></span><div class="grow"><div class="num" style="font-weight:700;font-size:17px">${eur(netPot(g))} di montepremi</div><div class="mut sm">${n} giocator${n===1?'e':'i'} · ${esc(g.hostName)}</div></div>${lv?'<span class="badge live"><i class="dot"></i>In corso</span>':`<span class="badge grey">Conclusa</span>`}</button>`}).join('');
+  return ex+gs.map(g=>{const n=plist(g).length,lv=g.status==='live';return `<button class="card tap gcard" data-act="${lv?'live':'detail'}" data-gid="${g.id}"><span class="dtile ${lv?'live':''}"><b>${dDay(g.scheduledAt)}</b><span>${dMon(g.scheduledAt)}</span></span><div class="grow"><div class="num" style="font-weight:700;font-size:17px">${eur(netPot(g))} di montepremi</div><div class="mut sm">${n} giocator${n===1?'e':'i'} · ${esc(g.hostName)}</div></div>${lv?'<span class="badge live"><i class="dot"></i>In corso</span>':`<span class="badge grey">Conclusa</span>`}</button>`}).join('');
 }
 function tabClassifica(D){
   const {rank,bal}=D;
   if(!rank.length)return `<div class="card"><b>La classifica parte dalla prima partita</b><p class="mut sm" style="margin:6px 0 0">Dopo la chiusura vedrai chi è in vantaggio e chi deve ancora saldare.</p></div>`;
-  return `<div class="mut sm" style="margin:0 4px">Tocca un giocatore per vedere da chi riscuotere e a chi dare.</div>`+rank.map((r,i)=>rankRow(r,i,bal)).join('');
+  return `<div class="mut sm" style="margin:0 4px">Tocca un giocatore per le sue statistiche e per vedere da chi riscuotere e a chi dare.</div>`+rank.map((r,i)=>rankRow(r,i,bal)).join('');
 }
 function vHome(){
   const D=homeData(),t=TAB();
@@ -610,7 +788,7 @@ const rubrica=()=>Object.entries(S.players).map(([id,p])=>({id,name:p.name,reg:!
 
 /* --- Nuova partita --- */
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
-function resetNew(){F.ng={host:(S.me&&S.me.name)||LS.get('name','')||'',date:todayStr(),time:'21:00',loc:'',seats:'',buy:2000,custom:false,cv:'',chips:'2000',sel:S.me?{[S.me.id]:true}:{},names:'',pstatus:'PENDING'}}
+function resetNew(){F.ng={host:(S.me&&S.me.name)||LS.get('name','')||'',date:todayStr(),time:'21:00',loc:'',seats:'',buy:defBuy(),custom:![500,1000,2000,5000].includes(defBuy()),cv:[500,1000,2000,5000].includes(defBuy())?'':(defBuy()/100).toFixed(2).replace('.',','),chips:String((S.cfg&&S.cfg.defChips)||2000),sel:S.me?{[S.me.id]:true}:{},names:'',pstatus:'PENDING'}}
 function ngVals(){
   const n=F.ng;const buy=n.custom?parseEur(n.cv):n.buy;const chips=parseCh(n.chips);
   const seats=n.seats.trim()===''?null:parseCh(n.seats);
@@ -649,7 +827,7 @@ async function createGame(){
   let rs;try{rs=await ensurePlayers(ts)}catch(e){toast(errMsg(e),'err');return}
   const now=new Date().toISOString(),players={};
   rs.forEach((r,i)=>{players[r.id]={playerId:r.id,playerName:r.name,seq:i+1,buyIns:[{buyInId:nid('b'),amountCents:v.buy,paymentStatus:n.pstatus,timestamp:now}],cashOuts:[],cashOutCents:null,netCents:null}});
-  const doc={scheduledAt:new Date(n.date+'T'+n.time).toISOString(),hostName:n.host.trim(),location:n.loc.trim(),maxSeats:v.seats,dealerChips:0,buyInCents:v.buy,chipsPerBuyIn:v.chips,status:'live',pinHash:await sha(gid+':'+pin),holeCents:null,holeMode:'',createdAt:now,players,debts:[],seq:rs.length};
+  const doc={scheduledAt:new Date(n.date+'T'+n.time).toISOString(),hostName:n.host.trim(),location:n.loc.trim(),maxSeats:v.seats,dealerChips:0,buyInCents:v.buy,chipsPerBuyIn:v.chips,status:'live',pinHash:await sha(gid+':'+pin),hostId:S.me?S.me.id:null,adminPin:pin,holeCents:null,holeMode:'',createdAt:now,players,debts:[],seq:rs.length};
   try{await db.doc('games/'+gid).set(doc)}catch(e){toast(errMsg(e),'err');return}
   S.games[gid]=doc;
   const pins=LS.get('pins',{});pins[gid]=pin;LS.set('pins',pins);S.admin[gid]=true;
@@ -706,7 +884,7 @@ function vLive(){
   if(g.status==='closed')return `<div class="wrap">${topbar()}<h1 style="margin-top:20px">Partita già conclusa</h1><p class="mut">Questa serata è chiusa: trovi tutti i dati nel resoconto.</p><button class="btn" data-act="detail" data-gid="${gid}">Vai al resoconto</button></div>`;
   const A=isAdmin(gid),L=plist(g),total=grossOf(g),paid=sum(L.map(p=>sum(p.buyIns.filter(b=>b.paymentStatus==='PAID').map(b=>b.amountCents)))),pend=sum(L.map(pendOf)),safe=sum(L.map(safeOf));
   const inPlay=Math.max(0,toChips(total-safe,g));
-  const pin=(LS.get('pins',{}))[gid];
+  const pin=adminPinOf(gid);
   const R=resSorted();
   return `<div class="wrap">${backBtn('home','Home')}
 <div class="row sp" style="align-items:flex-start"><div class="grow"><h1>Cassa live</h1><div class="mut sm" style="margin-top:2px">${dLong(g.scheduledAt)}</div></div><span class="badge ${A?'paid':'grey'}" style="margin-top:6px">${A?'Admin':'Sola lettura'}</span></div>
@@ -728,7 +906,7 @@ ${F.resOpen?`<div class="stack" style="gap:0">${resList(g,A)}</div>`:''}</div>
 </div>
 <div class="sec">Al tavolo <small>${L.length}</small></div>
 <div class="stack">${L.length?L.map(p=>livePlayer(g,p,A)).join(''):'<div class="card mut sm">Nessun giocatore al tavolo. Aggiungi i giocatori e registra il loro buy-in.</div>'}
-${A?`<button class="btn dash" data-act="addpl">${ico('plus',18)} Aggiungi giocatori</button>`:''}</div></div>
+${A?`<button class="btn dash" data-act="addpl">${ico('plus',18)} Aggiungi giocatori</button>`:''}</div>${histBlock(g,'live')}</div>
 <div class="bar"><div class="bar-in">${A?`<button class="btn" data-act="startclose" ${closable(g)&&canWrite?'':'disabled'}>Chiudi partita · Conta le fiches</button>
 ${closable(g)?'':'<div class="mut xs" style="padding-top:6px">Servono almeno 2 giocatori per chiudere la partita.</div>'}
 <button class="link" data-act="delgame" style="min-height:44px">${armed.delgame?'Confermi? Tocca di nuovo':'Elimina partita'}</button>`:'<div class="mut sm" style="text-align:center;padding:6px 0">Sola lettura: inserisci il PIN Admin per chiudere o modificare questa partita.</div>'}</div></div>`;
@@ -824,37 +1002,52 @@ function jsonFor(gid){
   buyIns:plist(g).flatMap(p=>p.buyIns.map(b=>({buyInId:b.buyInId,playerId:p.playerId,amount:E(b.amountCents),paymentStatus:b.paymentStatus,timestamp:b.timestamp}))),
   debts:(g.debts||[]).map(d=>({debtId:d.debtId,fromPlayerName:d.fromPlayerName,toPlayerName:d.toPlayerName,totalAmount:E(d.totalAmount),paidAmount:E(d.paidAmount),remainingAmount:E(d.remainingAmount),transactions:d.transactions.map(t=>({subId:t.subId,amount:E(t.amount),status:t.status,lastUpdated:t.lastUpdated}))}))};
 }
+const isDealerD=d=>d.toPlayerId==='dealer'||String(d.toPlayerName)==='Dealer';
+const avaN=(n,s)=>n==='Dealer'?`<span class="ava ${s||''}" style="--h:45"><i>🃏</i></span>`:ava(n,s);
+const meIsFrom=d=>!!S.me&&(d.fromPlayerId?d.fromPlayerId===S.me.id:String(d.fromPlayerName).toLowerCase()===S.me.name.toLowerCase());
+function debtRow(gid,d){
+  const perm=debtPerm(gid,d),done=d.remainingAmount===0,part=d.paidAmount>0&&!done,mine=meIsFrom(d),toMe=isCreditor(d);
+  const st=done?'<span class="badge paid">Pagato</span>':part?`<span class="badge pend num">Restano ${eur(d.remainingAmount)}</span>`:'<span class="badge pend">Da pagare</span>';
+  return `<div class="debt ${done?'done':''} ${mine||toMe?'me':''}">
+<div class="row" style="gap:10px"><div class="pair">${avaN(d.fromPlayerName,'s')}<span class="arr">${ico('chevr',16)}</span>${avaN(d.toPlayerName,'s')}</div>
+<div class="grow"><div class="dl"><b>${mine?'Tu':esc(d.fromPlayerName)}</b> <span class="mut">${mine?'dai a':'dà a'}</span> <b>${toMe?'te':esc(d.toPlayerName)}</b></div><div style="margin-top:4px">${st}</div></div>
+<b class="num amt ${done?'green':''}">${eur(d.totalAmount)}</b></div>
+${part?`<div class="meter" style="margin-top:12px"><i class="m-g" style="flex:${d.paidAmount} 1 0"></i><i class="m-r" style="flex:${d.remainingAmount} 1 0"></i></div><div class="mut xs num" style="margin-top:6px">Ricevuti ${eur(d.paidAmount)} su ${eur(d.totalAmount)}</div>`:''}
+${perm.can?(done?`<button class="link" style="min-height:40px;margin-top:4px" data-act="settle" data-did="${d.debtId}">Modifica</button>`:`<button class="btn green" style="margin-top:12px;min-height:50px" data-act="settle" data-did="${d.debtId}">${ico('check',18)} Segna come ricevuto</button>`):''}
+${mine&&!done?`<div class="stack" style="margin-top:12px;gap:8px">${payBlock(d)}</div>`:''}
+${!perm.can&&!done&&!mine?`<div class="mut xs" style="margin-top:8px">Lo segna come ricevuto ${isDealerD(d)?'chi ha avviato la partita':esc(d.toPlayerName)}.</div>`:''}</div>`;
+}
 function vDetail(){
   const gid=V.gid,g=S.games[gid];if(!g)return notFound();
   const A=isAdmin(gid),L=plist(g).slice().sort((a,b)=>(b.netCents||0)-(a.netCents||0)),closed=g.status==='closed';
-  const hole=g.holeCents||0;
-  const cassa=!closed?'—':hole===0?'Perfetta ✅':hole>0?`Ammanco ${eur(hole)}`:`Avanzo ${eur(-hole)}`;
-  const tile=(k,v,cls)=>`<div class="kpi" style="padding:12px 8px"><div class="k">${k}</div><div class="v num ${cls||''}">${v}</div></div>`;
+  const hole=g.holeCents||0,D=g.debts||[];
+  const cassa=!closed?'—':hole===0?'Perfetta':hole>0?`Ammanco ${eur(hole)}`:`Avanzo ${eur(-hole)}`;
+  const me=S.me&&L.find(p=>p.playerId===S.me.id||p.playerName.toLowerCase()===S.me.name.toLowerCase());
+  const nDone=D.filter(d=>d.remainingAmount===0).length,totD=sum(D.map(d=>d.totalAmount)),paidD=sum(D.map(d=>d.paidAmount));
+  const resRow=(p,i)=>{const open=!!F.open['res:'+gid+p.playerId],net=p.netCents||0;return `<div class="rrow"><button class="row" style="width:100%;text-align:left;gap:12px;min-height:56px" data-act="resopen" data-k="${gid+p.playerId}">${closed?`<span class="mut num" style="width:16px;text-align:center;font-weight:700">${i+1}</span>`:''}${ava(p.playerName,'s')}<div class="grow"><div style="font-weight:600">${esc(p.playerName)}</div><div class="mut xs num">${eur(inv(p))} investiti${closed?` · ${eur(p.cashOutCents||0)} incassati`:''}</div></div>${closed?`<b class="num ${net>0?'green':net<0?'red':'mut'}" style="font-family:var(--serif);font-size:19px">${sgn(net)}</b>`:''}<span class="mut">${ico(open?'chevu':'chev',16)}</span></button>
+${open?`<div class="chips" style="gap:6px;padding:0 0 12px 28px">${p.buyIns.map((b,k)=>`<span class="badge ${b.paymentStatus==='PAID'?'paid':'pend'} num">${k?'Re-buy':'Buy-in'} ${eur(b.amountCents)} · ${b.paymentStatus==='PAID'?'pagato':'da pagare'}</span>`).join('')}${(p.cashOuts||[]).map(c=>`<span class="badge grey num">Cash out ${eur(c.amountCents)}</span>`).join('')}</div>`:''}</div>`};
   return `<div class="wrap">${backBtn('home','Home')}
-<div class="row sp" style="align-items:flex-start"><div class="grow"><h1>Partita del ${dShort(g.scheduledAt)}</h1><div class="mut sm" style="margin-top:4px">${dLong(g.scheduledAt)} · avviata da ${esc(g.hostName)}</div></div><span style="margin-top:6px">${closed?'<span class="badge grey">Conclusa</span>':'<span class="badge live"><i class="dot"></i>In corso</span>'}</span></div>
-${closed?'':`<button class="btn" style="margin-top:14px" data-act="live" data-gid="${gid}">▶ Torna alla cassa live</button>`}
-<div class="kpis two-c" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-top:16px">${tile('Giocatori',L.length)}${tile('Montepremi',eur(netPot(g)),'gold')}${tile('Buy-in',eur(grossOf(g)))}${(g.dealerChips||0)>0?tile('Mance dealer',eur(g.dealerChips)):''}${tile('Cassa',cassa,hole===0?'green':'gold')}</div>
-<div class="lbl">Risultati</div>
-<div class="stack">${L.map(p=>`<div class="card"><div class="row" style="align-items:flex-start">${ava(p.playerName)}<div class="grow"><div class="pl-name">${esc(p.playerName)}</div>
-<div class="mut sm num">${p.buyIns.length} ingress${p.buyIns.length===1?'o':'i'} · ${eur(inv(p))} investiti${closed?` · incassate ${eur(p.cashOutCents||0)}`:''}</div>
-${safeOf(p)>0?`<div class="gold sm num">💰 ${eur(safeOf(p))} messi al sicuro durante la partita</div>`:''}</div>
-${closed?`<b class="num ${(p.netCents||0)>=0?'green':'red'}" style="font-family:var(--serif);font-size:21px">${sgn(p.netCents||0)}</b>`:''}</div>
-<div class="chips" style="margin-top:10px;gap:6px">${p.buyIns.map(b=>`<span class="badge ${b.paymentStatus==='PAID'?'paid':'pend'} num">${b.paymentStatus==='PAID'?'Pagato':'Da pagare'} ${eur(b.amountCents)} · Ore ${tHM(b.timestamp)}</span>`).join('')}</div>
-${pendOf(p)>0?`<div class="red sm num" style="margin-top:8px">⏳ deve ancora saldare ${eur(pendOf(p))} di buy-in</div>`:''}</div>`).join('')}</div>
-${closed?`<div class="lbl">Saldi da fare</div><div class="stack">
-${!A&&(g.debts||[]).some(d=>!debtPerm(gid,d).needPin)?pinBox(gid,'I saldi verso il Dealer li registra chi ha avviato la partita: serve il suo PIN Admin a 4 cifre.'):''}
-${(g.debts&&g.debts.length)?g.debts.map(d=>debtCard(d,debtPerm(gid,d))).join(''):'<div class="card mut sm">Nessuna transazione necessaria ✅</div>'}</div>
-<div class="lbl">Condividi</div><div class="stack">
-<a class="btn wa" href="${waHref(waText(gid))}" target="_blank" rel="noopener">Condividi su WhatsApp</a>
-<div class="two"><button class="btn ghost" data-act="copyjson" data-gid="${gid}">Copia dati JSON</button><button class="btn ghost" data-act="copytxt" data-gid="${gid}">Copia resoconto</button></div>
-<div class="card"><pre class="preview">${esc(waText(gid))}</pre></div></div>`:''}
+<div class="row sp" style="align-items:flex-start"><div class="grow"><h1>Serata del ${dShort(g.scheduledAt)}</h1><div class="mut sm" style="margin-top:4px">${dLong(g.scheduledAt)} · avviata da ${esc(g.hostName)}</div></div><span style="margin-top:6px">${closed?'<span class="badge grey">Conclusa</span>':'<span class="badge live"><i class="dot"></i>In corso</span>'}</span></div>
+${closed?'':`<button class="btn" style="margin-top:14px" data-act="live" data-gid="${gid}">Torna alla cassa live</button>`}
+${closed&&me?`<div class="hero" style="margin-top:16px;padding:20px"><div class="mut sm">Il tuo risultato</div><div class="bignum num ${(me.netCents||0)>0?'green':(me.netCents||0)<0?'red':''}" style="font-size:46px">${sgn(me.netCents||0)}</div><div class="mut sm num" style="margin-top:6px">${eur(inv(me))} investiti · ${eur(me.cashOutCents||0)} incassati</div></div>`:''}
+${closed?`<div class="sec">Saldo finale ${D.length?`<small>${nDone} di ${D.length} pagat${D.length===1?'o':'i'}</small>`:''}</div>
+${D.length?`<div class="card stack" style="gap:0;padding:8px 16px 14px">${D.length>1?`<div style="padding:8px 0 4px"><div class="meter"><i class="m-g" style="flex:${paidD} 1 0"></i><i style="flex:${totD-paidD} 1 0"></i></div></div>`:''}
+${!A&&D.some(d=>isDealerD(d)&&d.remainingAmount>0)?`<div style="padding-top:8px">${pinBox(gid,'Le mance al Dealer le segna chi ha avviato la partita, con il PIN Admin.')}</div>`:''}
+${D.slice().sort((a,b)=>(a.remainingAmount===0)-(b.remainingAmount===0)||(meIsFrom(b)||isCreditor(b))-(meIsFrom(a)||isCreditor(a))).map(d=>debtRow(gid,d)).join('')}</div>`:`<div class="card row" style="gap:12px"><span class="suit" style="background:var(--green-bg);color:#5BE07D">${ico('check',22)}</span><div><b>Tutti pari</b><div class="mut sm">Nessuno deve niente a nessuno.</div></div></div>`}`:''}
+<div class="sec">Risultati</div>
+<div class="card" style="padding:4px 16px">${L.map(resRow).join('')}</div>
+<div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="kpi"><div class="k">Montepremi</div><div class="v num">${eur(netPot(g))}</div></div><div class="kpi"><div class="k">Giocatori</div><div class="v num">${L.length}</div></div><div class="kpi"><div class="k">Cassa</div><div class="v ${hole===0?'green':'gold'}" style="font-size:16px">${cassa}</div></div></div>
+${(g.dealerChips||0)>0?`<div class="mut sm num" style="margin:8px 4px 0">Mance dealer: ${eur(g.dealerChips)}, già tolte dal montepremi.</div>`:''}
+${closed?`${histBlock(g,'detail')}<div class="sec">Condividi</div><div class="stack" style="margin-top:10px">
+<a class="btn wa" href="${waHref(waText(gid))}" target="_blank" rel="noopener">Manda il resoconto su WhatsApp</a>
+<button class="btn ghost" data-act="copytxt" data-gid="${gid}">Copia il resoconto</button></div>`:''}
 ${A?`<div style="text-align:center;margin-top:18px"><button class="link" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Elimina partita'}</button></div>`:''}</div>`;
 }
 function debtCard(d,perm){
   const A=perm.can;const done=d.remainingAmount===0;
   return `<div class="card stack" style="gap:10px"><div class="row sp" style="align-items:flex-start"><div class="grow num" style="font-size:16px"><b>${esc(d.fromPlayerName)}</b> dà <b class="gold">${eur(d.totalAmount)}</b> a <b>${esc(d.toPlayerName)}</b></div>${done?'<span class="badge paid">Pagato</span>':'<span class="badge pend">Da pagare</span>'}</div>
 ${d.paidAmount>0?`<div class="meter"><i class="m-g" style="flex:${d.paidAmount} 1 0"></i><i class="m-r" style="flex:${d.remainingAmount} 1 0"></i></div><div class="sm num">Pagati <b class="green">${eur(d.paidAmount)}</b> · restano <b class="red">${eur(d.remainingAmount)}</b></div>`:''}
-${d.transactions.map(t=>{const inner=`<div class="row sp"><b class="num">${eur(t.amount)}</b>${stBadge(t.status)}</div><div class="mut xs num">Ultima modifica: ${dShort(t.lastUpdated)} alle ${tHM(t.lastUpdated)}</div>`;const cls='tr '+(t.status==='PAID'?'paid':'pend');return A?`<button class="${cls}" data-act="subtap" data-did="${d.debtId}" data-sid="${t.subId}">${inner}</button>`:`<div class="${cls}">${inner}</div>`}).join('')}${!A&&!done?`<div class="mut xs">🔒 Solo ${esc(perm.who)} può registrare i pagamenti${perm.needPin?' con il suo PIN':''}.</div>`:''}</div>`;
+${d.transactions.map(t=>{const inner=`<div class="row sp"><b class="num">${eur(t.amount)}</b>${stBadge(t.status)}</div><div class="mut xs num">Ultima modifica: ${dShort(t.lastUpdated)} alle ${tHM(t.lastUpdated)}</div>`;const cls='tr '+(t.status==='PAID'?'paid':'pend');return A?`<button class="${cls}" data-act="subtap" data-did="${d.debtId}" data-sid="${t.subId}">${inner}</button>`:`<div class="${cls}">${inner}</div>`}).join('')}${payBlock(d)}${!A&&!done?`<div class="mut xs">🔒 Solo ${esc(perm.who)} può registrare i pagamenti${perm.needPin?' con il suo PIN':''}.</div>`:''}</div>`;
 }
 async function deleteGame(gid){
   try{
@@ -912,12 +1105,50 @@ ${buyForm(g,nre===ts.length?'Registra re-buy':'Siedi al tavolo',ts.length)}`:''}
     const bm=bioMine();
     body=`<div class="row" style="gap:14px">${ava(S.me.name,'l')}<div class="grow"><div class="pl-name">${esc(S.me.name)}</div><div class="mut sm">Tavolo: ${esc(S.table?S.table.name:'')}</div></div></div>
 ${S.bioOk?(bm?'<button class="btn ghost" data-act="biooff">Disattiva Face ID su questo telefono</button>':'<button class="btn" data-act="bioask">Attiva Face ID</button>'):''}
-<button class="btn ghost" data-act="chpin">Cambia PIN</button><button class="btn ghost" data-act="leave">Cambia tavolo</button><button class="btn redb" data-act="logout">Esci</button>`;
+<button class="btn ghost" data-act="pstats" data-k="${esc(S.me.name.trim().toLowerCase())}">${ico('bars',18)} Le mie statistiche</button>
+<button class="btn ghost" data-act="paym">${ico('coins',18)} Come vuoi essere pagato</button>
+<button class="btn ghost" data-act="export">${ico('share',18)} Esporta i dati</button>
+<button class="btn ghost" data-act="settings">Impostazioni tavolo</button><button class="btn ghost" data-act="chpin">Cambia PIN</button><button class="btn ghost" data-act="leave">Cambia tavolo</button><button class="btn redb" data-act="logout">Esci</button><button class="link" style="align-self:center;color:#FF6A60" data-act="delme">Elimina il mio profilo</button>`;
+  }else if(s.type==='paym'&&S.me){
+    title='Come vuoi essere pagato';
+    body=`<p class="mut sm" style="margin:0">Chi ti deve dei soldi vedrà questi dati nella scheda del debito, con il pulsante per pagarti.</p>
+<label class="field"><span>Nome utente PayPal.me</span><input class="in" id="pm-pp" data-bind="pm.paypal" value="${esc(F.pm.paypal)}" placeholder="es. mariorossi" autocapitalize="off" autocomplete="off" spellcheck="false"><span class="xs">È la parte dopo paypal.me/ nel tuo link PayPal.</span></label>
+<label class="field"><span>Altri metodi (opzionale)</span><textarea class="in" id="pm-note" data-bind="pm.note" maxlength="300" placeholder="Satispay: 333 1234567&#10;IBAN: IT00 …">${esc(F.pm.note)}</textarea></label>
+<button class="btn" data-act="paymok">Salva</button>`;
+  }else if(s.type==='export'){
+    title='Esporta i dati';
+    body=`<p class="mut sm" style="margin:0">Scarica tutte le partite del tavolo ${esc(S.table?S.table.name:'')}.</p>
+<button class="btn" data-act="xlsx">Scarica file Excel</button><div class="mut xs" style="margin-top:-6px">Un foglio ciascuno per partite, risultati, movimenti, saldi e classifica.</div>
+<button class="btn ghost" data-act="backup">Scarica backup completo (JSON)</button><div class="mut xs" style="margin-top:-6px">Copia di sicurezza di tutti i dati, senza PIN.</div>`;
   }else if(s.type==='bio'&&S.me){
     title='Attiva Face ID';
     body=`<p class="mut sm" style="margin:0">Dopo l'attivazione entri e confermi i pagamenti con il volto o l'impronta, senza scrivere il PIN. Per sicurezza conferma ora il tuo PIN.</p>
 <label class="field"><span>Il tuo PIN</span><input class="in" id="bio-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="bpin" value="${esc(F.bpin||'')}" autocomplete="current-password"></label>
 <button class="btn" data-act="bioon" ${PIN_RE.test(F.bpin||'')?'':'disabled'}>Attiva Face ID</button>`;
+  }else if(s.type==='delme'&&S.me){
+    const open=myOpenStuff();
+    title='Elimina il mio profilo';
+    body=open?`<div class="box r sm">${esc(open)}</div><p class="mut sm" style="margin:0">Quando non avrai più saldi aperti potrai eliminare il profilo.</p><button class="btn ghost" data-act="sheetclose">Ho capito</button>`:`<p class="mut sm" style="margin:0">Il profilo <b>${esc(S.me.name)}</b> verrà cancellato: non potrai più accedere con questo nome e PIN. Le partite già giocate restano nello storico del tavolo con il tuo nome.</p>
+<label class="field"><span>Conferma con il tuo PIN</span><input class="in" id="del-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="dpin" value="${esc(F.dpin||'')}" autocomplete="off"></label>
+<button class="btn redb" data-act="delmeok" ${PIN_RE.test(F.dpin||'')?'':'disabled'}>Elimina definitivamente</button>`;
+  }else if(s.type==='undo'&&g){
+    const e=(g.hist||[]).find(x=>x.id===s.hid),d=e&&(e.ch.find(c=>c.k[0]==='d')||{}).a;
+    if(!e||!d)return '';
+    const perm=debtPerm(V.gid,d);
+    title='Annulla modifica';
+    body=`<div><b>${esc(e.msg)}</b><div class="mut sm">${esc(hWhoAll(e))} · ${dShort(e.at)} alle ${tHM(e.at)}</div></div>
+${pinField(perm)}
+<button class="btn redb" data-act="undook" ${pinReady(perm)?'':'disabled'}>Annulla questa modifica</button>`;
+  }else if(s.type==='settle'&&g){
+    const d=(g.debts||[]).find(x=>x.debtId===s.did);if(!d)return '';
+    const perm=debtPerm(V.gid,d),pr=pinReady(perm),rem=d.remainingAmount,pv=parseEur(F.pay.v);
+    title='Saldo';
+    body=`<div class="row" style="gap:12px"><div class="pair">${avaN(d.fromPlayerName)}<span class="arr">${ico('chevr',18)}</span>${avaN(d.toPlayerName)}</div><div class="grow"><b>${esc(d.fromPlayerName)}</b> <span class="mut">dà a</span> <b>${esc(d.toPlayerName)}</b><div class="mut sm num">${rem?`Restano ${eur(rem)} su ${eur(d.totalAmount)}`:`Pagato tutto: ${eur(d.totalAmount)}`}</div></div></div>
+${pinField(perm)}
+${rem?`<button class="btn green" data-act="sfull" ${pr?'':'disabled'}>${ico('check',18)} Ricevuti ${eur(rem)}</button>
+${F.pay.partial?`<label class="field"><span>Quanto hai ricevuto?</span><input class="in big-n" id="pay-v" inputmode="decimal" data-bind="pay.v" value="${esc(F.pay.v)}" placeholder="Es. 10,00"></label>
+<button class="btn" data-act="spartok" ${pv>0&&pv<rem&&pr?'':'disabled'}>${pv>0&&pv<rem?`Registra ${eur(pv)} · restano ${eur(rem-pv)}`:'Registra acconto'}</button>`:`<button class="btn ghost" data-act="paypart">Ho ricevuto solo una parte</button>`}`:''}
+${d.paidAmount>0?`<button class="btn redb" data-act="sundo" ${pr?'':'disabled'}>Rimetti ${rem?'tutto ':''}da pagare</button>`:''}`;
   }else if(s.type==='rebuy'&&g&&g.players[s.pid]){
     title='Re-buy · '+g.players[s.pid].playerName;
     body=`<p class="mut sm" style="margin:0">Registra importo e stato del pagamento.</p>${buyForm(g,'Registra re-buy',1)}`;
@@ -977,8 +1208,8 @@ async function addBuyIn(pid,name){
   const gid=V.gid,b=F.bi,amt=b.custom?parseEur(b.cv):b.amt;
   if(!(amt>0))return;
   const bi={buyInId:nid('b'),amountCents:amt,paymentStatus:b.status,timestamp:new Date().toISOString()};
-  const ok=await saveGame(gid,gg=>{if(!gg.players[pid])return false;gg.players[pid].buyIns.push(bi)});
-  if(ok){SH=null;render();toast('Re-buy registrato','ok')}
+  const ok=await saveGame(gid,gg=>{if(!gg.players[pid])return false;gg.players[pid].buyIns.push(bi)},'Re-buy registrato');
+  if(ok){SH=null;render()}
 }
 async function seatMany(){
   const g=S.games[V.gid],ts=targetsFrom(F.ap.sel,F.ap.names);if(!ts.length)return;
@@ -993,8 +1224,8 @@ async function seatMany(){
       if(ex){ex.buyIns.push(bi);rebuys++}
       else{gg.seq=(gg.seq||0)+1;gg.players[r.id]={playerId:r.id,playerName:r.name,seq:gg.seq,buyIns:[bi],cashOuts:[],cashOutCents:null,netCents:null}}
     });
-  });
-  if(ok){SH=null;F.ap={sel:{},names:''};render();toast(rebuys===rs.length?'Re-buy registrati':rs.length>1?`${rs.length} giocatori al tavolo`:'Giocatore al tavolo','ok')}
+  },()=>rebuys===rs.length?'Re-buy registrati':rs.length>1?`${rs.length} giocatori al tavolo`:'Giocatore al tavolo');
+  if(ok){SH=null;F.ap={sel:{},names:''};render()}
 }
 function playedBefore(pid,name){return Object.values(S.games).some(g=>Object.values(g.players||{}).some(p=>p.playerId===pid||p.playerName.toLowerCase()===name.toLowerCase()))}
 async function delPlayerOk(id){
@@ -1026,6 +1257,51 @@ async function bioFresh(p){
 }
 const bioBtn=()=>{const b=LS.get('bio',null);return b&&S.players[b.id]?`<button type="button" class="btn" data-act="biologin">Accedi con Face ID · ${esc(S.players[b.id].name)}</button>`:''};
 
+
+/* ===== Annulla, grafico, esportazione ===== */
+function toastUndo(msg,fn){
+  document.querySelectorAll('#toast .t.u').forEach(x=>x.remove());
+  const el=document.createElement('div');el.className='t ok u';
+  el.innerHTML=ico('check',16)+'<span></span><button type="button" class="undo">Annulla</button>';
+  el.querySelector('span').textContent=msg;let used=false;
+  el.querySelector('button').onclick=()=>{if(used)return;used=true;el.remove();fn()};
+  $('#toast').appendChild(el);setTimeout(()=>el.remove(),6000);
+}
+function sparkAt(e){
+  const s=e.target&&e.target.closest&&e.target.closest('svg.spark');if(!s)return;
+  const pts=JSON.parse(s.dataset.pts),r=s.getBoundingClientRect(),vx=(e.clientX-r.left)/r.width*320;
+  let b=pts[0];pts.forEach(p=>{if(Math.abs(p.x-vx)<Math.abs(b.x-vx))b=p});
+  const dot=s.querySelector('.spk-dot');dot.setAttribute('cx',b.x);dot.setAttribute('cy',b.y);
+  const rd=document.getElementById('spk-read');if(rd)rd.textContent=b.n==null?'Prima partita: si parte da 0,00 €':`Serata del ${b.t}: ${sgn(b.n)} · totale ${sgn(b.v)}`;
+}
+document.addEventListener('pointermove',sparkAt);document.addEventListener('pointerdown',sparkAt);
+function loadJs(src){return new Promise((ok,ko)=>{if(window.XLSX)return ok();const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>ko(new Error('Libreria non caricata'));document.head.appendChild(s)})}
+function dlBlob(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)}
+const fileBase=()=>'home-poker-'+String(S.table?S.table.name:'tavolo').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'-'+todayStr();
+function exportSheets(){
+  const E=c=>Math.round(c||0)/100;
+  const gs=Object.entries(S.games).map(([id,g])=>Object.assign({id},g)).sort((a,b)=>String(a.scheduledAt).localeCompare(String(b.scheduledAt)));
+  const closed=g=>g.status==='closed';
+  return {
+    'Partite':gs.map(g=>({Data:dShort(g.scheduledAt),Ora:tHM(g.scheduledAt),'Avviata da':g.hostName,Luogo:g.location||'',Stato:closed(g)?'Conclusa':'In corso',Giocatori:plist(g).length,'Buy-in totali €':E(grossOf(g)),'Mance dealer €':E(g.dealerChips),'Montepremi €':E(netPot(g)),Cassa:!closed(g)?'':(g.holeCents||0)===0?'Perfetta':(g.holeCents>0?'Ammanco ':'Avanzo ')+eur(Math.abs(g.holeCents))})),
+    'Risultati':gs.flatMap(g=>plist(g).map(p=>({Data:dShort(g.scheduledAt),Giocatore:p.playerName,Ingressi:p.buyIns.length,'Investito €':E(inv(p)),'Incassato €':closed(g)?E(p.cashOutCents):'','Netto €':closed(g)?E(p.netCents):''}))),
+    'Movimenti':gs.flatMap(g=>plist(g).flatMap(p=>p.buyIns.map((b,i)=>({Data:dShort(g.scheduledAt),Ora:tHM(b.timestamp),Giocatore:p.playerName,Tipo:i?'Re-buy':'Buy-in','Importo €':E(b.amountCents),Stato:b.paymentStatus==='PAID'?'Pagato':'Da pagare'})).concat((p.cashOuts||[]).map(c=>({Data:dShort(g.scheduledAt),Ora:tHM(c.createdAt),Giocatore:p.playerName,Tipo:'Cash out','Importo €':E(c.amountCents),Stato:'Messo al sicuro'}))))),
+    'Saldi':gs.flatMap(g=>(g.debts||[]).map(d=>({Data:dShort(g.scheduledAt),Da:d.fromPlayerName,A:d.toPlayerName,'Totale €':E(d.totalAmount),'Pagato €':E(d.paidAmount),'Restante €':E(d.remainingAmount),Stato:d.remainingAmount===0?'Pagato':'Da pagare'}))),
+    'Classifica':homeData().rank.map((r,i)=>({Posizione:i+1,Giocatore:r.name,Partite:r.n,Vinte:r.w,'Netto €':E(r.tot)}))
+  };
+}
+async function exportXlsx(){
+  try{await loadJs('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js')}catch(e){toast('Impossibile preparare il file Excel: controlla la connessione','err');return}
+  const data=exportSheets(),wb=XLSX.utils.book_new();
+  Object.entries(data).forEach(([name,rows])=>{const ws=XLSX.utils.json_to_sheet(rows.length?rows:[{Nota:'Nessun dato'}]);const keys=Object.keys(rows[0]||{Nota:1});ws['!cols']=keys.map(k=>({wch:Math.max(10,k.length+2)}));XLSX.utils.book_append_sheet(wb,ws,name)});
+  XLSX.writeFile(wb,fileBase()+'.xlsx');toast('File Excel scaricato','ok');
+}
+function exportBackup(){
+  const players={};Object.entries(S.players).forEach(([id,p])=>{const c=Object.assign({},p);delete c.pinHash;delete c.bio;players[id]=c});
+  const data={app:'home-poker',version:1,exportedAt:new Date().toISOString(),table:S.table,players,games:Object.fromEntries(Object.entries(S.games).map(([id,g])=>{const c=Object.assign({},g);delete c.pinHash;return [id,c]}))};
+  dlBlob(fileBase()+'.json',new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));toast('Backup scaricato','ok');
+}
+
 /* ===== Eventi ===== */
 const H={
   home(){go('home')},
@@ -1040,8 +1316,8 @@ const H={
   resopen(){F.resOpen=!F.resOpen;render()},
   delres(d){removeRes(d.id)},
   tgl(d){F.open[d.pid]=!F.open[d.pid];render()},
-  flip(d){saveGame(V.gid,g=>{const b=g.players[d.pid].buyIns.find(x=>x.buyInId===d.bid);if(!b)return false;b.paymentStatus=b.paymentStatus==='PAID'?'PENDING':'PAID'})},
-  delbi(d){if(!arm('bi'+d.bid))return;saveGame(V.gid,g=>{const p=g.players[d.pid];p.buyIns=p.buyIns.filter(x=>x.buyInId!==d.bid);if(!p.buyIns.length&&!(p.cashOuts||[]).length)delete g.players[d.pid]})},
+  flip(d){saveGame(V.gid,g=>{const b=g.players[d.pid].buyIns.find(x=>x.buyInId===d.bid);if(!b)return false;b.paymentStatus=b.paymentStatus==='PAID'?'PENDING':'PAID'},'Stato del buy-in cambiato')},
+  delbi(d){saveGame(V.gid,g=>{const p=g.players[d.pid];p.buyIns=p.buyIns.filter(x=>x.buyInId!==d.bid);if(!p.buyIns.length&&!(p.cashOuts||[]).length)delete g.players[d.pid]},'Movimento eliminato')},
   addpl(){F.ap={sel:{},names:''};freshBi(S.games[V.gid]);openSheet({type:'add'})},
   selpl(d){F.ap.sel[d.id]=!F.ap.sel[d.id];render()},
   delpl(d){SH={type:'delpl',id:d.id,anim:false};render()},
@@ -1057,8 +1333,8 @@ const H={
   async cosave(){
     const g=S.games[V.gid],co=F.co,cents=co.mode==='chips'?toEuro(parseCh(co.v)||0,g):(parseEur(co.v)||0);if(!(cents>0))return;
     const pid=SH.pid;
-    const ok=await saveGame(V.gid,gg=>{const p=gg.players[pid];p.cashOuts=(p.cashOuts||[]).concat([{id:nid('c'),amountCents:cents,createdAt:new Date().toISOString()}])});
-    if(ok){SH=null;render();toast('Messi al sicuro '+eur(cents),'ok')}
+    const ok=await saveGame(V.gid,gg=>{const p=gg.players[pid];p.cashOuts=(p.cashOuts||[]).concat([{id:nid('c'),amountCents:cents,createdAt:new Date().toISOString()}])},'Messi al sicuro '+eur(cents));
+    if(ok){SH=null;render()}
   },
   closesheet(d,e){if(e.target===e.currentTarget||e.currentTarget.classList.contains('x')){SH=null;render()}},
   startclose(){startClose()},
@@ -1071,10 +1347,10 @@ const H={
   delgame(){if(!arm('delgame'))return;deleteGame(V.gid)},
   subtap(d){const g=S.games[V.gid],dd=g.debts.find(x=>x.debtId===d.did),t=dd.transactions.find(x=>x.subId===d.sid);if(!debtPerm(V.gid,dd).can)return;F.pay={partial:false,v:''};F.mod={v:''};F.pinp='';openSheet({type:t.status==='PAID'?'paid':'pay',did:d.did,sid:d.sid})},
   paypart(){F.pay.partial=true;render()},
-  async payfull(){const s=SH;if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dPayFull(g.debts.find(x=>x.debtId===s.did),s.sid,new Date().toISOString()));if(ok){SH=null;render();toast('Pagamento registrato','ok')}},
-  async payconf(){const s=SH,a=parseEur(F.pay.v);if(!(a>0))return;if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dPartial(g.debts.find(x=>x.debtId===s.did),s.sid,a,new Date().toISOString()));if(ok){SH=null;render();toast('Acconto registrato','ok')}},
-  async modok(){const s=SH,a=parseEur(F.mod.v);if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dModify(g.debts.find(x=>x.debtId===s.did),s.sid,a,new Date().toISOString()));if(ok){SH=null;render();toast('Importo modificato','ok')}},
-  async restore(){const s=SH;if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dRestore(g.debts.find(x=>x.debtId===s.did),s.sid,new Date().toISOString()));if(ok){SH=null;render();toast('Ripristinato a Da pagare','ok')}},
+  async payfull(){const s=SH;if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dPayFull(g.debts.find(x=>x.debtId===s.did),s.sid,new Date().toISOString()),'Pagamento registrato');if(ok){SH=null;render()}},
+  async payconf(){const s=SH,a=parseEur(F.pay.v);if(!(a>0))return;if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dPartial(g.debts.find(x=>x.debtId===s.did),s.sid,a,new Date().toISOString()),'Acconto registrato');if(ok){SH=null;render()}},
+  async modok(){const s=SH,a=parseEur(F.mod.v);if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dModify(g.debts.find(x=>x.debtId===s.did),s.sid,a,new Date().toISOString()),'Importo modificato');if(ok){SH=null;render()}},
+  async restore(){const s=SH;if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dRestore(g.debts.find(x=>x.debtId===s.did),s.sid,new Date().toISOString()),'Ripristinato a Da pagare');if(ok){SH=null;render()}},
   copyjson(d){copyText(JSON.stringify(jsonFor(d.gid),null,2))},
   copytxt(d){copyText(waText(d.gid))},
   tab(d){LS.set('tab',d.t);ENTER='fade';render();window.scrollTo(0,0)},
@@ -1109,6 +1385,63 @@ const H={
     try{await bioAssert(b.cred);F.bioOk=Date.now();render()}catch(e){toast('Face ID non riuscito','err')}
   },
   leave(){LS.del('table');LS.del('me');LS.del('active');location.reload()},
+  pstats(d){SH=null;go('player',null,{k:d.k})},
+  paym(){const p=S.players[S.me.id]||{};F.pm={paypal:(p.pay&&p.pay.paypal)||'',note:(p.pay&&p.pay.note)||''};openSheet({type:'paym'})},
+  async paymok(){
+    const pp=String(F.pm.paypal||'').trim().replace(/^https?:\/\//i,'').replace(/^(www\.)?paypal\.me\//i,'').replace(/^@/,'').replace(/[\/?#].*$/,'');
+    if(pp&&!/^[A-Za-z0-9._-]{2,40}$/.test(pp)){toast('Nome PayPal.me non valido','err');return}
+    const p=S.players[S.me.id];const doc=Object.assign({},p,{pay:{paypal:pp,note:String(F.pm.note||'').trim().slice(0,300)}});
+    try{await db.doc('players/'+S.me.id).set(doc);S.players[S.me.id]=doc;SH=null;render();toast('Metodi di pagamento salvati','ok')}catch(e){toast(errMsg(e),'err')}
+  },
+  export(){openSheet({type:'export'})},
+  xlsx(){exportXlsx()},
+  backup(){exportBackup()},
+  copyraw(d){copyText(d.t)},
+  histopen(){const k='hist:'+V.gid;F.open[k]=!F.open[k];render()},
+  histundo(d){
+    const g=S.games[V.gid],e=g&&(g.hist||[]).find(x=>x.id===d.hid);if(!e)return;
+    const dc=e.ch.find(c=>c.k[0]==='d');
+    if(dc&&debtPerm(V.gid,dc.a||dc.b).needPin){F.pinp='';F.bioOk=0;openSheet({type:'undo',hid:d.hid,did:(dc.a||dc.b).debtId});return}
+    undoEntry(V.gid,d.hid);
+  },
+  async undook(){const s=SH;if(!(await authDebt(s.did)))return;const ok=await undoEntry(V.gid,s.hid);if(ok){SH=null;render()}},
+  sheetclose(){SH=null;render()},
+  delme(){F.dpin='';openSheet({type:'delme'})},
+  async delmeok(){
+    const p=S.me&&S.players[S.me.id];if(!p)return;
+    if(myOpenStuff()){render();return}
+    if((await pinHash(S.me.id,F.dpin))!==p.pinHash){toast('PIN errato','err');return}
+    try{await db.doc('players/'+S.me.id).delete();delete S.players[S.me.id]}catch(e){toast(errMsg(e),'err');return}
+    const b=LS.get('bio',null);if(b&&b.id===S.me.id)LS.del('bio');
+    F.dpin='';SH=null;S.me=null;LS.del('me');F.auth={mode:null,name:'',pin:'',pin2:'',err:''};V={name:'home'};render();toast('Profilo eliminato','ok');
+  },
+  settings(){SH=null;F.set={};go('settings')},
+  claimmgr(){if(!S.me||hasManagers())return;saveCfg({managers:[S.me.id]}).then(ok=>{if(ok)toast('Ora sei gestore del tavolo','ok')})},
+  mgrtoggle(d){if(!isManager())return;const m=((S.cfg&&S.cfg.managers)||[]).filter(x=>S.players[x]);const on=m.includes(d.id);saveCfg({managers:on?m.filter(x=>x!==d.id):m.concat([d.id])}).then(ok=>{if(ok)toast(on?'Non è più gestore':'Nuovo gestore','ok')})},
+  async resetpin(d){
+    if(!isManager()||!arm('rp'+d.id))return;const p=S.players[d.id];if(!p)return;
+    const doc=Object.assign({},p,{registered:false,bio:[]});delete doc.pinHash;
+    try{await db.doc('players/'+d.id).set(doc);S.players[d.id]=doc;render();toast('PIN azzerato: '+p.name+' può registrarsi di nuovo con lo stesso nome','ok')}catch(e){toast(errMsg(e),'err')}
+  },
+  async rmplayer(d){
+    if(!isManager())return;const p=S.players[d.id];if(!p)return;
+    const w=openStuffFor(d.id,p.name);if(w.length){toast('Non si può rimuovere: '+p.name+' '+w.join(', '),'err');return}
+    if(!arm('rm'+d.id))return;
+    try{await db.doc('players/'+d.id).delete();delete S.players[d.id]}catch(e){toast(errMsg(e),'err');return}
+    const m=((S.cfg&&S.cfg.managers)||[]);if(m.includes(d.id))await saveCfg({managers:m.filter(x=>x!==d.id)});
+    render();toast(p.name+' rimosso dal tavolo','ok');
+  },
+  setbuy(d){if(!isManager())return;F.set.buy=+d.v;render()},
+  async setsave(){
+    if(!isManager())return;const ch=parseCh(F.set.chips!=null?F.set.chips:String((S.cfg&&S.cfg.defChips)||2000));
+    if(!(ch>0)){toast('Inserisci un numero di fiches valido','err');return}
+    if(await saveCfg({defBuy:F.set.buy!=null?F.set.buy:defBuy(),defChips:ch})){F.set={};render();toast('Impostazioni salvate','ok')}
+  },
+  resopen(d){const k='res:'+d.k;F.open[k]=!F.open[k];render()},
+  settle(d){F.pay={partial:false,v:''};F.pinp='';F.bioOk=0;openSheet({type:'settle',did:d.did})},
+  async sfull(){const s=SH,gid=V.gid;if(!(await authDebt(s.did)))return;const ok=await saveGame(gid,g=>{const d=g.debts.find(x=>x.debtId===s.did);const now=new Date().toISOString();let c=0;d.transactions.filter(t=>t.status==='PENDING').map(t=>t.subId).forEach(sid=>{if(dPayFull(d,sid,now))c++});return c?undefined:false},()=>'Saldo ricevuto');if(ok){SH=null;render()}},
+  async spartok(){const s=SH,gid=V.gid,a=parseEur(F.pay.v);if(!(a>0))return;if(!(await authDebt(s.did)))return;const ok=await saveGame(gid,g=>{const d=g.debts.find(x=>x.debtId===s.did);const t=d.transactions.find(x=>x.status==='PENDING');if(!t||a>=d.remainingAmount)return false;return dPartial(d,t.subId,a,new Date().toISOString())?undefined:false},'Acconto di '+eur(a)+' ricevuto');if(ok){SH=null;render()}},
+  async sundo(){const s=SH,gid=V.gid;if(!(await authDebt(s.did)))return;const ok=await saveGame(gid,g=>{const d=g.debts.find(x=>x.debtId===s.did);const now=new Date().toISOString();let c=0;d.transactions.filter(t=>t.status==='PAID').map(t=>t.subId).forEach(sid=>{if(dRestore(d,sid,now))c++});return c?undefined:false},'Rimesso da pagare');if(ok){SH=null;render()}},
   rk(d){F.open['rk:'+d.k]=!F.open['rk:'+d.k];render()},
   authmode(d){F.auth.mode=d.m;F.auth.err='';F.auth.pin='';F.auth.pin2='';render()},
   authpick(d){F.auth.name=d.n;render()},
@@ -1164,10 +1497,15 @@ const parentOf=p=>p.split('/').slice(0,-1).join('/');
 let BASE=null;
 async function makeBase(){
   await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js');
-  const sb=window.supabase.createClient(SB_URL,SB_KEY);
+  const sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'hpl-auth'}});
   const T='hpl_docs';
+  const {data:sd}=await sb.auth.getSession();
+  if(!sd||!sd.session){
+    const r=await sb.auth.signInAnonymously();
+    if(r.error){const m=String(r.error.message||'');throw new Error(/anonymous/i.test(m)?'Accesso anonimo disattivato in Supabase: attiva "Allow anonymous sign-ins" in Authentication → Sign In / Providers.':m)}
+  }
+  async function rpc(fn,args){const {data,error}=await sb.rpc(fn,args);if(error)throw error;return data}
   async function getDoc(path){const {data,error}=await sb.from(T).select('data').eq('path',path).maybeSingle();if(error)throw error;return data?data.data:null}
-  async function insertDoc(path,d){const {error}=await sb.from(T).insert({path,parent:parentOf(path),data:d});if(error)throw error}
   async function scope(prefix){
     const cache=new Map(),subs=new Set(),pre=prefix+'/';
     const notify=()=>subs.forEach(f=>{try{f()}catch(e){console.error(e)}});
@@ -1196,7 +1534,7 @@ async function makeBase(){
       onSnapshot(cb){return watch(()=>{const d=colDocs(c);return {docs:d,size:d.length,empty:!d.length}},cb)}});
     return {doc,collection,close(){clearInterval(iv);document.removeEventListener('visibilitychange',vis);try{sb.removeChannel(ch)}catch(e){}}};
   }
-  return {getDoc,insertDoc,scope};
+  return {getDoc,rpc,scope};
 }
 
 /* ===== Tavolo: entra o crea ===== */
@@ -1205,6 +1543,7 @@ async function enterTable(t){
   S.table={id:t.id,name:t.name};S.dbReady=true;
   const onErr=e=>{toast(errMsg(e),'err')};
   db.collection('games').onSnapshot(sn=>{const o={};sn.docs.forEach(d=>{o[d.id]=d.data()});S.games=o;S.loaded.games=true;afterData()},onErr);
+  db.doc('settings/table').onSnapshot(sn=>{S.cfg=sn.exists?sn.data():null;if(S.loaded.players)render()},onErr);
   db.collection('players').onSnapshot(sn=>{const o={};sn.docs.forEach(d=>{o[d.id]=d.data()});S.players=o;S.loaded.players=true;afterData()},onErr);
   render();
 }
@@ -1216,21 +1555,44 @@ async function doTable(){
   if(create&&t.pw!==t.pw2)return fail('Le due password non coincidono.');
   t.busy=true;t.err='';render();
   try{
-    const id='t'+(await sha('hpltn:'+name.toLowerCase())).slice(0,20),h=await sha('hpltp:'+id+':'+t.pw);
-    const ex=await BASE.getDoc('tables/'+id);let shown=name;
+    const id='t'+(await sha('hpltn:'+name.toLowerCase())).slice(0,20);let shown=name;
     if(create){
-      if(ex)return fail('Esiste già un tavolo con questo nome: tocca Entra, oppure scegli un altro nome.');
-      await BASE.insertDoc('tables/'+id,{name,pwHash:h,createdAt:new Date().toISOString()});
+      const r=await BASE.rpc('hpl_create_table',{tid:id,tname:name,pw:t.pw});
+      if(r==='exists')return fail('Esiste già un tavolo con questo nome: tocca Entra, oppure scegli un altro nome.');
+      if(r!=='ok')return fail('Non sono riuscito a creare il tavolo, riprova.');
     }else{
-      if(!ex)return fail('Nessun tavolo con questo nome. Controlla come è scritto, oppure creane uno.');
-      if(ex.pwHash!==h)return fail('Password errata.');
-      shown=ex.name;
+      const r=await BASE.rpc('hpl_join_table',{tid:id,pw:t.pw});
+      if(!r||r.status==='not_found')return fail('Nessun tavolo con questo nome. Controlla come è scritto, oppure creane uno.');
+      if(r.status==='bad_password')return fail('Password errata.');
+      if(r.status==='too_many')return fail('Troppi tentativi sbagliati: riprova tra qualche minuto.');
+      shown=r.name;
     }
-    LS.set('table',{id,h});LS.set('lasttb',shown);
+    LS.set('table',{id});LS.set('lasttb',shown);
     F.tb={mode:null,name:'',pw:'',pw2:'',err:'',busy:false};
     await enterTable({id,name:shown});
   }catch(e){fail(errMsg(e))}
 }
+
+/* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
+const APP_VERSION='1791805446736';
+let updShown=false;
+async function checkUpdate(){
+  if(updShown||!/^https?:/.test(location.protocol))return;
+  try{
+    const r=await fetch(location.pathname+'?vcheck='+Date.now(),{cache:'no-store'});if(!r.ok)return;
+    const m=(await r.text()).match(/const APP_VERSION='(\d+)'/);
+    if(!m||m[1]===APP_VERSION)return;
+    updShown=true;const nv=m[1];
+    const go=()=>location.replace(location.pathname+'?v='+nv+location.hash);
+    if(!S.me&&!SH){go();return}
+    const el=document.createElement('div');el.className='upd';
+    el.innerHTML='<span>È disponibile una nuova versione</span><button type="button">Aggiorna</button>';
+    el.querySelector('button').onclick=go;document.body.appendChild(el);
+  }catch(e){}
+}
+setTimeout(checkUpdate,2500);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate()});
+setInterval(checkUpdate,15*60*1000);
 
 /* ===== Avvio ===== */
 (async function start(){
@@ -1241,7 +1603,7 @@ async function doTable(){
   bioSupport().then(v=>{S.bioOk=v;if(SH)render()});
   const sess=LS.get('table',null);
   if(sess){
-    try{const d=await BASE.getDoc('tables/'+sess.id);if(d&&d.pwHash===sess.h){await enterTable({id:sess.id,name:d.name});return}}catch(e){console.error(e)}
+    try{const r=await BASE.rpc('hpl_my_table',{tid:sess.id});if(r&&r.status==='ok'){await enterTable({id:sess.id,name:r.name});return}}catch(e){console.error(e)}
     LS.del('table');
   }
   render();
