@@ -1291,6 +1291,20 @@ span.chips i{position:absolute;left:0;bottom:calc(var(--j)*3px);width:18px;heigh
 .pt-card>svg{color:var(--gold)}
 .hs-seg button{padding:0 8px;font-size:14px}
 
+
+.dp-sum{display:flex;align-items:baseline;gap:10px;margin:14px 4px 2px}
+.dp-sum span:first-child{color:var(--mut);font-size:14px}
+.dp-sum b{font-family:var(--serif);font-size:26px;font-weight:800;letter-spacing:-.02em}
+.dp-sum.get b{color:var(--green)}.dp-sum.give b{color:var(--red)}
+.dp-sum .xs{margin-left:auto}
+.dp{border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0) 50%),var(--card);box-shadow:inset 0 0 0 1px var(--hair),0 14px 34px -22px rgba(0,0,0,.9);overflow:hidden}
+.dp-h{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px}
+.dp-h b{display:block;font-size:17px}.dp-h .grow>span{display:block}
+.dp-amt{font-family:var(--serif);font-size:21px;font-weight:800;letter-spacing:-.015em;white-space:nowrap}
+.dp .chv{transition:transform .35s var(--spring)}.dp.open .chv{transform:rotate(180deg)}
+.dp-x{border-top:1px solid var(--line2);animation:fadeIn .3s var(--ease) both}
+.dp-x .li{padding-inline:14px}
+
 /* ===================== effetti ===================== */
 .page-ghost{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
 .page-ghost>div{will-change:transform}
@@ -3480,6 +3494,7 @@ tabStorico=function(D){
 ${mine.length?`<div class="hs-me"><div class="grow"><div class="mut xs">Il tuo bilancio · ${mine.length} serat${mine.length===1?'a':'e'}, ${myWins} in vincita</div><div class="hs-big num ${myTot>0?'green':myTot<0?'red':''}">${sgnS(myTot)}</div></div>${spark}</div>`:''}
 </section>
 <div class="seg hs-seg">${[['all','Tutte',0],['mine','Le mie',0],['open','Da saldare',nOpen],['get','Da ricevere',nGet]].map(([k,l,n])=>`<button class="${f===k?'on':''}" data-act="stf" data-f="${k}">${l}${n?` <span class="hs-n">${n}</span>`:''}</button>`).join('')}</div>`;
+  if(f==='get'||f==='open')return h+debtPeople(f)+`<button class="link" style="align-self:center;margin-top:10px" data-act="export">${ico('share',16)}&nbsp;Esporta in Excel o backup</button>`;
   if(!shown.length)h+=`<div class="card" style="margin-top:12px;text-align:center"><p class="mut sm" style="margin:0">${f==='open'?'Non devi niente a nessuno 🎉':f==='get'?'Nessuno ti deve dei soldi.':'Nessuna partita qui.'}</p></div>`;
   const groups=[];shown.forEach(g=>{const d=new Date(g.scheduledAt),k=d.getFullYear()*12+d.getMonth();let G=groups[groups.length-1];if(!G||G.k!==k)groups.push(G={k,m:d.toLocaleDateString('it-IT',{month:'long',year:'numeric'}),list:[]});G.list.push(g)});
   h+=groups.map(G=>{const tp=sum(G.list.filter(g=>g.status==='closed').map(netPot));
@@ -6202,6 +6217,26 @@ ${P.map(card).join('')}
 };
 H.openplan=function(d){SH=null;go('book',d.gid)};
 
+
+/* ---------- Storico: da ricevere / da saldare raggruppati per persona ---------- */
+function debtPeople(f){
+  const get=f==='get',M={};
+  Object.entries(S.games).forEach(([gid,g])=>{if(g.status!=='closed')return;(g.debts||[]).forEach(d=>{
+    if(!(d.remainingAmount>0)||isNetted(d))return;
+    if(get?!isCreditor(d):!meIsFrom(d))return;
+    const id=get?d.fromPlayerId:d.toPlayerId,nm=get?d.fromPlayerName:d.toPlayerName,k=pKey(id,nm);
+    const P=M[k]||(M[k]={k,name:pName(id,nm),tot:0,items:[]});P.tot+=d.remainingAmount;P.items.push({gid,g,d});
+  })});
+  const L=Object.values(M).sort((a,b)=>b.tot-a.tot);
+  if(!L.length)return `<div class="card" style="margin-top:12px;text-align:center"><p class="mut sm" style="margin:0">${get?'Nessuno ti deve dei soldi.':'Non devi niente a nessuno 🎉'}</p></div>`;
+  const tot=sum(L.map(x=>x.tot));
+  return `<div class="dp-sum ${get?'get':'give'}"><span>${get?'Ti devono in tutto':'Devi in tutto'}</span><b class="num">${eur(tot)}</b><span class="mut xs">${L.length} person${L.length===1?'a':'e'}</span></div>
+<div class="stack" style="gap:10px">${L.map(x=>{const open=!!F.open['dp:'+f+x.k];return `<div class="dp ${open?'open':''}">
+<button class="dp-h" data-act="dpopen" data-k="${esc(f+x.k)}" aria-expanded="${open}">${ava(x.name)}<span class="grow"><b>${esc(x.name)}</b><span class="mut xs">${x.items.length} serat${x.items.length===1?'a':'e'}</span></span><b class="num dp-amt ${get?'green':'red'}">${eur(x.tot)}</b><span class="mut chv">${ico('chev',16)}</span></button>
+${open?`<div class="dp-x">${x.items.sort((a,b)=>String(b.g.scheduledAt).localeCompare(String(a.g.scheduledAt))).map(it=>`<button class="li" data-act="detail" data-gid="${it.gid}"><span class="dtile sm"><b>${dDay(it.g.scheduledAt)}</b><span>${dMon(it.g.scheduledAt)}</span></span><span class="grow"><b>${esc(it.g.kind==='netting'?'Compensazione':it.g.location||('Da '+(it.g.hostName||'')))}</b><span class="mut xs" style="display:block">${it.d.paidAmount>0?`pagati ${eur(it.d.paidAmount)} su ${eur(it.d.totalAmount)}`:'apri la serata'}</span></span><b class="num">${eur(it.d.remainingAmount)}</b>${ico('chevr',16)}</button>`).join('')}</div>`:''}</div>`}).join('')}</div>`;
+}
+H.dpopen=function(d){const k='dp:'+d.k;F.open[k]=!F.open[k];render()};
+
 /* =====================================================================
    Effetti e accessibilità, tutto attorno a render():
    - passaggio tra schermate: la pagina vecchia scivola via mentre entra la nuova
@@ -6487,7 +6522,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791919848299';
+const APP_VERSION='1791920885942';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
