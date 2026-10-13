@@ -2026,7 +2026,7 @@ ${A?`<div class="lpa"><button class="btn-s" data-act="rebuy" data-pid="${p.playe
 ${open?`<div class="lpx">${p.buyIns.map((b,k)=>`<div class="mv"><i class="dt" style="background:${b.paymentStatus==='PAID'?'var(--green)':'var(--red)'}"></i><span class="num">${k?'Re-buy':'Buy-in'} · ${tHM(b.timestamp)}</span>
 ${A?`<button class="bdg-btn" data-act="flip" data-pid="${p.playerId}" data-bid="${b.buyInId}">${stBadge(b.paymentStatus)}</button>`:stBadge(b.paymentStatus)}
 <b class="num grow" style="text-align:right">${eur(b.amountCents)}</b>${A?`<button class="x" data-act="delbi" data-pid="${p.playerId}" data-bid="${b.buyInId}" aria-label="Elimina movimento">${armed['bi'+b.buyInId]?'<span class="red xs">Sicuro?</span>':ico('close',16)}</button>`:''}</div>`).join('')}
-${(p.cashOuts||[]).map(c=>`<div class="mv"><i class="dt" style="background:var(--gold)"></i><span class="gold">Cash out · ${tHM(c.createdAt||g.scheduledAt)}</span><b class="num grow gold" style="text-align:right">${eur(c.amountCents)}</b></div>`).join('')}
+${(p.cashOuts||[]).map((c,k)=>{const ck=c.id||('i'+k);return `<div class="mv"><i class="dt" style="background:var(--gold)"></i><span class="gold">Cash out · ${tHM(c.createdAt||g.scheduledAt)}</span><b class="num grow gold" style="text-align:right">${eur(c.amountCents)}</b>${A?`<button class="x" data-act="delco" data-pid="${p.playerId}" data-cid="${esc(ck)}" aria-label="Elimina cash out">${armed['co'+p.playerId+ck]?'<span class="red xs">Sicuro?</span>':ico('close',16)}</button>`:''}</div>`}).join('')}
 ${A?'':'<div class="mut xs" style="padding-top:8px">Solo chi ha il PIN Admin può registrare movimenti.</div>'}</div>`:''}</div>`;
 }
 
@@ -2424,6 +2424,7 @@ const H={
   delres(d){removeRes(d.id)},
   tgl(d){F.open[d.pid]=!F.open[d.pid];render()},
   flip(d){saveGame(V.gid,g=>{const b=g.players[d.pid].buyIns.find(x=>x.buyInId===d.bid);if(!b)return false;b.paymentStatus=b.paymentStatus==='PAID'?'PENDING':'PAID'},'Stato del buy-in cambiato')},
+  delco(d){if(!arm('co'+d.pid+d.cid))return;saveGame(V.gid,g=>{const p=g.players[d.pid];if(!p)return false;const L=p.cashOuts||[],i=L.findIndex((c,k)=>(c.id||('i'+k))===d.cid);if(i<0)return false;const amt=L[i].amountCents;p.cashOuts=L.filter((_,k)=>k!==i);return undefined},'Cash out eliminato')},
   delbi(d){saveGame(V.gid,g=>{const p=g.players[d.pid];p.buyIns=p.buyIns.filter(x=>x.buyInId!==d.bid);if(!p.buyIns.length&&!(p.cashOuts||[]).length)delete g.players[d.pid]},'Movimento eliminato')},
   addpl(){F.ap={sel:{},names:''};freshBi(S.games[V.gid]);openSheet({type:'add'})},
   selpl(d){F.ap.sel[d.id]=!F.ap.sel[d.id];render()},
@@ -6486,7 +6487,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791915459975';
+const APP_VERSION='1791919848299';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
