@@ -981,6 +981,103 @@ span.chips i{position:absolute;left:0;bottom:calc(var(--j)*3px);width:18px;heigh
 .cmsg{background:var(--card2)}
 .cmsg.me{background:linear-gradient(180deg,#2B3E2F,#22332A)}
 
+
+/* ===================== tavoli virtuali: lobby, creazione, pannello ===================== */
+.vl{padding-top:calc(6px + env(safe-area-inset-top,0px));padding-bottom:20px}
+.vl-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px}
+.vl-top .back-l{max-width:65%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vl-ib{position:relative;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));box-shadow:inset 0 0 0 1px var(--hair-2);color:var(--ivory)}
+.vl-ib.on{background:var(--gold-grad);color:var(--on-acc)}
+.vl-h{font-size:36px;letter-spacing:-.035em;margin-top:6px;background:linear-gradient(180deg,#fff,#F3E2B8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.vl-sub{margin:4px 2px 2px;color:var(--mut);font-size:14.5px}
+.vl .lob-lbl{margin:22px 4px 10px}
+.vl-k{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.vl-k .dot.off{background:var(--gold);box-shadow:none}.vl-k .dot.off::after{display:none}
+.vmini{display:block;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
+/* partita in corso */
+.vl-hero{position:relative;overflow:hidden;border-radius:26px;padding:16px;background:radial-gradient(120% 100% at 0% 0%,rgba(42,163,116,.35),transparent 60%),linear-gradient(160deg,#10281F,#0B1612);box-shadow:inset 0 0 0 1px rgba(228,182,86,.38),inset 0 1px 0 rgba(255,255,255,.07),0 24px 50px -24px rgba(0,0,0,.95)}
+.vl-hero-go{display:flex;align-items:center;gap:14px;width:100%;text-align:left}
+.vl-hero-mini{flex:none;margin:-4px -6px -4px -8px}
+.vl-hero-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.vl-hero-tx b{font-family:var(--serif);font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vl-hero-me{font-size:13px;color:var(--mut);margin-top:4px}.vl-hero-me b{display:inline;font-family:var(--serif);font-size:16px;color:var(--gold-l)}
+.vl-hero-acts{display:flex;gap:8px;margin-top:14px}
+.vl-hero-acts .btn{flex:1;min-height:52px}
+.vl-hero-acts .btn-s{width:52px;min-height:52px;padding:0;border-radius:18px}
+/* crea */
+.vl-new{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:16px;border-radius:24px;color:var(--ivory);background:linear-gradient(180deg,rgba(228,182,86,.1),rgba(228,182,86,.03));box-shadow:inset 0 0 0 1.5px rgba(228,182,86,.38)}
+.vl-new b{display:block;font-family:var(--serif);font-size:19px;font-weight:800;letter-spacing:-.015em}
+.vl-new span span{display:block;font-size:13px;color:var(--mut);margin-top:2px;line-height:1.35}
+.vl-new>svg{color:var(--gold)}
+.vl-new-ic{width:50px;height:50px;border-radius:17px;display:grid;place-items:center;flex:none;background:var(--gold-grad);color:var(--on-acc);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 18px -8px rgba(228,182,86,.6)}
+/* tavoli aperti */
+.vl-card{border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0) 50%),var(--card);box-shadow:inset 0 0 0 1px var(--hair),0 14px 34px -22px rgba(0,0,0,.9);overflow:hidden}
+.vl-card.live{box-shadow:inset 0 0 0 1px rgba(70,218,128,.28),0 14px 34px -22px rgba(0,0,0,.9)}
+.vl-main{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 14px 10px}
+.vl-mini{flex:none;width:76px;display:grid;place-items:center}
+.vl-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.vl-t{display:flex;align-items:center;gap:8px;min-width:0}
+.vl-t b{flex:1;min-width:0;font-size:17px;font-weight:700}
+.vl-fmt{flex:none;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:rgba(70,218,128,.12);color:var(--green-l)}
+.vl-fmt.t{background:rgba(228,182,86,.15);color:var(--gold-l)}
+.vl-meta{font-size:13px;color:var(--mut)}
+.vl-ppl{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:12.5px;color:var(--mut)}
+.vl-ppl .stk .ava{width:24px;height:24px;font-size:9.5px;margin-left:-7px;box-shadow:0 0 0 2px var(--card)}
+.vl-ppl .stk .ava:first-child{margin-left:0}
+.vl-ppl .stk .more{width:24px;height:24px;margin-left:-7px;font-size:10px;box-shadow:0 0 0 2px var(--card)}
+.vl-foot{display:flex;align-items:center;gap:10px;padding:10px 14px 12px;border-top:1px solid var(--line2)}
+.vl-st{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:650;color:var(--mut);flex:1}
+.vl-st i{width:8px;height:8px;border-radius:50%;background:var(--mut-2)}
+.vl-st.live{color:var(--green-l)}.vl-st.live i{background:var(--green);box-shadow:0 0 10px rgba(70,218,128,.8)}
+.vl-st.wait{color:var(--gold-l)}.vl-st.wait i{background:var(--gold)}
+.vl-go{min-height:40px;padding:0 18px;border-radius:999px;font-weight:700;font-size:14.5px}
+.vl-go.gold{background:var(--gold-grad);color:var(--on-acc);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px -8px rgba(228,182,86,.6)}
+.vl-go.ghost{background:var(--card2);box-shadow:inset 0 0 0 1px var(--hair-2);color:var(--ivory)}
+.vroom-prev{display:flex;flex-direction:column;align-items:center;gap:6px;padding:4px 0}
+/* regole in lettura */
+.vrules{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vrules>div{border-radius:16px;padding:10px 12px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px var(--hair)}
+.vrules span{display:block;font-size:12px;color:var(--mut)}
+.vrules b{font-family:var(--serif);font-size:16px;font-weight:700;letter-spacing:-.01em}
+/* creazione */
+.vc .pg{padding-bottom:20px}
+.vc-prev{display:flex;align-items:center;gap:12px;margin-top:14px;padding:14px;border-radius:24px;background:radial-gradient(120% 100% at 0% 0%,rgba(42,163,116,.3),transparent 60%),linear-gradient(160deg,#10241C,#0B1512);box-shadow:inset 0 0 0 1px rgba(228,182,86,.3),0 20px 40px -24px rgba(0,0,0,.9)}
+.vc-prev-mini{flex:none;margin:-6px -4px -6px -6px}
+.vc-prev-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.vc-prev-tx b{font-family:var(--serif);font-size:20px;font-weight:800;letter-spacing:-.02em}
+.vc-prev-tx>span:last-child{font-size:12.5px;color:var(--mut);line-height:1.35}
+.vc-sec{display:flex;flex-direction:column;gap:9px;margin-top:8px}
+.vc-lab{display:flex;align-items:baseline;justify-content:space-between;font-size:13px;font-weight:700;color:var(--mut);letter-spacing:.02em;margin:0 2px}
+.vc-lab b{font-family:var(--serif);font-size:16px;color:var(--gold-l)}
+.vc-fmts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.vc-fmt{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:12px 11px;border-radius:20px;min-height:128px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)),var(--card2);box-shadow:inset 0 0 0 1px var(--hair)}
+.vc-fmt b{font-family:var(--serif);font-size:16px;font-weight:800;letter-spacing:-.015em;line-height:1.1;margin-top:4px}
+.vc-fmt>span:last-child{font-size:11.5px;color:var(--mut);line-height:1.3}
+.vc-fmt-ic{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:rgba(255,255,255,.07);color:var(--mut)}
+.vc-fmt.on{background:radial-gradient(120% 100% at 0% 0%,rgba(228,182,86,.22),transparent 65%),var(--card2);box-shadow:inset 0 0 0 1.5px var(--gold),0 10px 22px -12px rgba(228,182,86,.55)}
+.vc-fmt.on .vc-fmt-ic{background:var(--gold-grad);color:var(--on-acc)}
+.vc-seats{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+.vc-seat{min-height:46px;border-radius:14px;font-family:var(--serif);font-weight:800;font-size:17px;background:var(--card2);box-shadow:inset 0 0 0 1px var(--hair);color:var(--mut)}
+.vc-seat.on{background:var(--gold-grad);color:var(--on-acc);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px -6px rgba(228,182,86,.6)}
+.vc-opts{display:grid;gap:7px}.vc-opts.c2{grid-template-columns:1fr 1fr}.vc-opts.c3{grid-template-columns:repeat(3,minmax(0,1fr))}.vc-opts.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.vc-opt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:58px;padding:6px 4px;border-radius:16px;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)),var(--card2);box-shadow:inset 0 0 0 1px var(--hair);line-height:1.15}
+.vc-opt b{font-size:14.5px;font-weight:700}
+.vc-opt span{font-size:11px;color:var(--mut)}
+.vc-opt.on{background:linear-gradient(180deg,rgba(228,182,86,.22),rgba(228,182,86,.08));box-shadow:inset 0 0 0 1.5px var(--gold);color:var(--gold-l)}
+.vc-opt.on span{color:var(--gold-l);opacity:.85}
+.vc-hint{font-size:12.5px;color:var(--mut);margin:0 2px;line-height:1.35}
+.vc-adv{text-align:left;display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:0 14px;border-radius:16px;background:rgba(255,255,255,.03);box-shadow:inset 0 0 0 1px var(--hair);color:var(--mut);font-weight:600;font-size:15px}
+.vc-advb{display:flex;flex-direction:column;gap:10px;padding:4px 2px 0;animation:fadeIn .3s var(--ease) both}
+.vc-num{display:flex;flex-direction:column;gap:6px}.vc-num>span:first-child{font-size:13px;color:var(--mut);font-weight:600}
+.vc .bar .vn-err{margin-bottom:8px}
+/* pannello del tavolo */
+.vm-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.vm-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:84px;padding:8px 6px;border-radius:18px;font-size:12.5px;font-weight:650;line-height:1.2;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),var(--card2);box-shadow:inset 0 0 0 1px var(--hair)}
+.vm-tile>span{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(228,182,86,.24),rgba(228,182,86,.09));color:var(--gold-l)}
+.vm-danger{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 16px;border-radius:18px;color:var(--red-l);background:rgba(255,92,80,.07);box-shadow:inset 0 0 0 1px rgba(255,92,80,.22);font-weight:650}
+.vm-danger small{display:block;font-size:12px;font-weight:500;color:var(--mut);margin-top:1px}
+.sheet h2{font-size:22px}
+
 /* ===================== effetti ===================== */
 .page-ghost{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
 .page-ghost>div{will-change:transform}
@@ -5289,6 +5386,219 @@ const _openT3=openTable;
 openTable=async function(t){F.tbStep=null;SH=null;return _openT3(t)};
 
 /* =====================================================================
+   TAVOLI VIRTUALI — lobby, creazione e gestione rifatte da capo.
+   Lobby: chi sta giocando dove, a colpo d'occhio, con un tavolino in
+   miniatura per ogni partita. Creazione: una schermata sola con anteprima
+   dal vivo, scelte a pulsanti e i numeri esatti solo se li vuoi.
+   Gestione: un pannello ordinato (giocatori, azioni, regole, uscita).
+   ===================================================================== */
+Object.assign(IP,{dots:'M5 12h.01M12 12h.01M19 12h.01',play:'M8 5v14l11-7z',pause:'M8 5v14M16 5v14',edit:'M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4',hist:'M3 12a9 9 0 109-9 9 9 0 00-6.4 2.6L3 8M3 3v5h5M12 7v5l3 2',sit:'M6 20v-6a2 2 0 012-2h8a2 2 0 012 2v6M8 12V6a4 4 0 018 0v6'});
+
+/* ---------- tavolino in miniatura ---------- */
+function vtMiniSvg(ms,names,big){
+  const L=ms<=2?SP2:ms<=6?SP6:SP,W=big?168:76,H=big?108:50,r=big?9:5;
+  const seats=L.slice(0,ms).map(([x,y],i)=>{
+    const cx=(x/100*W).toFixed(1),cy=(y/100*H).toFixed(1),n=names[i];
+    if(!n)return `<circle cx="${cx}" cy="${cy}" r="${r-1}" fill="rgba(0,0,0,.35)" stroke="rgba(255,255,255,.35)" stroke-width="1" stroke-dasharray="2 2"/>`;
+    const me=n===true;
+    return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${me?'#E4B656':`hsl(${hueOf(n)} 60% 46%)`}" stroke="${me?'#FFF4D2':'#F4ECDC'}" stroke-width="${big?2:1.4}"/>`;
+  }).join('');
+  return `<svg class="vmini${big?' big':''}" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><ellipse cx="${W/2}" cy="${H/2}" rx="${W*.36}" ry="${H*.31}" fill="#5A3424"/><ellipse cx="${W/2}" cy="${H/2}" rx="${W*.36-(big?5:3)}" ry="${H*.31-(big?5:3)}" fill="url(#vmf${big?'b':''})"/><defs><radialGradient id="vmf${big?'b':''}" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="#22966C"/><stop offset="1" stop-color="#0B4232"/></radialGradient></defs>${seats}</svg>`;
+}
+const vtMiniOf=(st,big)=>{const ms=HE.maxSeats(st),acct=myAcct();return vtMiniSvg(ms,st.seats.slice(0,ms).map(x=>x?(x.acct===acct?true:x.name):null),big)};
+const vtFmt=st=>st.cfg.mode==='sng'?'Torneo':HE.maxSeats(st)===2?'Testa a testa':'Cash';
+const vtRebTxt=m=>m>=99?'illimitate':m?String(m):'nessuna';
+function vtRules(cfg,ms){
+  const r=[['Formato',cfg.mode==='sng'?'Torneo Sit & Go':ms===2?'Testa a testa (cash)':'Cash game'],['Posti',String(ms)],[cfg.mode==='sng'?'Bui iniziali':'Bui',fchip(cfg.sb)+' / '+fchip(cfg.bb)],['Fiches iniziali',fchip(cfg.stack)+' · '+Math.round(cfg.stack/cfg.bb)+' bui'],['Tempo per turno',cfg.turnSec+' secondi']];
+  r.push(cfg.mode==='sng'?['Livelli dei bui','ogni '+(cfg.lvlMin||6)+' minuti']:['Ricariche a testa',vtRebTxt(cfg.maxRebuys==null?2:cfg.maxRebuys)]);
+  return r;
+}
+const vtRulesHtml=(cfg,ms)=>`<div class="vrules">${vtRules(cfg,ms).map(([k,v])=>`<div><span>${k}</span><b class="num">${esc(v)}</b></div>`).join('')}</div>`;
+function vtJoinLabel(st){
+  const acct=myAcct(),mine=st.seats.some(x=>x&&x.acct===acct);
+  if(st.closed)return ['Risultati','ghost'];
+  if(mine)return ['Torna al tavolo','gold'];
+  if(HE.sngOn(st))return ['Guarda','ghost'];
+  const free=st.seats.some((x,i)=>!x&&i<HE.maxSeats(st));if(!free)return ['Guarda','ghost'];
+  if(st.busted&&st.busted[acct])return HE.rebuysLeft(st,acct)>0?['Rientra','gold']:['Guarda','ghost'];
+  return ['Siediti','gold'];
+}
+
+/* ---------- lobby ---------- */
+vLobby=function(){
+  const acct=myAcct(),u=S.vt.unread;
+  const all=Object.values(S.vt.rooms).filter(st=>st.room&&(!st.closed||st.seats.some(x=>x&&x.acct===acct)));
+  const isMine=st=>st.seats.some(x=>x&&x.acct===acct);
+  const rank=st=>{const[,c]=roomStatus(st);return c==='live'?0:c==='wait'?1:2};
+  const mine=all.filter(st=>isMine(st)&&!st.closed),rest=all.filter(st=>!mine.includes(st)).sort((a,b)=>rank(a)-rank(b)||((b.room.createdAt||0)-(a.room.createdAt||0)));
+  const top=`<div class="vl-top"><button class="back-l" data-act="mode">${ico('back',20)}${esc(S.table.name)}</button><span class="row" style="gap:8px"><button class="vl-ib ${F.vt.chatOpen?'on':''}" data-act="vtchat" aria-label="Chat del tavolo">${ico('chat',20)}${u?`<i class="v2-dot">${u>9?'9+':u}</i>`:''}</button><button class="vl-ib" data-act="vtinvite" aria-label="Invita a giocare">${ico('uplus',20)}</button></span></div>
+<h1 class="vl-h">Tavoli virtuali</h1><p class="vl-sub">Texas Hold'em con fiches finte, ognuno dal suo telefono.</p>`;
+  if(S.vt.missing)return `<div class="app"><main class="pg vl">${top}<div class="box o sm">Per i tavoli virtuali va eseguito <b>virtuale2.sql</b> in Supabase (e aggiornata la funzione hpl-holdem).</div></main></div>`;
+  const ppl=st=>{const sat=st.seats.filter(Boolean);return `<span class="vl-ppl">${sat.length?stackAva(sat.map(x=>x.name),4):''}<span class="num">${sat.length}/${HE.maxSeats(st)} seduti</span></span>`};
+  const meta=st=>{const b=HE.blinds(st,vtNow());return `${st.cfg.mode==='sng'&&HE.sngOn(st)?'livello '+(b.level+1)+' · ':''}bui ${fchip(b.sb)}/${fchip(b.bb)} · ${fchip(st.cfg.stack)} fiches`};
+  const hero=st=>{const me=st.seats.find(x=>x&&x.acct===acct),[stt,cls]=roomStatus(st);
+    return `<div class="vl-hero"><button class="vl-hero-go" data-act="vtopen" data-rid="${esc(st.room.id)}"><span class="vl-hero-mini">${vtMiniOf(st,true)}</span>
+<span class="vl-hero-tx"><span class="vl-k"><i class="dot${cls==='live'?'':' off'}"></i>${esc(stt)} · ${vtFmt(st)}</span><b>${esc(st.room.name)}</b><span class="mut sm">${meta(st)}</span>
+<span class="vl-hero-me">Le tue fiches <b class="num">${me.out?'eliminato':fchip(me.stack)}</b></span></span></button>
+<div class="vl-hero-acts"><button class="btn" data-act="vtopen" data-rid="${esc(st.room.id)}">${ico('play',18)} Torna al tavolo</button><button class="btn-s" data-act="vroom" data-rid="${esc(st.room.id)}" aria-label="Dettagli del tavolo">${ico('dots',22)}</button></div></div>`};
+  const card=st=>{const [stt,cls]=roomStatus(st),[jl,jc]=vtJoinLabel(st),rid=esc(st.room.id);
+    return `<div class="vl-card ${cls}"><button class="vl-main" data-act="vroom" data-rid="${rid}" aria-label="Dettagli di ${esc(st.room.name)}"><span class="vl-mini">${vtMiniOf(st)}</span>
+<span class="vl-body"><span class="vl-t"><b class="ell">${esc(st.room.name)}</b><span class="vl-fmt ${st.cfg.mode==='sng'?'t':''}">${vtFmt(st)}</span></span><span class="vl-meta">${meta(st)}</span>${ppl(st)}</span></button>
+<div class="vl-foot"><span class="vl-st ${cls}"><i></i>${esc(stt)}</span><button class="vl-go ${jc}" data-act="vtjoin" data-rid="${rid}">${jl}</button></div></div>`};
+  const newCard=`<button class="vl-new" data-act="vtnew"><span class="vl-new-ic">${ico('plus',26)}</span><span class="grow"><b>Crea un tavolo</b><span>Cash, torneo o testa a testa: scegli e sei già seduto</span></span>${ico('chevr',20)}</button>`;
+  let body='';
+  if(mine.length)body+=`<div class="lob-lbl">${mine.length===1?'Stai giocando':'Stai giocando a '+mine.length+' tavoli'}</div><div class="stack" style="gap:12px">${mine.map(hero).join('')}</div>`;
+  body+=`<div style="margin-top:${mine.length?14:4}px">${newCard}</div>`;
+  if(!S.vt.roomsLoaded&&!all.length)body+=`<div class="lob-lbl">Aperti ora</div><div class="stack" aria-hidden="true"><div class="sk"></div><div class="sk" style="opacity:.5"></div></div>`;
+  else if(rest.length)body+=`<div class="lob-lbl">${mine.length?'Altri tavoli':'Aperti ora'} · ${rest.length}</div><div class="stack" style="gap:12px">${rest.map(card).join('')}</div>`;
+  else if(!mine.length)body+=`<div class="lob-empty" style="margin:18px 0 0"><div class="fan"><i class="r">♥</i><i>♠</i><i class="r">♦</i></div><b>Nessun tavolo aperto</b><span>Creane uno: entri subito e gli altri ricevono l'invito sul telefono.</span></div>`;
+  return `<div class="app"><main class="pg vl">${top}${body}</main></div>`;
+};
+
+/* ---------- scheda di un tavolo (dalla lobby) ---------- */
+function vRoomSheet(){
+  const st=S.vt.rooms[SH.rid];if(!st)return '';
+  const ms=HE.maxSeats(st),[stt,cls]=roomStatus(st),[jl]=vtJoinLabel(st),sat=st.seats.map((x,i)=>x?{x,i}:null).filter(Boolean),acct=myAcct();
+  const kill=isManager()?`<button class="vm-danger" data-act="vtkill" data-rid="${esc(st.room.id)}">${ico('trash',18)}<span class="grow">${armed['vtkill'+st.room.id]?'Confermi? Tocca di nuovo':'Chiudi il tavolo per tutti'}<small>Puoi farlo perché sei gestore</small></span></button>`:'';
+  return `<div class="back" data-act="closesheet"><div class="sheet ${SH.anim?'anim':''}" role="dialog" aria-label="${esc(st.room.name)}"><div class="grab"></div><div class="sheet-body">
+<div class="row sp"><h2>${esc(st.room.name)}</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
+<div class="vroom-prev">${vtMiniOf(st,true)}<span class="vl-st ${cls}"><i></i>${esc(stt)}</span></div>
+${sat.length?`<div class="list">${sat.map(({x})=>`<div class="li">${ava(x.name,'xs')}<span class="grow"><b>${esc(x.acct===acct?'Tu':x.name)}</b>${x.away?'<span class="mut xs"> · in pausa</span>':''}</span><span class="num mut sm">${x.out?'eliminato':fchip(x.stack)+' fiches'}</span></div>`).join('')}</div>`:'<p class="mut sm" style="margin:0">Nessuno è seduto: il primo posto è tuo.</p>'}
+<div class="lbl in">Regole</div>${vtRulesHtml(st.cfg,ms)}
+<button class="btn" data-act="vtjoin" data-rid="${esc(st.room.id)}">${jl}</button>
+${kill}</div></div></div>`;
+}
+
+/* ---------- controlli condivisi: creazione e modifica regole ---------- */
+const VC_BL=[[5,10,'Micro'],[25,50,'Bassi'],[100,200,'Medi'],[500,1000,'Alti']];
+const VC_DEPTH=[[50,'Corto'],[100,'Classico'],[200,'Profondo']];
+const VC_SPEED=[['Turbo',12,4],['Normale',20,6],['Con calma',30,10]];
+const VC_REB=[[0,'Nessuna'],[1,'1'],[2,'2'],[99,'Illimitate']];
+const vcOpt=(on,act,o,v,b,s,extra)=>`<button class="vc-opt ${on?'on':''}" data-act="${act}" data-o="${o}" data-v="${v}"${extra||''}><b>${b}</b>${s?`<span>${s}</span>`:''}</button>`;
+function vcRows(c,o,withSeats){
+  const sng=c.mode==='sng',bb=+c.bb||1,depth=Math.round((+c.stack||0)/bb);
+  let h='';
+  if(withSeats)h+=`<section class="vc-sec"><div class="vc-lab">Posti al tavolo <b class="num">${c.ms}</b></div><div class="vc-seats">${[2,3,4,5,6,7,8,9].map(n=>`<button class="vc-seat ${+c.ms===n?'on':''}" data-act="vcms" data-o="${o}" data-v="${n}" aria-label="${n} posti">${n}</button>`).join('')}</div></section>`;
+  h+=`<section class="vc-sec"><div class="vc-lab">${sng?'Bui iniziali':'Bui'}</div><div class="vc-opts c4">${VC_BL.map(([s,b,l],i)=>vcOpt(+c.sb===s&&+c.bb===b,'vcbl',o,i,l,fchip(s)+'/'+fchip(b))).join('')}</div></section>`;
+  h+=`<section class="vc-sec"><div class="vc-lab">Fiches iniziali</div><div class="vc-opts c3">${VC_DEPTH.map(([d,l])=>vcOpt(depth===d,'vcdepth',o,d,l,fchip(bb*d)+' · '+d+' bui')).join('')}</div></section>`;
+  h+=`<section class="vc-sec"><div class="vc-lab">Ritmo</div><div class="vc-opts c3">${VC_SPEED.map(([l,t,m],i)=>vcOpt(+c.turnSec===t&&(!sng||+c.lvlMin===m),'vcspeed',o,i,l,t+' s a turno'+(sng?' · bui ogni '+m+'′':''))).join('')}</div></section>`;
+  if(!sng)h+=`<section class="vc-sec"><div class="vc-lab">Ricariche a testa</div><div class="vc-opts c4">${VC_REB.map(([v,l])=>vcOpt(+c.maxRebuys===v,'vcreb',o,v,l,'')).join('')}</div><p class="vc-hint">Chi finisce le fiches lascia il posto e può rientrare con una ricarica.</p></section>`;
+  const adv=!!F.vcAdv;
+  const num=(lab,k,id)=>`<label class="vc-num"><span>${lab}</span><span class="vn-num"><button class="vn-st" data-act="vcstep" data-o="${o}" data-k="${k}" data-d="-1" aria-label="Meno ${lab}">−</button><input class="in num" id="${id}" inputmode="numeric" data-digits="1" data-bind="${o==='cfg'?'vt.cfg':'vc'}.${k}" value="${esc(String(c[k]))}"><button class="vn-st" data-act="vcstep" data-o="${o}" data-k="${k}" data-d="1" aria-label="Più ${lab}">+</button></span></label>`;
+  h+=`<section class="vc-sec"><button class="vc-adv" data-act="vcadv" aria-expanded="${adv}">${ico('gear',17)}<span class="grow">Numeri esatti</span>${ico(adv?'chevu':'chev',18)}</button>
+${adv?`<div class="vc-advb">${num('Piccolo buio','sb',o+'-sb')}${num('Grande buio','bb',o+'-bb')}${num('Fiches iniziali','stack',o+'-st')}${num('Secondi per turno','turnSec',o+'-t')}${sng?num('Minuti per livello','lvlMin',o+'-l'):num('Ricariche (99 = senza limite)','maxRebuys',o+'-r')}</div>`:''}</section>`;
+  return h;
+}
+const vcTgt=d=>d.o==='cfg'?F.vt.cfg:F.vc;
+const vcDefaults=(fmt,prev)=>{
+  const p=Object.assign({sb:25,bb:50,stack:5000,turnSec:20,lvlMin:6},prev||{});
+  const f=fmt||'cash';
+  return Object.assign(p,{fmt:f,mode:f==='sng'?'sng':'cash',ms:f==='duel'?2:(prev&&prev.ms&&prev.ms>2?prev.ms:6),maxRebuys:f==='duel'?99:f==='sng'?0:(prev&&prev.maxRebuys!=null&&prev.fmt!=='duel'?prev.maxRebuys:2),name:prev&&prev.name||'',busy:false});
+};
+const vcSummary=c=>{const bits=[c.mode==='sng'?'Torneo':+c.ms===2?'Testa a testa':'Cash',c.ms+' posti','bui '+fchip(+c.sb)+'/'+fchip(+c.bb),fchip(+c.stack)+' fiches',c.turnSec+'s'];
+  bits.push(c.mode==='sng'?'livelli '+c.lvlMin+'′':'ricariche '+vtRebTxt(+c.maxRebuys));return bits.join(' · ')};
+
+/* ---------- schermata: nuovo tavolo ---------- */
+function vCreate(){
+  const c=F.vc||(F.vc=vcDefaults('cash')),err=vnErr(c),nm='Tavolo di '+firstName(S.acct?S.acct.name:S.me.name);
+  const FM=[['cash','Cash game','Si entra e si esce quando si vuole','chip'],['sng','Torneo','Stesse fiches per tutti, vince l\'ultimo','trophy'],['duel','Testa a testa','Uno contro uno, ricariche libere','duel']];
+  const names=[true].concat(Array(Math.max(0,+c.ms-1)).fill(null));
+  return `<div class="app vc"><main class="pg vl">
+<div class="vl-top"><button class="back-l" data-act="vtlobby">${ico('back',20)}Tavoli virtuali</button></div>
+<h1 class="vl-h">Nuovo tavolo</h1>
+<div class="vc-prev"><div class="vc-prev-mini">${vtMiniSvg(Math.min(9,Math.max(2,+c.ms||2)),names,true)}</div><div class="vc-prev-tx"><span class="vl-k">Anteprima</span><b class="ell">${esc(c.name.trim()||nm)}</b><span>${esc(vcSummary(c))}</span></div></div>
+<section class="vc-sec"><div class="vc-lab">Formato</div><div class="vc-fmts">${FM.map(([k,t,s,ic])=>`<button class="vc-fmt ${c.fmt===k?'on':''}" data-act="vcfmt" data-o="vc" data-v="${k}"><span class="vc-fmt-ic">${ico(ic,22)}</span><b>${t}</b><span>${s}</span></button>`).join('')}</div></section>
+<label class="field vc-sec"><span class="vc-lab">Nome del tavolo</span><input class="in" id="vc-name" data-bind="vc.name" value="${esc(c.name)}" placeholder="${esc(nm)}" maxlength="28" autocapitalize="sentences"></label>
+${vcRows(c,'vc',c.fmt!=='duel')}
+</main>
+<div class="bar"><div class="bar-in">${err?`<div class="vn-err" role="alert">${esc(err)}</div>`:''}<button class="btn" data-act="vccreate" ${c.busy||err?'disabled':''}>${c.busy?'Preparo il tavolo…':`${ico('chip',18)} Crea e siediti`}</button></div></div></div>`;
+}
+async function vcCreate(){
+  const c=F.vc;if(!c||c.busy||vnErr(c))return;
+  c.busy=true;render();
+  const nm=c.name.trim()||'Tavolo di '+firstName(S.acct?S.acct.name:S.me.name);
+  const cfg={sb:+c.sb,bb:+c.bb,stack:+c.stack,turnSec:+c.turnSec,mode:c.mode,lvlMin:+c.lvlMin||6,maxRebuys:c.mode==='sng'?0:+c.maxRebuys};
+  const r=await vtCall('create',{name:nm,maxSeats:+c.ms,cfg});
+  c.busy=false;
+  if(r&&r.rid){S.vt.rooms[r.rid]=r.state;F.vc=null;F.vcAdv=false;vtOpenRoom(r.rid);toast('Tavolo pronto: invita gli altri','ok');
+    if(vtInvList().some(x=>!x.at&&x.push)){F.vinv={};setTimeout(()=>{if(V.name==='vt')openSheet({type:'vtinv'})},700)}}
+  else render();
+}
+
+/* ---------- pannello del tavolo (rotella in alto) ---------- */
+vtMenuSheet=function(){
+  const st=S.vt.st;if(!st)return '';
+  const me=vtSeat(),s=me>=0&&st.seats[me],live=vtLive(),sngR=HE.sngOn(st),ms=HE.maxSeats(st),acct=myAcct();
+  const rows=st.seats.map((x,i)=>x?{x,net:x.stack-st.cfg.stack*(1+(x.rebuys||0))}:null).filter(Boolean).sort((a,b)=>st.cfg.mode==='sng'?b.x.stack-a.x.stack:b.net-a.net);
+  const tile=(act,ic,l,extra)=>`<button class="vm-tile" data-act="${act}"${extra||''}><span>${ico(ic,22)}</span>${l}</button>`;
+  const tiles=[tile('vtinvite','uplus','Invita'),tile('vthist','hist','Mani giocate')];
+  if(s&&!s.away&&!live&&!sngR)tiles.push(tile('vtpause','pause','Salta le mani'));
+  if(s&&s.away)tiles.push(tile('vtback','play','Torno a giocare'));
+  if(s&&s.stack===0&&!live&&!sngR)tiles.push(tile('vtrebuy','coins','Ricarica'));
+  if(s&&st.running&&!sngR)tiles.push(tile('vtstop','pause','Ferma dopo questa mano'));
+  if(s&&!st.running&&st.cfg.mode!=='sng'&&HE.eligible(st).length>=2)tiles.push(tile('vtstart','play','Riprendi la partita'));
+  const locked=live||sngR;
+  return `<div class="back" data-act="closesheet"><div class="sheet ${SH.anim?'anim':''}" role="dialog" aria-label="Il tavolo ${esc(st.room?st.room.name:'')}"><div class="grab"></div><div class="sheet-body">
+<div class="row sp"><div class="grow"><h2 class="ell">${esc(st.room?st.room.name:'Tavolo')}</h2><div class="mut sm">${vtFmt(st)} · ${ms} posti</div></div><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
+<div class="vm-tiles">${tiles.join('')}</div>
+${rows.length?`<div class="lbl in">${st.cfg.mode==='sng'?'Fiches in gioco':'Chi vince e chi perde'}</div><div class="list">${rows.map(r=>`<div class="li">${ava(r.x.name,'xs')}<span class="grow"><b>${esc(r.x.acct===acct?'Tu':r.x.name)}</b><span class="mut xs" style="display:block">${r.x.out?'Eliminato':fchip(r.x.stack)+' fiches'}${r.x.rebuys?` · ${r.x.rebuys} ricaric${r.x.rebuys===1?'a':'he'}`:''}${r.x.away?' · in pausa':''}</span></span>${st.cfg.mode==='cash'?`<b class="num ${r.net>0?'green':r.net<0?'red':'mut'}">${r.net>0?'+':r.net<0?'−':''}${fchip(Math.abs(r.net))}</b>`:''}</div>`).join('')}</div>`:''}
+<div class="row sp" style="margin-top:4px"><div class="lbl in" style="margin:0">Regole</div>${s?`<button class="btn-s go" style="min-height:38px" data-act="vtrules" ${locked?'disabled':''}>${ico('edit',16)} Modifica</button>`:''}</div>
+${locked&&s?`<p class="mut xs" style="margin:-6px 0 0">${sngR?'Il torneo è in corso: le regole si cambiano alla fine.':'Si possono cambiare tra una mano e l\'altra.'}</p>`:''}
+${vtRulesHtml(st.cfg,ms)}
+<div class="list"><button class="li" data-act="vtsound"><span class="lic">${ico(S.vt.sound!==false?'vol':'mute',17)}</span><span class="grow">Suoni</span><span class="sw ${S.vt.sound!==false?'on':''}"><i></i></span></button><button class="li" data-act="vtmusic"><span class="lic">${ico('music',17)}</span><span class="grow">Musica di sottofondo</span><span class="sw ${S.vt.music!==false?'on':''}"><i></i></span></button></div>
+${s?`<button class="vm-danger" data-act="vtleave">${ico('out',18)}<span class="grow">${armed.vtleave?'Confermi? Tocca di nuovo':'Alzati dal tavolo'}<small>${sngR?'Esci dal torneo. ':live&&st.hand.p[me]&&!st.hand.p[me].folded?'Lasci la mano in corso. ':''}Le tue fiches tornano al banco</small></span></button>`:''}
+${isManager()&&st.room?`<button class="vm-danger" data-act="vtkill" data-rid="${esc(st.room.id)}">${ico('trash',18)}<span class="grow">${armed['vtkill'+st.room.id]?'Confermi? Tocca di nuovo':'Chiudi il tavolo per tutti'}<small>Puoi farlo perché sei gestore</small></span></button>`:''}
+<p class="mut xs" style="margin:0;text-align:center">Fiches finte, nessun soldo vero. Le carte le distribuisce il server e ognuno vede solo le sue.</p>
+</div></div></div>`;
+};
+function vtRulesSheet(){
+  const st=S.vt.st;if(!st)return '';const c=F.vt.cfg,locked=vtLive()||HE.sngOn(st);
+  return `<div class="back" data-act="closesheet"><div class="sheet tall ${SH.anim?'anim':''}" role="dialog" aria-label="Modifica le regole"><div class="grab"></div><div class="sheet-body">
+<div class="row sp"><button class="x" data-act="vtmenu" aria-label="Indietro">${ico('back',20)}</button><h2 style="flex:1;text-align:center">Regole</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
+<section class="vc-sec"><div class="vc-lab">Formato</div><div class="vc-opts c2">${vcOpt(c.mode!=='sng','vcfmt','cfg','cash','Cash game','si entra e si esce')}${vcOpt(c.mode==='sng','vcfmt','cfg','sng','Torneo','vince l\'ultimo')}</div></section>
+${vcRows(c,'cfg',false)}
+<p class="vc-hint" style="margin:0">${esc(vcSummary(Object.assign({ms:HE.maxSeats(st)},c)))}</p>
+<button class="btn" data-act="vtcfgok" ${locked||vnErr(Object.assign({ms:HE.maxSeats(st)},c))?'disabled':''}>Salva le regole</button>
+</div></div></div>`;
+}
+
+/* ---------- collegamenti ---------- */
+const _viewVC=view;
+view=function(){if(S.table&&db&&S.me&&S.loaded.games&&V.name==='vcreate')return vCreate();return _viewVC()};
+const _sheetVC=sheetHtml;
+sheetHtml=function(){
+  if(SH&&SH.type==='vroom')return vRoomSheet();
+  if(SH&&SH.type==='vtrules')return vtRulesSheet();
+  if(SH&&SH.type==='vtmenu')return vtMenuSheet();
+  return _sheetVC();
+};
+Object.assign(H,{
+  vtnew(){F.vc=vcDefaults('cash');F.vcAdv=false;SH=null;go('vcreate')},
+  vtnewsame(){const st=S.vt.st||S.vt.gone;let p=null;
+    if(st&&st.cfg){const ms=HE.maxSeats(st);p=Object.assign({},st.cfg,{ms,name:st.room?st.room.name:''});p=vcDefaults(st.cfg.mode==='sng'?'sng':ms===2?'duel':'cash',p);p.ms=ms;p.maxRebuys=st.cfg.maxRebuys==null?2:st.cfg.maxRebuys}
+    F.vc=p||vcDefaults('cash');F.vcAdv=false;SH=null;go('vcreate')},
+  vroom(d){openSheet({type:'vroom',rid:d.rid})},
+  vtjoin(d){
+    const st=S.vt.rooms[d.rid];if(!st)return;const [l]=vtJoinLabel(st);SH=null;
+    vtOpenRoom(d.rid);
+    if(l==='Siediti'||l==='Rientra')vtDo('sit',{seat:null}).then(r=>{if(r)toast('Sei seduto: buona fortuna!','ok')});
+  },
+  vcfmt(d){const o=vcTgt(d);if(d.o==='cfg'){o.mode=d.v;if(d.v==='sng')o.lvlMin=+o.lvlMin||6;else if(o.maxRebuys==null)o.maxRebuys=2;render();return}
+    F.vc=vcDefaults(d.v,Object.assign({},o,{fmt:o.fmt}));render()},
+  vcms(d){vcTgt(d).ms=+d.v;render()},
+  vcbl(d){const o=vcTgt(d),[sb,bb]=VC_BL[+d.v],dep=Math.max(2,Math.round((+o.stack||0)/(+o.bb||1))||100);o.sb=sb;o.bb=bb;o.stack=bb*dep;render()},
+  vcdepth(d){const o=vcTgt(d);o.stack=(+o.bb||1)*(+d.v);render()},
+  vcspeed(d){const o=vcTgt(d),s=VC_SPEED[+d.v];o.turnSec=s[1];o.lvlMin=s[2];render()},
+  vcreb(d){vcTgt(d).maxRebuys=+d.v;render()},
+  vcstep(d){const o=vcTgt(d),L=VNLIM[d.k]||[0,999999,1],cur=+o[d.k]||0;o[d.k]=Math.max(L[0],Math.min(L[1],cur+(+d.d)*L[2]));render()},
+  vcadv(){F.vcAdv=!F.vcAdv;render()},
+  vccreate(){vcCreate()},
+  vtmenu(){F.vt.cfg=null;openSheet({type:'vtmenu'})},
+  vtrules(){const st=S.vt.st;if(!st)return;F.vt.cfg=Object.assign({maxRebuys:2,lvlMin:6},st.cfg);F.vcAdv=false;SH={type:'vtrules',anim:false};render()},
+  vtcfgok(){const c=F.vt.cfg;vtDo('config',{cfg:{sb:+c.sb,bb:+c.bb,stack:+c.stack,turnSec:+c.turnSec,mode:c.mode,lvlMin:+c.lvlMin||6,maxRebuys:c.mode==='sng'?0:+c.maxRebuys}}).then(r=>{if(r){SH={type:'vtmenu',anim:false};render();toast('Regole salvate','ok')}})}
+});
+
+/* =====================================================================
    Effetti e accessibilità, tutto attorno a render():
    - passaggio tra schermate: la pagina vecchia scivola via mentre entra la nuova
    - ingresso a cascata dei blocchi, cifre che contano fino al valore
@@ -5573,7 +5883,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791891709891';
+const APP_VERSION='1791892128522';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
