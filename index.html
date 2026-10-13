@@ -1078,6 +1078,171 @@ span.chips i{position:absolute;left:0;bottom:calc(var(--j)*3px);width:18px;heigh
 .vm-danger small{display:block;font-size:12px;font-weight:500;color:var(--mut);margin-top:1px}
 .sheet h2{font-size:22px}
 
+
+/* ===================== tavolo da gioco v3 ===================== */
+.vt3{height:100dvh;display:flex;flex-direction:column;max-width:560px;margin:0 auto;overflow:hidden;position:relative;user-select:none;-webkit-user-select:none;overscroll-behavior:none;padding-top:env(safe-area-inset-top);
+  background:radial-gradient(80% 45% at 50% 42%,rgba(36,150,108,.25),transparent 72%),radial-gradient(120% 70% at 50% 40%,#0C1A15,#060A08 70%)}
+.vt3::before{content:"";position:absolute;left:50%;top:-12%;width:120%;height:60%;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(255,236,190,.08),transparent);pointer-events:none}
+.t3-top{display:flex;align-items:center;gap:8px;padding:6px 10px 0;min-height:56px;flex:none;position:relative;z-index:5}
+.t3-tt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2;text-align:center}
+.t3-tt b{font-family:var(--serif);font-weight:800;font-size:17px;letter-spacing:-.015em}
+.t3-tt span{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t3-ib{position:relative;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));box-shadow:inset 0 0 0 1px var(--hair-2);color:var(--ivory)}
+.t3-ib.on{background:var(--gold-grad);color:var(--on-acc)}
+.t3-stage{flex:1;min-height:0;display:flex;justify-content:center;padding:20px 4px 0}
+.t3-tbl{position:relative;width:100%;max-width:470px;height:100%;min-height:340px}
+.t3-rail{position:absolute;inset:8.5% 12% 9.5%;border-radius:999px;padding:12px;
+  background:linear-gradient(165deg,#6A3E2A,#3A1F14 45%,#1C0E09);box-shadow:0 34px 70px -10px rgba(0,0,0,.8),inset 0 2px 0 rgba(255,220,180,.22),inset 0 -4px 10px rgba(0,0,0,.6),0 0 0 1px rgba(228,182,86,.16)}
+.t3-felt{position:relative;width:100%;height:100%;border-radius:999px;overflow:hidden;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),radial-gradient(70% 50% at 50% 38%,#25A276 0%,#167655 45%,#0B4A36 100%);
+  box-shadow:inset 0 0 40px rgba(0,0,0,.55),inset 0 0 0 2px rgba(0,0,0,.3)}
+.t3-felt::before{content:"";position:absolute;inset:12px;border-radius:999px;border:1.5px solid rgba(228,182,86,.3)}
+.t3-felt::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(55% 30% at 50% 22%,rgba(255,255,255,.12),transparent 70%);pointer-events:none}
+.t3-logo{position:absolute;left:0;right:0;top:66%;text-align:center;font-family:var(--serif);font-weight:800;font-size:17px;letter-spacing:.04em;color:rgba(255,255,255,.08);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 26px}
+.t3-logo span{display:block;font-size:34px;line-height:1;margin-bottom:2px}
+.t3-center{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);width:74%;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:2;pointer-events:none}
+.t3-center>*{pointer-events:auto}
+.t3-stagelbl{font-size:10.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.55);min-height:13px}
+.t3-pot{display:flex;align-items:center;gap:8px;padding:4px 14px 4px 7px;border-radius:999px;background:rgba(0,0,0,.42);box-shadow:inset 0 0 0 1px rgba(228,182,86,.25);opacity:0;transform:scale(.85);transition:opacity .3s,transform .4s var(--spring);min-height:32px}
+.t3-pot.on{opacity:1;transform:none}
+.t3-potv{display:flex;align-items:baseline;gap:6px}.t3-potv small{font-size:11px;color:rgba(255,255,255,.7);font-weight:700}.t3-potv b{font-family:var(--serif);font-size:17px;color:#FFE7A8}
+.t3-board{display:flex;gap:5px;perspective:600px}
+.t3-slot{width:46px;height:65px;border-radius:7px;display:block;flex:none;border:1.5px dashed rgba(255,255,255,.12)}
+.t3-slot.full{border-color:transparent}
+.cd.b{width:46px;height:65px;border-radius:7px}
+.cd.b .cd-ix{left:5px;top:4px}.cd.b .cd-ix b{font-size:19px}.cd.b .cd-ix i{font-size:13px}.cd.b .cd-pip{right:4px;bottom:3px;font-size:26px}
+.cd.h{width:74px;height:104px;border-radius:10px}
+.cd.h .cd-ix{left:8px;top:6px}.cd.h .cd-ix b{font-size:30px}.cd.h .cd-ix i{font-size:20px}.cd.h .cd-pip{right:7px;bottom:5px;font-size:44px}
+.cd.h.back i{inset:5px;border-radius:7px}
+.cd.flip{animation:flip3 .6s var(--snap) both}
+@keyframes flip3{0%{transform:translateY(-10px) rotateY(100deg) scale(.85);opacity:0;filter:brightness(.6)}55%{opacity:1}100%{transform:none;opacity:1;filter:none}}
+.cd.hi{box-shadow:0 0 0 2px #F2CB72,0 0 22px rgba(242,203,114,.7);transform:translateY(-5px)}
+.cd.dim{filter:brightness(.45) saturate(.5)}
+.t3-msg{min-height:46px;display:flex;align-items:center;justify-content:center;text-align:center}
+.t3-hint{font-size:13px;color:rgba(255,255,255,.8);line-height:1.35;background:rgba(0,0,0,.25);padding:6px 12px;border-radius:999px}
+.t3-win{display:flex;flex-direction:column;align-items:center;padding:6px 18px 7px;border-radius:16px;background:rgba(6,12,9,.82);box-shadow:inset 0 0 0 1px rgba(228,182,86,.5),0 10px 30px rgba(0,0,0,.4);line-height:1.3;animation:winIn .55s var(--spring) both}
+.t3-win b{color:#FFE3A1;font-size:15.5px}.t3-win span{font-size:12.5px;color:#fff;opacity:.9}
+.t3-win.mine{background:linear-gradient(180deg,rgba(84,62,12,.95),rgba(38,28,6,.95));box-shadow:inset 0 0 0 1px #F2CB72,0 0 40px rgba(242,203,114,.45)}
+@keyframes winIn{from{opacity:0;transform:scale(.6) translateY(10px)}}
+/* posti */
+.s3{position:absolute;transform:translate(-50%,-50%);width:88px;display:flex;flex-direction:column;align-items:center;z-index:3;transition:opacity .35s,filter .35s}
+.s3.off{display:none}
+.s3-av{position:relative;width:56px;height:56px;z-index:2;transition:transform .35s var(--spring)}
+.s3-ava .ava{width:52px;height:52px;margin:2px;font-size:16px;box-shadow:0 0 0 2px rgba(0,0,0,.6),0 6px 14px rgba(0,0,0,.5)}
+.s3-ring{position:absolute;left:-6px;top:-6px;width:68px;height:68px;transform:rotate(-90deg);pointer-events:none;opacity:0;transition:opacity .25s}
+.s3-ring circle{fill:none;stroke:#F2CB72;stroke-width:4.5;stroke-linecap:round;stroke-dasharray:182.2px;stroke-dashoffset:calc(182.2px * (1 - var(--p,1)));transition:stroke-dashoffset .25s linear,stroke .3s;filter:drop-shadow(0 0 4px rgba(242,203,114,.8))}
+.s3-ring.late circle{stroke:#FF6A60;filter:drop-shadow(0 0 4px rgba(255,106,96,.9))}
+.s3.act .s3-ring{opacity:1}
+.s3.act .s3-av{transform:scale(1.08)}
+.s3.act .s3-plate{box-shadow:inset 0 0 0 1.5px rgba(242,203,114,.8),0 0 18px rgba(242,203,114,.35)}
+.s3-plate{margin-top:-10px;z-index:3;position:relative;min-width:70px;max-width:92px;padding:3px 10px 4px;border-radius:12px;text-align:center;line-height:1.15;background:rgba(7,11,9,.9);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);transition:box-shadow .3s}
+.s3-nm{display:block;font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.s3-stk{font-size:12.5px;font-weight:800;color:#F2CB72}
+.s3.me .s3-nm{color:var(--gold-l)}
+.s3-cards{position:absolute;left:58%;top:-6px;z-index:1;pointer-events:none}
+.s3.rgt .s3-cards{left:auto;right:58%}
+.s3.topr .s3-cards{top:10px;left:64%}
+.s3.topr.rgt .s3-cards{left:auto;right:64%}
+.s3-cc{display:flex}
+.s3-cc .cd{width:26px;height:36px;border-radius:4px}
+.s3-cc .cd:first-child{transform:rotate(-10deg) translateX(5px)}.s3-cc .cd:last-child{transform:rotate(8deg) translateX(-4px)}
+.s3-cc.up{position:relative;top:-6px;gap:2px}
+.s3-cc.up .cd{width:30px;height:42px;transform:none!important}
+.s3-cc.up .cd.hi{transform:translateY(-4px)!important}
+.s3-act{margin-top:3px;min-height:20px;z-index:4}
+.s3 .la{display:inline-block;font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;white-space:nowrap;animation:laIn .35s var(--spring) both;letter-spacing:.01em}
+@keyframes laIn{from{transform:scale(.5) translateY(-4px);opacity:0}}
+.la-fold{background:#3A1418;color:#FF8A80}.la-check{background:#1E2E46;color:#B7CBFF}.la-call{background:#173A2A;color:#86EBAC}.la-raise{background:#4A3510;color:#FFD27A}.la-allin{background:linear-gradient(180deg,#E8435A,#B8213A);color:#fff;box-shadow:0 0 14px rgba(232,67,90,.6)}.la-blind{background:rgba(0,0,0,.45);color:#C9D2CC}
+.s3 .la.win{background:var(--gold-grad);color:var(--on-acc);font-size:12.5px;box-shadow:0 0 18px rgba(242,203,114,.6)}
+.s3.fold .s3-av,.s3.fold .s3-plate{opacity:.45;filter:grayscale(.9)}
+.s3.win .s3-ava .ava{box-shadow:0 0 0 3px #F2CB72,0 0 30px rgba(242,203,114,.9)}
+.s3.win .s3-av{animation:winBob .8s var(--spring)}
+@keyframes winBob{40%{transform:scale(1.15)}}
+.s3.allin .s3-plate{box-shadow:inset 0 0 0 1.5px #E8435A,0 0 16px rgba(232,67,90,.45)}
+.s3.away .s3-plate .s3-stk{color:#FFB65C}
+.s3.out,.s3.wait .s3-av{opacity:.45}
+.s3.empty{cursor:pointer}
+.s3.empty .s3-av{width:52px;height:52px;border-radius:50%;border:1.5px dashed rgba(255,255,255,.45);background:rgba(0,0,0,.3);display:grid;place-items:center;transition:transform .2s,background-color .2s}
+.s3.empty:active .s3-av{transform:scale(.92);background:rgba(228,182,86,.2)}
+.s3.empty .s3-ava{display:grid;place-items:center;color:#fff}
+.s3.empty .s3-plate{background:transparent;box-shadow:none;margin-top:2px}.s3.empty .s3-nm{color:rgba(255,255,255,.85);font-size:11.5px}
+.s3.me .s3-cards{display:none}
+.s3.me{visibility:hidden}
+.t3-mystk{display:inline-flex;align-items:center;gap:7px;padding:3px 12px 3px 3px;border-radius:999px;background:rgba(7,11,9,.88);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.t3-mystk b{font-family:var(--serif);font-size:15px;color:#F2CB72}
+.t3-mystk .ava{width:28px;height:28px;font-size:10.5px}
+.vt3.myturn .t3-mystk{box-shadow:inset 0 0 0 1.5px rgba(242,203,114,.8),0 0 16px rgba(242,203,114,.35)}
+/* puntate e mazziere */
+.b3{position:absolute;transform:translate(-50%,-50%) scale(.5);opacity:0;display:flex;align-items:center;gap:5px;padding:2px 10px 2px 4px;border-radius:999px;background:rgba(0,0,0,.5);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);font-size:12px;font-weight:800;color:#fff;z-index:2;pointer-events:none;transition:opacity .2s,transform .35s var(--spring)}
+.b3.on{opacity:1;transform:translate(-50%,-50%)}
+.t3-dbtn{position:absolute;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-weight:900;font-size:12px;color:#111;background:radial-gradient(circle at 35% 30%,#fff,#E6E0D2);box-shadow:0 3px 6px rgba(0,0,0,.6),inset 0 0 0 2px rgba(0,0,0,.12);transform:translate(-50%,-50%) scale(0);transition:left .7s var(--ease),top .7s var(--ease),transform .35s var(--spring);z-index:2}
+.t3-dbtn.on{transform:translate(-50%,-50%) scale(1)}
+/* le mie carte */
+.t3-hero{position:relative;flex:none;min-height:112px;display:flex;align-items:center;justify-content:center;padding:0 14px;z-index:4}
+.t3-mine{display:flex;justify-content:center;align-items:flex-end;min-height:104px;transition:transform .45s var(--ease),opacity .45s}
+.t3-mine .cd.h:first-child{transform:rotate(-7deg) translate(10px,3px)}.t3-mine .cd.h:last-child{transform:rotate(7deg) translate(-10px,3px)}
+.t3-mine .cd.h.hi:first-child{transform:rotate(-7deg) translate(10px,-8px)}.t3-mine .cd.h.hi:last-child{transform:rotate(7deg) translate(-10px,-8px)}
+.t3-mine.gone{transform:translateY(26px) scale(.9);opacity:.35}
+.cd.deal3{animation:deal3 .6s var(--snap) both}
+@keyframes deal3{0%{transform:translateY(-120px) rotateY(180deg) scale(.4);opacity:0}60%{opacity:1}}
+.t3-me{position:absolute;right:12px;left:12px;bottom:4px;display:flex;align-items:center;justify-content:space-between;pointer-events:none}
+.t3-me>*{pointer-events:auto}
+.t3-hand{position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);font-family:var(--serif);font-weight:800;font-size:14px;padding:3px 12px;border-radius:999px;background:rgba(6,12,9,.88);box-shadow:inset 0 0 0 1px rgba(124,235,166,.3);color:#9BF0B8;white-space:nowrap;animation:laIn .35s var(--spring) both}
+.t3-hand.win{color:#1A1203;background:var(--gold-grad);box-shadow:0 0 22px rgba(242,203,114,.6)}
+.t3-hand.mut{color:var(--mut);box-shadow:inset 0 0 0 1px var(--hair)}
+.t3-me .emo{margin-left:auto}
+.t3-emos{position:absolute;right:12px;bottom:56px;display:flex;flex-wrap:wrap;gap:2px;max-width:220px;padding:6px;border-radius:22px;background:rgba(12,18,15,.97);box-shadow:inset 0 0 0 1px var(--hair-2),0 14px 34px rgba(0,0,0,.6);z-index:30;animation:winIn .3s var(--spring)}
+.t3-emos button{font-size:24px;width:44px;height:44px;border-radius:50%}
+.t3-note{font-size:14px;color:var(--mut);text-align:center}
+.t3-note.sm{font-size:13.5px}
+/* comandi */
+.t3-ctl{flex:none;padding:6px 12px calc(env(safe-area-inset-bottom) + 12px);display:flex;flex-direction:column;gap:8px;min-height:86px;position:relative;z-index:5}
+.t3-tbar{height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.t3-tbar i{display:block;height:100%;width:calc(var(--p,1)*100%);background:var(--gold-grad);border-radius:3px;transition:width .25s linear}
+.t3-tbar.late i{background:linear-gradient(90deg,#FF7468,#E2392C)}
+.t3-acts{display:grid;grid-template-columns:1fr 1.25fr 1.25fr;gap:8px;animation:ctlIn .35s var(--snap) both}
+.t3-acts.two{grid-template-columns:1fr 1fr;align-items:center}
+@keyframes ctlIn{from{opacity:0;transform:translateY(14px)}}
+.t3-go{min-height:62px;border-radius:19px;font-weight:800;font-size:16.5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.1;padding:0 6px;letter-spacing:.005em}
+.t3-acts.two .t3-go{flex-direction:row;gap:8px;min-height:52px;font-size:15px}
+.t3-go small{font-size:12.5px;font-weight:700;opacity:.75}
+.t3-go.fold{background:linear-gradient(180deg,#3A1A1C,#2A1012);color:#FF9A90;box-shadow:inset 0 0 0 1px rgba(255,106,96,.3)}
+.t3-go.call{background:linear-gradient(180deg,#FFFFFF,#E2E6EE);color:#0E1612;box-shadow:inset 0 -2px 0 rgba(0,0,0,.1),0 10px 22px -12px rgba(255,255,255,.4)}
+.t3-go.raise{background:var(--gold-grad);color:var(--on-acc);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 22px -10px rgba(228,182,86,.6)}
+.t3-go.big{min-height:56px;font-size:17px}
+.t3-go[disabled]{opacity:.5}
+.vt3.myturn .t3-ctl::before{content:"";position:absolute;left:0;right:0;top:-40px;height:40px;background:linear-gradient(transparent,rgba(242,203,114,.08));pointer-events:none}
+.t3-raise{display:flex;flex-direction:column;gap:10px;padding:10px 12px 12px;border-radius:24px;background:linear-gradient(180deg,#16211C,#0F1814);box-shadow:inset 0 0 0 1px rgba(228,182,86,.25),0 -10px 30px rgba(0,0,0,.4);animation:ctlIn .3s var(--snap) both}
+.t3-rtop{display:flex;align-items:center;gap:10px}
+.t3-rx{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.07);flex:none}
+.t3-ramt{flex:1;text-align:center;line-height:1.05}.t3-ramt small{display:block;color:var(--mut);font-size:12px}.t3-ramt b{font-family:var(--serif);font-size:32px;font-weight:800;color:#FFE3A1}
+.t3-rmax{font-size:12px;color:var(--mut);min-width:38px;text-align:right}
+.t3-rrow{display:flex;align-items:center;gap:10px}
+.t3-step{width:44px;height:44px;border-radius:14px;background:var(--card2);box-shadow:inset 0 0 0 1px var(--hair);font-size:22px;font-weight:700;flex:none}
+#vt-range{flex:1;-webkit-appearance:none;appearance:none;height:32px;background:transparent;--f:50%}
+#vt-range::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:linear-gradient(90deg,#F2CB72 var(--f),rgba(255,255,255,.12) var(--f))}
+#vt-range::-moz-range-track{height:8px;border-radius:4px;background:linear-gradient(90deg,#F2CB72 var(--f),rgba(255,255,255,.12) var(--f))}
+#vt-range::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-10px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#F2CB72 60%,#B88A1C);box-shadow:0 3px 10px rgba(0,0,0,.5),0 0 0 4px rgba(242,203,114,.2)}
+#vt-range::-moz-range-thumb{width:28px;height:28px;border:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#F2CB72 60%,#B88A1C)}
+.t3-pres{display:grid;gap:6px}
+.t3-pres button{min-height:40px;border-radius:12px;background:var(--card2);box-shadow:inset 0 0 0 1px var(--hair);font-weight:700;font-size:13.5px}
+.t3-pres button.on{background:var(--gold-grad);color:var(--on-acc);box-shadow:none}
+.t3-wait{display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;color:#C9D2CC;min-height:28px}
+.t3-wait.wide{min-height:58px;border-radius:18px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px var(--hair)}
+.t3-who{display:inline-flex;align-items:center;gap:8px}.t3-who .ava{width:26px;height:26px;font-size:10px}
+.t3-sec .tsec,.t3-next .tsec{font-weight:800;font-size:12px;background:rgba(255,255,255,.08);padding:2px 9px;border-radius:999px;color:#E9EBF2;font-variant-numeric:tabular-nums}
+.t3-sec.late .tsec{background:#E2392C;color:#fff}
+.t3-next{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--mut);font-size:13.5px}
+.t3-pre{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.t3-pre button{min-height:52px;border-radius:16px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.08);font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 6px;color:#C9D2CC;line-height:1.15}
+.t3-pre button.on{box-shadow:inset 0 0 0 1.5px var(--gold);color:#fff;background:rgba(228,182,86,.14)}
+.t3-pre button.on .pchk{background:var(--gold);box-shadow:none;color:var(--on-acc)}
+.t3-away{display:flex;flex-direction:column;gap:8px;text-align:center;color:#FFB65C;font-size:14px}
+.v2-fly.fcard{margin:-20px 0 0 -14px}
+.vt3 .v2-fx{position:absolute;inset:0;pointer-events:none;z-index:20;overflow:visible}
+@media (max-height:740px){.t3-hero{min-height:94px}.cd.h{width:62px;height:88px}.cd.h .cd-ix b{font-size:25px}.cd.h .cd-pip{font-size:36px}.t3-mine{min-height:90px}.t3-go{min-height:54px}.s3-av{transform:scale(.9)}.cd.b,.t3-slot{width:40px;height:57px}.cd.b .cd-ix b{font-size:17px}.cd.b .cd-pip{font-size:22px}}
+@media (prefers-reduced-motion:reduce){.cd.flip,.cd.deal3,.s3 .la,.t3-win,.t3-acts,.t3-raise{animation:none!important}}
+
 /* ===================== effetti ===================== */
 .page-ghost{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
 .page-ghost>div{will-change:transform}
@@ -4251,7 +4416,7 @@ function vtAnimate(prev,st,me){
   if(!ph||ph.no!==h.no){
     const center=$$id('v2-c2'),order=Object.keys(h.dealOrder||{});
     let k=0,i=h.dealer;const seq=[];for(let n=0;n<9;n++){i=(i+1)%9;if(h.p[i])seq.push(i)}
-    [0,1].forEach(r=>seq.forEach(s=>{const to=$$id('vs'+s).querySelector(s===me?'.st-plate':'.st-cards');fxFly(center,to,cardHTML(null,'s'),'card',(r*seq.length+k%seq.length)*110,380);k++}));
+    [0,1].forEach(r=>seq.forEach(s=>{const to=$$id('vs'+s).querySelector(s===me?'.st-plate':'.st-cards');fxFly(center,to,cardHTML(null,'s'),'fcard',(r*seq.length+k%seq.length)*110,380);k++}));
     for(let n=0;n<seq.length*2;n++)SND.card(n*.11);
     // i bui
     [h.sb,h.bb].forEach(s=>{if(h.p[s]&&h.p[s].bet)bump('vb'+s)});
@@ -5599,6 +5764,297 @@ Object.assign(H,{
 });
 
 /* =====================================================================
+   IL TAVOLO DA GIOCO, rifatto.
+   Un "regista" mette in fila quello che arriva dal server, così niente
+   salta: si distribuiscono le carte, le fiches volano davanti ai posti,
+   a fine giro finiscono nel piatto, le carte del board si girano una alla
+   volta (anche negli all-in), poi si scoprono le mani e il piatto vola al
+   vincitore. Le fiches dei giocatori contano fino al nuovo valore.
+   ===================================================================== */
+const T3={no:null,board:0,lastFlip:0,resAt:0,timer:null,prev:null,stk:{},heroFlip:null,celebrated:null};
+const T3_LA={Fold:'Lascia',Check:'Passa',Call:'Chiama',Raise:'Rilancia',Bet:'Punta','All-in':'All-in',Lascia:'Lascia',Passa:'Passa',Chiama:'Chiama',Rilancia:'Rilancia',Punta:'Punta'};
+const T3_LAC={Lascia:'fold',Passa:'check',Chiama:'call',Rilancia:'raise',Punta:'raise','All-in':'allin'};
+const T3_STAGE={preflop:'Pre-flop',flop:'Flop',turn:'Turn',river:'River'};
+const T3_P9=[[50,92],[13,77],[9,52],[13,28],[31,10],[69,10],[87,28],[91,52],[87,77]];
+const T3_P6=[[50,92],[10,66],[12,27],[50,9],[88,27],[90,66]];
+const T3_P2=[[50,92],[50,9]];
+const t3Layout=st=>{const ms=st?HE.maxSeats(st):9;return {ms,L:ms<=2?T3_P2:ms<=6?T3_P6:T3_P9}};
+const t3Sched=(ms,fn)=>{if(T3.timer)return;T3.timer=setTimeout(()=>{T3.timer=null;fn();if(V&&V.name==='vt')vtPaint()},ms)};
+
+/* la mano non è finita sul telefono finché non si è vista: il prossimo giro aspetta */
+const t3Settled=()=>{const h=S.vt.st&&S.vt.st.hand;if(!h||h.stage!=='done')return true;return T3.no===h.no&&T3.resAt>0&&Date.now()-T3.resAt>2600};
+
+function t3Tween(el,from,to,ms){
+  if(!el)return;if(FX.RM()||from===to){el.textContent=fchip(to);return}
+  const t0=performance.now(),step=t=>{if(!el.isConnected)return;const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);el.textContent=fchip(Math.round(from+(to-from)*e));if(k<1)requestAnimationFrame(step)};
+  requestAnimationFrame(step);
+}
+
+vVT=function(){
+  return `<div class="vt3" id="vtroot">
+<header class="t3-top" id="t3-top"></header>
+<div class="t3-stage"><div class="t3-tbl" id="v2-tbl">
+<div class="t3-rail"><div class="t3-felt"><div class="t3-logo" id="t3-logo"></div></div></div>
+<div class="t3-center"><div class="t3-stagelbl" id="t3-stg"></div><div class="t3-pot" id="t3-pot"></div><div class="t3-board">${[0,1,2,3,4].map(k=>`<span class="t3-slot" id="t3-c${k}"></span>`).join('')}</div><div class="t3-msg" id="t3-msg" aria-live="polite"></div></div>
+${[...Array(9)].map((_,i)=>`<div class="s3 off" id="vs${i}"><div class="s3-cards"></div><div class="s3-av"><svg class="s3-ring" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29"/></svg><div class="s3-ava"></div></div><div class="s3-plate"><b class="s3-nm"></b><span class="s3-stk num"></span></div><div class="s3-act"></div></div><div class="b3" id="vb${i}"></div>`).join('')}
+<div class="t3-dbtn" id="t3-dbtn" aria-hidden="true">D</div>
+<div class="v2-over" id="v2-over"></div>
+<div class="v2-fx" id="v2-fx"></div>
+</div></div>
+<div class="t3-hero" id="t3-hero"></div>
+<div class="t3-ctl" id="t3-ctl"></div>
+</div>`;
+};
+
+function t3Top(st){
+  const b=st?HE.blinds(st,vtNow()):null,sng=st&&HE.sngOn(st),u=S.vt.unread;
+  const name=st&&st.room?st.room.name:'Tavolo virtuale';
+  const sub=!st?'':sng?`Livello ${b.level+1} · bui ${fchip(b.sb)}/${fchip(b.bb)}${b.next?` · <span id="v2-lvl" data-lvl="${b.next}"></span>`:''}`:`${st.cfg.mode==='sng'?'Torneo':'Cash'} · bui ${fchip(st.cfg.sb)}/${fchip(st.cfg.bb)}`;
+  return `<button class="t3-ib" data-act="vtlobby" aria-label="Torna ai tavoli">${ico('back',22)}</button>
+<div class="t3-tt"><b class="ell">${esc(name)}</b><span>${sub}</span></div>
+<button class="t3-ib ${F.vt.chatOpen?'on':''}" data-act="vtchat" aria-label="Chat">${ico('chat',20)}${u?`<i class="v2-dot">${u>9?'9+':u}</i>`:''}</button>
+<button class="t3-ib" data-act="vtmenu" aria-label="Il tavolo: giocatori, regole, uscita">${ico('dots',22)}</button>`;
+}
+
+/* ---------- comandi ---------- */
+function t3Ctl(st,me,disp){
+  if(!st)return `<button class="btn" data-act="vtsit" data-seat="-1">Siediti al tavolo</button>`;
+  if(st.closed)return `<button class="btn" data-act="vtlobby">Torna ai tavoli</button>`;
+  const h=st.hand,live=vtLive(),s=me>=0&&st.seats[me],P=h&&me>=0&&h.p[me];
+  const turnOf=(cls)=>{const t=h&&h.toAct!=null&&st.seats[h.toAct];return `<div class="t3-wait ${cls||''}">${t?`<span class="t3-who">${ava(t.name,'xs')}Tocca a <b>${esc(firstName(t.name))}</b></span><span class="t3-sec" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span>Si girano le carte…</span>'}</div>`};
+  if(h&&h.stage==='done'&&!disp.showRes)return `<div class="t3-wait wide"><span>Si scoprono le carte…</span></div>`;
+  if(me<0){
+    const was=vtBusted(st),left=vtLeft(st),free=st.seats.some((x,i)=>!x&&i<HE.maxSeats(st));
+    if(HE.sngOn(st))return `<div class="t3-note">Torneo in corso: guardi la partita</div>`;
+    if(was&&!left)return `<div class="t3-note">Hai finito le ricariche su questo tavolo <button class="link" data-act="vtlobby">Altri tavoli</button></div>`;
+    if(!free)return `<div class="t3-note">Il tavolo è pieno: guardi la partita</div>`;
+    return `<button class="btn" data-act="vtsit" data-seat="-1">${ico('plus',18)} ${was?`Rientra con ${fchip(st.cfg.stack)} fiches`:'Siediti al tavolo'}</button>`;
+  }
+  if(s.away)return `<div class="t3-away"><span>Sei in pausa: salti le mani${HE.sngOn(st)?' (i bui li paghi lo stesso)':''}.</span><button class="btn" data-act="vtback">Torno a giocare</button></div>`;
+  if(S.vt.optPending&&h&&h.toAct==null&&h.stage!=='done')return `<div class="t3-wait"><span class="mut">Fatto</span></div>`;
+  if(live&&h.toAct===me){
+    const toCall=Math.max(0,h.curBet-P.bet),maxTo=P.bet+s.stack,bb=h.bbAmt||st.cfg.bb,minTo=Math.min(maxTo,h.curBet>0?h.curBet+h.minRaise:bb),canRaise=s.stack>toCall,busy=S.vt.busy?'disabled':'';
+    const bar=`<div class="t3-tbar" data-dl="${h.deadline}"><i></i></div>`;
+    if(F.vt.raise!=null&&canRaise){
+      const pot=potOf(h),step=Math.max(1,st.cfg.sb||1),cl=v=>Math.max(minTo,Math.min(maxTo,Math.round(v/step)*step));
+      const pre=h.stage==='preflop'?[['Min',minTo],['3 bui',cl(bb*3)],['½ piatto',cl(h.curBet+(pot+toCall)/2)],['Piatto',cl(h.curBet+pot+toCall)],['All-in',maxTo]]:[['Min',minTo],['½',cl(h.curBet+(pot+toCall)/2)],['¾',cl(h.curBet+(pot+toCall)*.75)],['Piatto',cl(h.curBet+pot+toCall)],['All-in',maxTo]];
+      const seen=new Set(),pres=pre.filter(([,v])=>!seen.has(v)&&seen.add(v));
+      const val=Math.max(minTo,Math.min(maxTo,F.vt.raise));
+      return `${bar}<div class="t3-raise">
+<div class="t3-rtop"><button class="t3-rx" data-act="vtraisex" aria-label="Annulla">${ico('close',20)}</button><div class="t3-ramt"><small>${h.curBet?'Rilanci a':'Punti'}</small><b class="num" id="vt-rv">${fchip(val)}</b></div><span class="t3-rmax num">hai ${fchip(maxTo)}</span></div>
+<div class="t3-rrow"><button class="t3-step" data-act="vtstep" data-d="-1" aria-label="Meno">−</button><input type="range" id="vt-range" min="${minTo}" max="${maxTo}" step="${step}" value="${val}" aria-label="Quanto punti" style="--f:${maxTo>minTo?((val-minTo)/(maxTo-minTo)*100).toFixed(1):100}%"><button class="t3-step" data-act="vtstep" data-d="1" aria-label="Più">+</button></div>
+<div class="v2-pres t3-pres" style="grid-template-columns:repeat(${pres.length},minmax(0,1fr))">${pres.map(([l,v])=>`<button class="${v===val?'on':''}" data-act="vtpre" data-v="${v}">${l}</button>`).join('')}</div>
+<button class="t3-go raise big" data-act="vtraiseok" ${busy}>${val>=maxTo?'All-in '+fchip(maxTo):(h.curBet?'Rilancia a ':'Punta ')+fchip(val)}</button></div>`;
+    }
+    return `${bar}<div class="t3-acts ${canRaise?'':'two'}"><button class="t3-go fold" data-act="vtmove" data-m="fold" ${busy}>Lascia</button>
+<button class="t3-go call" data-act="vtmove" data-m="${toCall?'call':'check'}" ${busy}>${toCall?(toCall>=s.stack?`All-in<small class="num">${fchip(s.stack)}</small>`:`Chiama<small class="num">${fchip(toCall)}</small>`):'Passa'}</button>
+${canRaise?`<button class="t3-go raise" data-act="vtraise" ${busy}>${h.curBet?'Rilancia':'Punta'}<small class="num">${h.curBet?'min '+fchip(minTo):'da '+fchip(minTo)}</small></button>`:''}</div>`;
+  }
+  if(live&&P&&!P.folded&&!P.allin){
+    const toCall=Math.max(0,h.curBet-P.bet),pre=F.vt.pre&&F.vt.pre.no===h.no&&F.vt.pre.stage===h.stage?F.vt.pre:null;
+    const opts=[['cf',toCall?'Lascia':'Passa o lascia'],toCall?['cl','Chiama '+fchip(Math.min(toCall,s.stack))]:['ck','Passa'],['ca','Chiamo tutto']];
+    return `${turnOf()}<div class="t3-pre">${opts.map(([k,l])=>`<button class="${pre&&pre.k===k?'on':''}" data-act="vtpreact" data-k="${k}" aria-pressed="${pre&&pre.k===k?'true':'false'}"><span class="pchk">${ico('check',13)}</span>${l}</button>`).join('')}</div>`;
+  }
+  if(live)return turnOf('wide');
+  if(h&&h.stage==='done'&&!disp.showRes)return `<div class="t3-wait wide"><span>Si scoprono le carte…</span></div>`;
+  if(st.sng&&st.sng.done&&!HE.sngOn(st)&&F.vt.hideRes!==st.sng.endedAt)return '';
+  const next=st.running&&HE.eligible(st).length>=2&&h&&h.stage==='done';
+  const nextW=next?`<div class="t3-next">Prossima mano<span class="t3-sec" data-dl="${Math.max((h.endedAt||0)+HE.NEXT_DELAY,T3.resAt?vtNow()+Math.max(0,T3.resAt+2600-Date.now()):0)}"><span class="tsec"></span></span></div>`:'';
+  if(h&&h.stage==='done'&&P&&!(h.reveal&&h.reveal[me])&&S.vt.cardsHand===h.no&&S.vt.cards)
+    return `<div class="t3-acts two"><button class="t3-go call" data-act="vtshow">${ico('eye',18)} Mostra le carte</button>${nextW||'<span></span>'}</div>`;
+  if(next)return `<div class="t3-wait wide">${nextW}</div>`;
+  if(s.out)return `<div class="t3-note">Sei fuori dal torneo: guarda come finisce</div>`;
+  if(st.lonelyAt&&st.cfg.mode!=='sng')
+    return `<div class="t3-away"><span>Sei rimasto solo: il tavolo si chiude tra <b class="t3-sec" data-dl="${st.lonelyAt+HE.LONELY_MS}"><span class="tsec"></span></b> se non arriva nessuno.</span><button class="btn ghost" data-act="vtinvite">${ico('uplus',18)} Invita giocatori</button></div>`;
+  if(!st.running){const n=st.cfg.mode==='sng'?st.seats.filter(Boolean).length:HE.eligible(st).length;
+    return n>=2?`<button class="btn" data-act="vtstart">${ico('play',18)} ${st.cfg.mode==='sng'?'Inizia il torneo':'Inizia la partita'} · ${n} giocatori</button>`:`<button class="btn ghost" data-act="vtinvite">${ico('uplus',18)} Invita giocatori</button>`}
+  return `<div class="t3-wait wide"><span>${HE.eligible(st).length<2?'Aspettate un altro giocatore':'Si mescola…'}</span></div>`;
+}
+
+/* ---------- disegno ---------- */
+vtPaint=function(){
+  const root=$$id('vtroot');if(!root)return;
+  const st0=S.vt.st,h=st0&&st0.hand,live=vtLive(),now=Date.now(),acct=myAcct();
+  /* chi ha finito le fiches resta al suo posto finché non si è vista la mano */
+  const st=st0&&h&&h.stage==='done'?Object.assign({},st0,{seats:st0.seats.map((x,i)=>x||(h.p[i]&&T3.no===h.no?{acct:h.p[i].acct,pid:null,name:h.p[i].name,stack:0,ghost:true}:null))}):st0;
+  let me=st?st.seats.findIndex(x=>x&&x.acct===acct):-1;
+  if(me>=0&&st&&st.room)T3.base=me;
+  setH($$id('t3-top'),t3Top(st));
+  setH($$id('t3-logo'),`<span>♠</span>${esc(S.table.name)}`);
+  if(S.vt.missing){setH($$id('t3-msg'),'<span class="t3-hint">Il tavolo virtuale va attivato in Supabase.</span>');setH($$id('t3-ctl'),'');return}
+
+  /* --- il regista: quanto della mano si è già visto --- */
+  if(h){
+    if(T3.no!==h.no){
+      const prevNo=T3.no;T3.no=h.no;T3.resAt=0;T3.lastFlip=0;clearTimeout(T3.timer);T3.timer=null;
+      T3.board=(prevNo!=null&&h.stage==='preflop')||h.stage==='preflop'?0:h.board.length;
+      if(h.stage==='done'&&prevNo==null)T3.resAt=now-3000;
+    }
+    if(T3.board>h.board.length)T3.board=h.board.length;
+    if(T3.board<h.board.length)t3Sched(T3.board===0?(T3.lastFlip?250:480):Math.max(120,(h.runout||h.stage==='done'?820:420)-(now-T3.lastFlip)),()=>{const H=S.vt.st&&S.vt.st.hand;if(!H||H.no!==T3.no)return;T3.board=T3.board===0?Math.min(3,H.board.length):Math.min(H.board.length,T3.board+1);T3.lastFlip=Date.now()});
+    else if(h.stage==='done'&&!T3.resAt)t3Sched(h.reveal?Math.max(450,650-(now-T3.lastFlip)):250,()=>{const H=S.vt.st&&S.vt.st.hand;if(H&&H.no===T3.no)T3.resAt=Date.now()});
+  }
+  const showRes=!!(h&&h.stage==='done'&&T3.resAt);
+  const disp={showRes};
+  const {ms,L}=t3Layout(st),base=me>=0?me:(T3.base||0),rel=i=>((i-base)%ms+ms)%ms;
+  const won={};if(showRes&&h.results)h.results.forEach(r=>{if(r.win>0)won[r.seat]=r});
+  const top=showRes&&h.results&&h.results[0]&&h.results[0].win>0?h.results[0]:null;
+  const best=new Set(top&&top.best?top.best:[]);
+  const prev=T3.prev,sameHand=prev&&h&&prev.no===h.no;
+  const D={no:h?h.no:null,stage:h?h.stage:null,bets:{},la:{},board:T3.board,showRes,inHand:{},rev:{}};
+
+  /* --- posti --- */
+  for(let i=0;i<9;i++){
+    const el=$$id('vs'+i),s=st?st.seats[i]:null,bt=$$id('vb'+i);
+    if(i>=ms){setCl(el,'s3 off');delete el.dataset.act;setCl(bt,'b3');setH(bt,'');continue}
+    const [x,y]=L[rel(i)],hero=me>=0&&i===me;
+    if(el.__pos!==x+','+y){el.style.left=x+'%';el.style.top=y+'%';el.__pos=x+','+y;el.classList.toggle('lft',x<35);el.classList.toggle('rgt',x>65);el.classList.toggle('topr',y<20)}
+    const bx=x+(50-x)*(hero?.12:.38),by=y+(50-y)*(hero?.38:.34);
+    if(bt.__pos!==bx+','+by){bt.style.left=bx+'%';bt.style.top=by+'%';bt.__pos=bx+','+by}
+    if(!s){
+      const canSit=me<0&&st&&!st.closed&&!HE.sngOn(st)&&(!st.busted||!st.busted[myAcct()]||HE.rebuysLeft(st,myAcct())>0);
+      setCl(el,canSit?'s3 empty':'s3 off');
+      if(canSit){el.dataset.act='vtsit';el.dataset.seat=i;el.setAttribute('role','button');el.setAttribute('aria-label','Siediti qui');setH(el.querySelector('.s3-ava'),`<span class="s3-plus">${ico('plus',20)}</span>`);setH(el.querySelector('.s3-nm'),'Siediti');}
+      else{delete el.dataset.act;el.removeAttribute('role');setH(el.querySelector('.s3-ava'),'');setH(el.querySelector('.s3-nm'),'')}
+      setH(el.querySelector('.s3-stk'),'');setH(el.querySelector('.s3-cards'),'');setH(el.querySelector('.s3-act'),'');setCl(bt,'b3');setH(bt,'');delete T3.stk[i];continue;
+    }
+    delete el.dataset.act;el.removeAttribute('role');
+    const P=h&&h.p[i],act=live&&h.toAct===i,out=s.out;
+    if(P){D.inHand[i]=!P.folded;D.la[i]=P.la||null}
+    setCl(el,`s3${hero?' me':''}${act?' act':''}${P&&P.folded?' fold':''}${P&&P.allin&&live?' allin':''}${won[i]?' win':''}${s.away?' away':''}${out?' out':''}${!P&&h&&live&&!out?' wait':''}${el.classList.contains('lft')?' lft':''}${el.classList.contains('rgt')?' rgt':''}${el.classList.contains('topr')?' topr':''}`);
+    const ring=el.querySelector('.s3-ring');if(act)ring.dataset.dl=h.deadline;else delete ring.dataset.dl;
+    setH(el.querySelector('.s3-ava'),ava(s.name));
+    setH(el.querySelector('.s3-nm'),esc(hero?'Tu':firstName(s.name)));
+    /* fiches: finché non si è visto chi vince, niente spoiler */
+    const winAmt=h&&h.stage==='done'&&!showRes&&h.results?((h.results.find(r=>r.seat===i)||{}).win||0):0;
+    const stack=Math.max(0,s.stack-winAmt),sk=el.querySelector('.s3-stk');
+    if(out)setH(sk,'Eliminato');else if(s.away&&!P)setH(sk,'In pausa');
+    else{const old=T3.stk[i];if(sk.__h!==String(stack)){sk.__h=String(stack);if(old!=null&&old!==stack&&sameHand)t3Tween(sk,old,stack,showRes?900:500);else sk.textContent=fchip(stack)}}
+    T3.stk[i]=stack;
+    /* carte del posto (le mie sono sotto, grandi) */
+    let ch='';
+    if(P&&!P.folded&&!hero){
+      const rv=h.reveal&&h.reveal[i];D.rev[i]=!!rv;
+      if(rv){const fl=!(prev&&prev.no===h.no&&prev.rev&&prev.rev[i]);ch=`<div class="s3-cc up">${rv.map((c,k)=>cardHTML(c,'s',(top?(best.has(c)&&won[i]?'hi ':'dim '):'')+(fl?'flip':''),fl?`animation-delay:${k*90}ms`:'')).join('')}</div>`}
+      else ch=`<div class="s3-cc">${cardHTML(null,'s')}${cardHTML(null,'s')}</div>`;
+    }
+    setH(el.querySelector('.s3-cards'),ch);
+    /* etichetta: ultima mossa o vincita */
+    let la='';
+    if(won[i])la=`<span class="la win num">+${fchip(won[i].win)}</span>`;
+    else if(P&&P.folded)la='<span class="la la-fold">Lascia</span>';
+    else if(P&&P.la&&live){const t=T3_LA[P.la]||P.la;la=`<span class="la la-${T3_LAC[t]||'call'}">${t}</span>`}
+    else if(h&&live&&P&&!P.la&&h.stage==='preflop'&&(i===h.sb||i===h.bb))la=`<span class="la la-blind">${i===h.sb?'P. buio':'G. buio'}</span>`;
+    else if(!P&&hero&&h&&live&&!out&&!s.away)la='<span class="la la-blind">Entri alla prossima</span>';
+    setH(el.querySelector('.s3-act'),la);
+    /* puntata davanti al posto */
+    const bet=P&&live?P.bet:0;D.bets[i]=bet;
+    setCl(bt,'b3'+(bet?' on':''));setH(bt,bet?`<span class="chips">${chipStack(bet)}</span><b class="num">${fchip(bet)}</b>`:'');
+  }
+  /* mazziere */
+  const dbn=$$id('t3-dbtn');
+  if(h&&st.seats[h.dealer]&&h.dealer<ms){const [x,y]=L[rel(h.dealer)];const dx=x+(50-x)*.2+(x<=50?7:-7),dy=y+(50-y)*.2+(y>50?-2:3);dbn.style.left=dx+'%';dbn.style.top=dy+'%';dbn.classList.add('on')}else dbn.classList.remove('on');
+
+  /* --- centro: piatto, board, messaggio --- */
+  const potLive=h?(h.stage==='done'?(h.pot||potOf(h)):potOf(h)-betsOf(h)):0;
+  const potShown=h&&!showRes?potLive:0;
+  const pe=$$id('t3-pot');
+  setH(pe,potShown?`<span class="chips">${chipStack(potShown)}</span><span class="t3-potv"><small>Piatto</small><b class="num">${fchip(potShown)}</b></span>`:'');
+  pe.classList.toggle('on',!!potShown);
+  setH($$id('t3-stg'),h&&!showRes&&h.stage!=='done'?(h.runout?'All-in':T3_STAGE[h.stage]||''):'');
+  const board=h?h.board:[];
+  for(let k=0;k<5;k++){
+    const sl=$$id('t3-c'+k),c=k<T3.board?board[k]:null,cls=c&&top&&top.best?(best.has(c)?'hi':'dim'):'',key=(c||'')+'|'+cls+'|'+(h?h.no:'');
+    if(sl.__k!==key){
+      const fresh=c&&!(sl.__k&&sl.__k.split('|')[0]===c);
+      const delay=fresh&&k<3&&T3.board>=3&&!(prev&&prev.no===h.no&&prev.board>=3)?k*130:0;
+      sl.innerHTML=c?cardHTML(c,'b',(fresh?'flip ':'')+cls,fresh?`animation-delay:${delay}ms`:''):'';sl.__k=key;sl.classList.toggle('full',!!c);
+      if(fresh)SND.card(delay/1000);
+    }
+  }
+  let msg='';
+  if(showRes){const W=h.results.filter(r=>r.win>0),meWin=W.some(r=>r.seat===me);
+    msg=`<div class="t3-win ${meWin?'mine':''}"><b>${W.map(r=>r.seat===me?'Hai vinto':esc(firstName(r.name))+' vince').join(' · ')} <span class="num">${fchip(W.reduce((a,r)=>a+r.win,0))}</span></b><span>${W[0].hand?esc(W[0].hand):'Gli altri hanno lasciato'}</span></div>`}
+  else if(!h&&st){const n=st.seats.filter(Boolean).length;msg=st.sng&&st.sng.done?'':`<span class="t3-hint">${n<2?(n?'Aspettate un altro giocatore':'Scegli un posto per sederti'):!st.running?(st.cfg.mode==='sng'?'Torneo pronto: si parte quando volete':'Pronti: si parte quando volete'):'Si mescola…'}</span>`}
+  else if(!st)msg='<span class="t3-hint">Scegli un posto per sederti</span>';
+  setH($$id('t3-msg'),msg);
+  setH($$id('v2-over'),sngResultsHtml(st));
+
+  /* --- le mie carte --- */
+  const P=h&&me>=0&&h.p[me],cards=P&&S.vt.cardsHand===h.no?S.vt.cards:null;
+  let hero='';
+  if(me>=0&&st){
+    let label='',lc='';
+    if(cards){const ev=HE.evalHand(cards.concat(board.slice(0,T3.board)));label=ev?ev.n:''}
+    if(won[me]){label='Hai vinto '+fchip(won[me].win)+(won[me].hand?' · '+won[me].hand:'');lc='win'}
+    else if(P&&P.folded){label='Hai lasciato';lc='mut'}
+    const s=st.seats[me],myStack=Math.max(0,s.stack-(h&&h.stage==='done'&&!showRes&&h.results?((h.results.find(r=>r.seat===me)||{}).win||0):0)),note=!P?(s.out?'Sei fuori dal torneo':s.stack===0?'Hai finito le fiches':s.away?'Sei in pausa':live?'Entri dalla prossima mano':''):'';
+    const fresh=cards&&T3.heroFlip!==h.no;if(fresh)T3.heroFlip=h.no;
+    const cc=P?(cards?cards.map((c,k)=>cardHTML(c,'h',(top?(best.has(c)&&won[me]?'hi ':'dim '):'')+(fresh?'deal3':''),fresh?`animation-delay:${180+k*150}ms`:'')).join(''):cardHTML(null,'h')+cardHTML(null,'h')):'';
+    hero=`<div class="t3-mine ${P&&P.folded?'gone':''}">${cc||`<span class="t3-note sm">${esc(note)}</span>`}</div>
+<div class="t3-me"><span class="t3-mystk">${ava(s.name,'xs')}<b class="num" id="t3-mystk">${s.out?'Eliminato':fchip(T3.myStk!=null?T3.myStk:myStack)}</b></span>${label?`<span class="t3-hand ${lc}">${esc(label)}</span>`:''}<button class="t3-ib emo ${F.vt.emo?'on':''}" data-act="vtemo" aria-label="Reazioni">${ico('smile',21)}</button></div>
+${F.vt.emo?`<div class="v2-emos t3-emos">${EMO.map(e=>`<button data-act="vtreact" data-e="${e}" aria-label="Reazione ${e}">${e}</button>`).join('')}</div>`:''}`;
+  }
+  setH($$id('t3-hero'),hero);
+  if(me>=0&&st){const el=$$id('t3-mystk'),v=T3.stk[me];if(el&&v!=null&&T3.myStk!==v){if(T3.myStk!=null&&!st.seats[me].out)t3Tween(el,T3.myStk,v,showRes?900:500);T3.myStk=v}}
+  root.classList.toggle('seated',me>=0);
+  root.classList.toggle('myturn',!!(live&&h.toAct===me&&me>=0));
+  setH($$id('t3-ctl'),t3Ctl(st0,vtSeat(),disp));
+  const rg=$$id('vt-range');if(rg)rg.style.setProperty('--f',(+rg.max>+rg.min?((rg.value-rg.min)/(rg.max-rg.min)*100):100).toFixed(1)+'%');
+
+  /* --- animazioni: confronto con quello che si vedeva prima --- */
+  try{t3Animate(prev,D,st,me)}catch(e){console.warn(e)}
+  T3.prev=D;S.vt.painted=st0?JSON.parse(JSON.stringify(st0)):null;
+  vtPreFire(st0,vtSeat());
+  vtChatPanel();if(st0&&!(h&&h.stage==='done'&&!showRes))vtOutToast(st0);vtMusicSync();
+};
+
+function t3Animate(prev,D,st,me){
+  if(!st||!st.hand||!prev)return;
+  const h=st.hand,potEl=$$id('t3-pot'),center=$$id('t3-c2');
+  const seatEl=i=>{const s=$$id('vs'+i);return s&&s.querySelector('.s3-av')};
+  if(prev.no!==D.no){
+    /* nuova mano: le carte partono dal centro verso ogni posto */
+    if(h.stage!=='preflop')return;
+    const seq=[];let i=h.dealer;for(let n=0;n<9;n++){i=(i+1)%9;if(h.p[i])seq.push(i)}
+    [0,1].forEach(r=>seq.forEach((s,k)=>{const to=s===me?$$id('t3-hero'):$$id('vs'+s).querySelector('.s3-cards');fxFly(center,to,cardHTML(null,'s'),'fcard',(r*seq.length+k)*90,360);SND.card((r*seq.length+k)*.09)}));
+    [h.sb,h.bb].forEach(s=>{if(h.p[s]&&h.p[s].bet)fxFly(seatEl(s),$$id('vb'+s),`<span class="chips">${chipStack(h.p[s].bet)}</span>`,'chip',120,380)});
+    return;
+  }
+  /* puntate nuove: le fiches escono dal posto */
+  let n=0;
+  Object.keys(D.bets).forEach(k=>{const a=prev.bets[k]||0,b=D.bets[k]||0;if(b>a&&prev.stage===D.stage){fxFly(seatEl(k),$$id('vb'+k),`<span class="chips">${chipStack(b-a)}</span>`,'chip',0,340);n++}});
+  if(n)SND.chip(3);
+  /* chi lascia butta le carte al centro, chi passa bussa */
+  Object.keys(D.la).forEach(k=>{const a=T3_LA[prev.la[k]]||prev.la[k],b=T3_LA[D.la[k]]||D.la[k];if(b===a)return;
+    if(b==='Lascia'){SND.fold();if(+k!==me){const c=$$id('vs'+k).querySelector('.s3-cards');fxFly(c||seatEl(k),center,`<span class="s3-cc">${cardHTML(null,'s')}${cardHTML(null,'s')}</span>`,'muck',0,420)}}
+    else if(b==='Passa')SND.check();});
+  /* fine giro: le puntate vanno nel piatto */
+  const was=Object.keys(prev.bets).filter(k=>(prev.bets[k]||0)>0&&!(D.bets[k]>0));
+  if(was.length&&(prev.stage!==D.stage||D.stage==='done')){was.forEach((k,j)=>fxFly($$id('vb'+k),potEl,`<span class="chips">${chipStack(prev.bets[k])}</span>`,'chip',j*45,420));SND.chip(4)}
+  /* si vede chi vince: il piatto vola da lui */
+  if(!prev.showRes&&D.showRes&&h.results){
+    const W=h.results.filter(r=>r.win>0);
+    W.forEach((r,j)=>fxFly($$id('t3-c2'),seatEl(r.seat),`<span class="chips">${chipStack(r.win)}</span>`,'chip big',j*140,620));
+    const mine=W.find(r=>r.seat===me);
+    setTimeout(()=>{if(mine){SND.win();if(T3.celebrated!==h.no&&mine.win>=(h.bbAmt||st.cfg.bb)*8){T3.celebrated=h.no;FX.confetti({n:70,y:.62,power:11})}}else SND.chip(5)},420);
+  }
+}
+
+/* il prossimo giro parte solo quando sul telefono si è visto chi ha vinto */
+setInterval(()=>{
+  if(!(V&&V.name==='vt'))return;
+  const st=S.vt.st,h=st&&st.hand;
+  if(st&&st.running&&h&&h.stage==='done'&&!t3Settled())S.vt.lastTick=Date.now();
+},200);
+
+/* pulizia quando si cambia stanza */
+const _t3Open=vtOpenRoom;
+vtOpenRoom=function(rid){if(S.vt.rid!==rid){clearTimeout(T3.timer);Object.assign(T3,{no:null,board:0,lastFlip:0,resAt:0,timer:null,prev:null,stk:{},heroFlip:null,base:0,myStk:null})}return _t3Open(rid)};
+/* il cursore della puntata colora la barra fin dove arrivi */
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='vt-range'){const r=e.target;r.style.setProperty('--f',(+r.max>+r.min?((r.value-r.min)/(r.max-r.min)*100):100).toFixed(1)+'%')}});
+
+/* =====================================================================
    Effetti e accessibilità, tutto attorno a render():
    - passaggio tra schermate: la pagina vecchia scivola via mentre entra la nuova
    - ingresso a cascata dei blocchi, cifre che contano fino al valore
@@ -5883,7 +6339,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791892128522';
+const APP_VERSION='1791893914548';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
