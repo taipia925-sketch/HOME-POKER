@@ -3360,6 +3360,7 @@ createGame=async function(){
   const v=ngVals();if(!v.ok||!db)return;
   const ts=targetsFrom(n.sel);if(ts.length<2)return;
   const gid=n.fromGid||('g'+Date.now().toString(36)+Math.random().toString(36).slice(2,5));
+  if(n.fromGid){try{const sn=await db.doc('games/'+gid).get(),cur=sn&&sn.data&&sn.data();if(cur&&cur.status!=='scheduled'){F.ng=null;go(cur.status==='live'?'live':'detail',gid);toast('La partita è già stata iniziata: eccola','ok');return}}catch(e){}}
   const pin=String(crypto.getRandomValues(new Uint32Array(1))[0]%10000).padStart(4,'0');
   const now=new Date().toISOString(),players={};
   ts.forEach((r,i)=>{players[r.id]={playerId:r.id,playerName:r.name,seq:i+1,buyIns:[{buyInId:nid('b'),amountCents:v.buy,paymentStatus:n.pstatus,timestamp:now}],cashOuts:[],cashOutCents:null,netCents:null}});
@@ -3392,7 +3393,7 @@ vBook=function(){
     const host=S.me&&(g.hostId===S.me.id||isManager());
     h=h.replace('<h1>Poker night</h1>',`<h1>Poker ${new Date(g.scheduledAt).toLocaleDateString('it-IT',{weekday:'long'})}</h1>`);
     if(g.note)h=h.replace('<p class="mut" style="margin:6px 0 0">Prenota il tuo posto al tavolo</p>',`<p class="mut" style="margin:6px 0 0">${esc(g.note)}</p>`);
-    h=h.replace('<button class="btn ghost" data-act="live" data-gid="'+V.gid+'">Apri la cassa</button>',host?`<button class="btn" data-act="startplan" data-gid="${V.gid}">${ico('chip',18)} Inizia la partita con i prenotati</button><button class="btn ghost" data-act="pushinvite" data-gid="${V.gid}">${ico('share',18)} Ricorda l'invito con una notifica</button><button class="link" style="align-self:center;color:#FF6A60" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Annulla la serata'}</button>`:'');
+    h=h.replace('<button class="btn ghost" data-act="live" data-gid="'+V.gid+'">Apri la cassa</button>',(S.me?`<button class="btn" data-act="startplan" data-gid="${V.gid}">${ico('chip',18)} Inizia la partita con i prenotati</button>`:'')+(host?`<button class="btn ghost" data-act="pushinvite" data-gid="${V.gid}">${ico('share',18)} Ricorda l'invito con una notifica</button><button class="link" style="align-self:center;color:#FF6A60" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Annulla la serata'}</button>`:''));
   }
   return h;
 };
@@ -6339,7 +6340,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791893914548';
+const APP_VERSION='1791912895919';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
