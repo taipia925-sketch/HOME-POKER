@@ -1243,6 +1243,54 @@ span.chips i{position:absolute;left:0;bottom:calc(var(--j)*3px);width:18px;heigh
 @media (max-height:740px){.t3-hero{min-height:94px}.cd.h{width:62px;height:88px}.cd.h .cd-ix b{font-size:25px}.cd.h .cd-pip{font-size:36px}.t3-mine{min-height:90px}.t3-go{min-height:54px}.s3-av{transform:scale(.9)}.cd.b,.t3-slot{width:40px;height:57px}.cd.b .cd-ix b{font-size:17px}.cd.b .cd-pip{font-size:22px}}
 @media (prefers-reduced-motion:reduce){.cd.flip,.cd.deal3,.s3 .la,.t3-win,.t3-acts,.t3-raise{animation:none!important}}
 
+
+/* ===================== serata programmata ===================== */
+.pbw{display:flex;flex-direction:column;gap:14px}
+.pb-ticket{position:relative;display:grid;grid-template-columns:auto 1fr;gap:4px 16px;padding:20px 18px 0;border-radius:28px;overflow:hidden;
+  background:radial-gradient(120% 90% at 0% 0%,rgba(30,140,100,.45),transparent 60%),radial-gradient(90% 80% at 100% 100%,rgba(228,182,86,.14),transparent 60%),linear-gradient(160deg,#10291F,#0B1612);
+  box-shadow:inset 0 0 0 1px rgba(228,182,86,.35),inset 0 1px 0 rgba(255,255,255,.08),0 30px 60px -28px rgba(0,0,0,.95);animation:rise .6s var(--ease) both}
+.pb-date{display:flex;flex-direction:column;align-items:center;justify-content:center;width:78px;height:92px;border-radius:20px;background:linear-gradient(180deg,#FBF4E2,#E8DCC0);color:#1A1203;box-shadow:0 10px 24px -8px rgba(0,0,0,.6);line-height:1}
+.pb-date span{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#9A6A1E}
+.pb-date b{font-family:var(--serif);font-size:40px;font-weight:800;letter-spacing:-.04em;margin:2px 0}
+.pb-info{display:flex;flex-direction:column;gap:4px;min-width:0}
+.pb-info h1{font-size:28px;text-transform:capitalize;line-height:1.05}
+.pb-when{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-l);padding:3px 10px;border-radius:999px;background:rgba(228,182,86,.14)}
+.pb-when.today{color:var(--green-l);background:var(--green-bg)}
+.pb-time,.pb-place{display:inline-flex;align-items:center;gap:6px;font-size:14.5px;color:var(--ivory);text-decoration:none}
+.pb-place{color:var(--gold-l);text-decoration:underline;text-decoration-color:rgba(247,224,166,.35);text-underline-offset:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.pb-time svg,.pb-place svg{color:var(--gold)}
+.pb-cut{grid-column:1/-1;height:1px;margin:16px -18px 0;background-image:linear-gradient(90deg,rgba(255,255,255,.22) 50%,transparent 50%);background-size:10px 1px;position:relative}
+.pb-cut::before,.pb-cut::after{content:"";position:absolute;top:-11px;width:22px;height:22px;border-radius:50%;background:var(--bg)}
+.pb-cut::before{left:-11px}.pb-cut::after{right:-11px}
+.pb-foot{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;padding:12px 0 16px}
+.pb-host{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--mut)}.pb-host b{color:var(--ivory)}
+.pb-note{font-size:14px;color:var(--ivory);padding:8px 12px;border-radius:14px;background:rgba(0,0,0,.25);box-shadow:inset 0 0 0 1px var(--hair)}
+.pb-seats-w{display:flex;flex-direction:column;gap:10px;padding:14px 16px 16px;border-radius:24px;background:var(--card);box-shadow:inset 0 0 0 1px var(--hair)}
+.pb-lbl{font-family:var(--serif);font-size:17px}
+.pb-seats{display:flex;flex-wrap:wrap;gap:8px}
+.pb-seat{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;animation:popIn .45s var(--spring) both}
+.pb-seat:nth-child(2){animation-delay:.04s}.pb-seat:nth-child(3){animation-delay:.08s}.pb-seat:nth-child(4){animation-delay:.12s}.pb-seat:nth-child(5){animation-delay:.16s}.pb-seat:nth-child(6){animation-delay:.2s}.pb-seat:nth-child(n+7){animation-delay:.24s}
+.pb-seat.free{border:1.5px dashed rgba(255,255,255,.25);width:36px;height:36px;margin:2px}
+.pb-seat.me .ava{box-shadow:0 0 0 2.5px var(--gold),0 0 14px rgba(228,182,86,.5)}
+.pb-seat.wl{opacity:.5}
+.pb-book{min-height:62px;font-size:18px}
+.pb-mine{display:flex;align-items:center;gap:12px;padding:14px 14px 14px 16px;border-radius:22px;background:linear-gradient(135deg,rgba(70,218,128,.16),rgba(70,218,128,.05));box-shadow:inset 0 0 0 1px rgba(70,218,128,.35);animation:rise .5s var(--spring) both}
+.pb-mine.wl{background:linear-gradient(135deg,rgba(228,182,86,.16),rgba(228,182,86,.05));box-shadow:inset 0 0 0 1px rgba(228,182,86,.35)}
+.pb-tick{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--green);color:#03210D}
+.pb-mine.wl .pb-tick{background:var(--gold);color:var(--on-acc)}
+.pb-mine b{display:block;font-size:17px}.pb-mine .grow>span{display:block;font-size:13px;color:var(--mut)}
+.pb-undo{min-height:40px;padding:0 14px;border-radius:999px;font-weight:700;font-size:13.5px;color:var(--ivory);background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px var(--hair-2)}
+.pb-n{width:18px;text-align:center;color:var(--gold);font-family:var(--serif)}
+.pb-acts{display:flex;flex-direction:column;gap:10px}
+/* avviso serata di oggi */
+.pt-hero{display:flex;gap:12px;align-items:flex-start}
+.pt-hero p{margin:0;color:var(--mut);font-size:14.5px;line-height:1.45}
+.pt-ic{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;flex:none;background:var(--gold-grad);color:var(--on-acc)}
+.pt-card{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:20px;background:radial-gradient(120% 100% at 0% 0%,rgba(30,140,100,.3),transparent 60%),var(--card2);box-shadow:inset 0 0 0 1px rgba(228,182,86,.35)}
+.pt-card b{display:block;font-size:16px}.pt-card .grow>span{display:block;font-size:13px;color:var(--mut);margin-top:1px}
+.pt-card>svg{color:var(--gold)}
+.hs-seg button{padding:0 8px;font-size:14px}
+
 /* ===================== effetti ===================== */
 .page-ghost{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
 .page-ghost>div{will-change:transform}
@@ -3422,14 +3470,16 @@ tabStorico=function(D){
   const tr=mine.slice(0,12).reverse(),mx=Math.max(1,...tr.map(g=>Math.abs(myP(g).netCents||0)));
   const spark=tr.length>1?`<div class="hs-spark" aria-hidden="true">${tr.map((g,k)=>{const v=myP(g).netCents||0,h=Math.max(6,Math.round(Math.abs(v)/mx*100));return `<i class="${v>0?'up':v<0?'dn':''}" style="--h:${h}%;--k:${k}"></i>`}).join('')}</div>`:'';
   const f=F.stf;
-  const shown=all.filter(g=>f==='open'?g.status==='closed'&&open(g):f==='mine'?myP(g):true);
-  const nOpen=closed.filter(open).length;
+  const live=d=>d.remainingAmount>0&&!isNetted(d);
+  const owe=g=>g.status==='closed'&&(g.debts||[]).some(d=>live(d)&&meIsFrom(d)),get=g=>g.status==='closed'&&(g.debts||[]).some(d=>live(d)&&isCreditor(d));
+  const shown=all.filter(g=>f==='open'?owe(g):f==='get'?get(g):f==='mine'?myP(g):true);
+  const nOpen=closed.filter(owe).length,nGet=closed.filter(get).length;
   let h=`<section class="hero hs-sum">
 <div class="hs-top"><div><div class="mut sm">Serate giocate</div><div class="bignum" style="font-size:44px">${closed.length}</div></div><div style="text-align:right"><div class="mut sm">Montepremi totale</div><div class="hs-big num">${eurS(totPot)}</div><div class="mut xs">media ${eurS(Math.round(totPot/Math.max(1,closed.length)))} a serata</div></div></div>
 ${mine.length?`<div class="hs-me"><div class="grow"><div class="mut xs">Il tuo bilancio · ${mine.length} serat${mine.length===1?'a':'e'}, ${myWins} in vincita</div><div class="hs-big num ${myTot>0?'green':myTot<0?'red':''}">${sgnS(myTot)}</div></div>${spark}</div>`:''}
 </section>
-<div class="seg hs-seg">${[['all','Tutte',0],['mine','Le mie',0],['open','Da saldare',nOpen]].map(([k,l,n])=>`<button class="${f===k?'on':''}" data-act="stf" data-f="${k}">${l}${n?` <span class="hs-n">${n}</span>`:''}</button>`).join('')}</div>`;
-  if(!shown.length)h+=`<div class="card" style="margin-top:12px;text-align:center"><p class="mut sm" style="margin:0">${f==='open'?'Tutto saldato: nessun debito aperto 🎉':'Nessuna partita qui.'}</p></div>`;
+<div class="seg hs-seg">${[['all','Tutte',0],['mine','Le mie',0],['open','Da saldare',nOpen],['get','Da ricevere',nGet]].map(([k,l,n])=>`<button class="${f===k?'on':''}" data-act="stf" data-f="${k}">${l}${n?` <span class="hs-n">${n}</span>`:''}</button>`).join('')}</div>`;
+  if(!shown.length)h+=`<div class="card" style="margin-top:12px;text-align:center"><p class="mut sm" style="margin:0">${f==='open'?'Non devi niente a nessuno 🎉':f==='get'?'Nessuno ti deve dei soldi.':'Nessuna partita qui.'}</p></div>`;
   const groups=[];shown.forEach(g=>{const d=new Date(g.scheduledAt),k=d.getFullYear()*12+d.getMonth();let G=groups[groups.length-1];if(!G||G.k!==k)groups.push(G={k,m:d.toLocaleDateString('it-IT',{month:'long',year:'numeric'}),list:[]});G.list.push(g)});
   h+=groups.map(G=>{const tp=sum(G.list.filter(g=>g.status==='closed').map(netPot));
     return `<div class="hs-mh"><span>${G.m}</span><span class="mut xs">${G.list.length} serat${G.list.length===1?'a':'e'}${tp?' · '+eurS(tp):''}</span></div><div class="stack" style="gap:10px">${G.list.map(g=>gameCard(g,myP(g),open(g))).join('')}</div>`}).join('');
@@ -5086,7 +5136,7 @@ document.addEventListener('visibilitychange',vtMusicSync);
 const _paintM=vtPaint;
 vtPaint=function(){_paintM();vtMusicSync()};
 const _renderM=render;
-render=function(){const r=_renderM.apply(this,arguments);if(!(V&&V.name==='vt'))MUS.off();return r};
+render=function(){const r=_renderM.apply(this,arguments);vtMusicSync();return r};
 const _menuM=vtMenuSheet;
 vtMenuSheet=function(){
   return _menuM().replace(/(<button class="li" data-act="vtsound">[\s\S]*?<\/button>)/,
@@ -6056,6 +6106,102 @@ vtOpenRoom=function(rid){if(S.vt.rid!==rid){clearTimeout(T3.timer);Object.assign
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='vt-range'){const r=e.target;r.style.setProperty('--f',(+r.max>+r.min?((r.value-r.min)/(r.max-r.min)*100):100).toFixed(1)+'%')}});
 
 /* =====================================================================
+   Musica ovunque nell'app (non solo al tavolo virtuale), serata
+   programmata ridisegnata, avviso se oggi c'è già una serata da aprire.
+   ===================================================================== */
+vtMusicSync=function(){
+  const want=!!(S.acct&&!S.locked)&&!document.hidden&&S.vt.music!==false;
+  if(want)MUS.on();else MUS.off();
+};
+document.addEventListener('visibilitychange',()=>vtMusicSync());
+/* il browser fa partire l'audio solo dopo un tocco */
+document.addEventListener('pointerdown',()=>vtMusicSync(),{passive:true});
+const _sheetMus=sheetHtml;
+sheetHtml=function(){
+  let h=_sheetMus();
+  if(SH&&(SH.type==='me'||SH.type==='acct')&&h&&h.indexOf('data-act="vtmusic"')<0){
+    const li=`<button class="li" data-act="vtmusic"><span class="lic">${ico('music',17)}</span><span class="grow">Musica di sottofondo<span class="mut xs" style="display:block">Jazz leggero in tutta l'app</span></span><span class="sw ${S.vt.music!==false?'on':''}"><i></i></span></button>`;
+    h=h.replace('<button class="li" data-act="pushtoggle">',li+'<button class="li" data-act="pushtoggle">');
+  }
+  return h;
+};
+
+/* ---------- serata programmata ---------- */
+const sameDay=(a,b)=>{const x=new Date(a),y=new Date(b);return x.getFullYear()===y.getFullYear()&&x.getMonth()===y.getMonth()&&x.getDate()===y.getDate()};
+function whenTxt(iso){
+  const t=new Date(iso).getTime(),now=Date.now(),d=t-now,day=86400000;
+  const d0=new Date();d0.setHours(0,0,0,0);const days=Math.round((new Date(new Date(iso).setHours(0,0,0,0))-d0)/day);
+  if(d<-3*3600000)return 'Era '+(days===0?'oggi':days===-1?'ieri':'il '+dDay(iso)+' '+dMon(iso));
+  if(d<=0)return 'In corso adesso';
+  if(d<3600000)return 'Tra '+Math.max(1,Math.round(d/60000))+' minuti';
+  if(days===0)return 'Stasera alle '+tHM(iso);
+  if(days===1)return 'Domani alle '+tHM(iso);
+  if(days<7)return 'Tra '+days+' giorni';
+  return 'Tra '+Math.round(days/7)+' settiman'+(Math.round(days/7)===1?'a':'e');
+}
+const mapsUrl=q=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
+function vPlanBook(){
+  const gid=V.gid,g=S.games[gid],R=resSorted(),me=S.me;
+  const mine=R.find(r=>(r.playerId&&r.playerId===me.id)||String(r.playerName).toLowerCase()===me.name.toLowerCase());
+  const rank=mine?R.indexOf(mine)+1:0,max=g.maxSeats||0,wait=max&&rank>max;
+  const host=g.hostId===me.id||isManager(),today=sameDay(g.scheduledAt,Date.now());
+  const dt=new Date(g.scheduledAt),wd=dt.toLocaleDateString('it-IT',{weekday:'long'}),mon=dt.toLocaleDateString('it-IT',{month:'long'});
+  const place=g.location||('da '+g.hostName);
+  const n=R.length,slots=max?Math.max(max,n):Math.max(n+1,Math.min(8,n+2));
+  const seats=Array.from({length:slots},(_,i)=>{const r=R[i];if(!r)return `<span class="pb-seat free" aria-hidden="true"></span>`;const me_=r===mine;return `<span class="pb-seat ${me_?'me':''} ${max&&i>=max?'wl':''}" title="${esc(r.playerName)}">${ava(r.playerName,'s')}</span>`}).join('');
+  const status=mine?`<div class="pb-mine ${wait?'wl':''}"><span class="pb-tick">${ico(wait?'clock':'check',20)}</span><span class="grow"><b>${wait?'Sei in lista d\'attesa':'Ci sei!'}</b><span>${wait?`Sei n° ${rank}: entri se qualcuno si libera`:`Il tuo posto è il n° ${rank}`}</span></span><button class="pb-undo" data-act="unbook" data-id="${mine.id}">Annulla</button></div>`
+    :`<button class="btn pb-book" data-act="bookme" ${canWrite?'':'disabled'}>${ico('plus',18)} Prenota il mio posto${max&&n>=max?' · lista d\'attesa':''}</button>`;
+  const start=`<button class="${today?'btn':'btn ghost'}" data-act="startplan" data-gid="${gid}">${ico('chip',18)} ${today?'Si gioca! Inizia la partita':'Inizia la partita con i prenotati'}</button>`;
+  return `<div class="wrap pbw">${backBtn('home','Home')}
+<section class="pb-ticket">
+  <div class="pb-date"><span>${esc(wd)}</span><b>${dt.getDate()}</b><span>${esc(mon)}</span></div>
+  <div class="pb-info"><span class="pb-when ${today?'today':''}">${today?'<i class="dot"></i>':''}${esc(whenTxt(g.scheduledAt))}</span>
+  <h1>Poker ${esc(wd)}</h1>
+  <span class="pb-time">${ico('clock',16)} ore ${tHM(g.scheduledAt)}</span>
+  <a class="pb-place" href="${mapsUrl(place)}" target="_blank" rel="noopener">${ico('pin',16)} ${esc(place)}</a></div>
+  <div class="pb-cut" aria-hidden="true"></div>
+  <div class="pb-foot"><span class="pb-host">${ava(g.hostName,'xs')}<span>Organizza <b>${esc(g.hostId===me.id?'tu':firstName(g.hostName))}</b></span></span>${g.note?`<span class="pb-note">${esc(g.note)}</span>`:''}</div>
+</section>
+<section class="pb-seats-w">
+  <div class="row sp"><b class="pb-lbl">Al tavolo</b><span class="mut sm num">${max?`${Math.min(n,max)} su ${max} posti${n>max?' · '+(n-max)+' in attesa':''}`:`${n} prenotat${n===1?'o':'i'}`}</span></div>
+  <div class="pb-seats">${seats}</div>
+  ${max?`<div class="meter thin"><i class="m-o" style="flex:${Math.min(n,max)} 1 0"></i><i style="flex:${Math.max(max-n,0)} 1 0"></i></div>`:''}
+</section>
+${g.status==='closed'?'<div class="box o">Questa serata è conclusa: le prenotazioni sono chiuse.</div>':status}
+${n?`<div class="list pb-list">${R.map((r,i)=>`<div class="li">${'<b class="pb-n num">'+(i+1)+'</b>'}${ava(r.playerName,'xs')}<span class="grow"><b>${esc(r.playerName)}</b>${max&&i>=max?' <span class="badge grey">in attesa</span>':''}</span><span class="mut xs num">${tHM(r.reservedAt)}</span>${host?`<button class="x" data-act="delres" data-id="${r.id}" aria-label="Togli ${esc(r.playerName)}">${ico('close',16)}</button>`:''}</div>`).join('')}</div>`:''}
+<div class="pb-acts">${start}
+<a class="btn wa" href="${waHref(inviteText(gid))}" target="_blank" rel="noopener">Invita su WhatsApp</a>
+${host?`<button class="btn ghost" data-act="pushinvite" data-gid="${gid}">${ico('bell',18)} Ricorda l'invito al tavolo</button>`:''}</div>
+${host?`<button class="link" style="align-self:center;color:#FF6A60;margin:6px auto 0;display:flex" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Annulla la serata'}</button>`:''}
+</div>`;
+}
+const _vBookP=vBook;
+vBook=function(){const g=S.games[V.gid];if(g&&g.status==='scheduled'&&S.me)return vPlanBook();return _vBookP()};
+
+/* ---------- nuova partita il giorno di una serata programmata ---------- */
+const todayPlans=()=>upcoming().filter(g=>sameDay(g.scheduledAt,Date.now()));
+const _newgameP=H.newgame;
+H.newgame=function(d){
+  const P=todayPlans();
+  if(P.length&&!(d&&d.force)){openSheet({type:'plantoday'});return}
+  SH=null;_newgameP.call(this,d);
+};
+const _sheetPlan=sheetHtml;
+sheetHtml=function(){
+  if(!(SH&&SH.type==='plantoday'))return _sheetPlan();
+  const P=todayPlans();if(!P.length){SH=null;return ''}
+  const card=g=>{const n=(g.__n!=null?g.__n:null);return `<button class="pt-card" data-act="openplan" data-gid="${g.id}"><span class="dtile"><b>${dDay(g.scheduledAt)}</b><span>${dMon(g.scheduledAt)}</span></span><span class="grow"><b>Poker di stasera · ${tHM(g.scheduledAt)}</b><span>${esc(g.location||('da '+g.hostName))}${g.note?' · '+esc(g.note):''}</span></span>${ico('chevr',18)}</button>`};
+  return `<div class="back" data-act="closesheet"><div class="sheet ${SH.anim?'anim':''}" role="dialog" aria-label="C'è già una serata programmata"><div class="grab"></div><div class="sheet-body">
+<div class="row sp"><h2>C'è già una serata oggi</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
+<div class="pt-hero"><span class="pt-ic">${ico('cal',26)}</span><p>${P.length===1?'Per oggi è già programmata una serata':'Per oggi ci sono '+P.length+' serate programmate'}. Aprila per iniziare la partita con chi si è prenotato: le prenotazioni restano collegate.</p></div>
+${P.map(card).join('')}
+<button class="btn" data-act="openplan" data-gid="${P[0].id}">${ico('chip',18)} Apri la serata programmata</button>
+<button class="btn ghost" data-act="newgame" data-force="1">Inizia comunque una partita nuova</button>
+</div></div></div>`;
+};
+H.openplan=function(d){SH=null;go('book',d.gid)};
+
+/* =====================================================================
    Effetti e accessibilità, tutto attorno a render():
    - passaggio tra schermate: la pagina vecchia scivola via mentre entra la nuova
    - ingresso a cascata dei blocchi, cifre che contano fino al valore
@@ -6340,7 +6486,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791912895919';
+const APP_VERSION='1791915459975';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
