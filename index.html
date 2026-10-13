@@ -1308,6 +1308,8 @@ span.chips i{position:absolute;left:0;bottom:calc(var(--j)*3px);width:18px;heigh
 
 .ava.pic{background:radial-gradient(circle at 50% 50%,#F7F0E0 0 57%,transparent 58%),repeating-conic-gradient(from 8deg,#F4ECDC 0 15deg,var(--c) 15deg 45deg)}
 .ava.pic::before{border-color:rgba(0,0,0,.18)}
+.ava .aph{position:absolute;inset:16%;width:68%;height:68%;border-radius:50%;object-fit:cover;z-index:1;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.ava:has(.aph)::before{display:none}
 .ava .ap{font-size:1.45em;line-height:1;text-shadow:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
 .ava.xs .ap{font-size:1.5em}.ava.l .ap{font-size:1.5em}
 .pic-prev{display:flex;align-items:center;gap:14px}
@@ -1467,7 +1469,7 @@ Object.assign(IP,{chip:'M12 3a9 9 0 100 18 9 9 0 000-18zM12 8a4 4 0 100 8 4 4 0 
 const hueOf=s=>{let h=7;for(const c of String(s).toLowerCase())h=(h*31+c.charCodeAt(0))%360;return h};
 const inits=n=>{const w=String(n).trim().split(/\s+/);return ((w[0]||'?')[0]+(w.length>1?w[1][0]:'')).toUpperCase()};
 const picOf=n=>{try{if(typeof S==='undefined'||!S.players)return null;const k=String(n||'').trim().toLowerCase();if(!k)return null;for(const id in S.players){const p=S.players[id];if(p&&p.pic&&String(p.name||'').trim().toLowerCase()===k)return p.pic}return null}catch(e){return null}};
-const ava=(n,s)=>{const pc=picOf(n);return `<span class="ava ${s||''}${pc?' pic':''}" style="--h:${hueOf(n)}">${pc?`<i class="ap" aria-hidden="true">${pc}</i><span class="sr">${esc(n)}</span>`:`<i>${esc(inits(n))}</i>`}</span>`};
+const ava=(n,s)=>{const pc=picOf(n);return `<span class="ava ${s||''}${pc?' pic':''}" style="--h:${hueOf(n)}">${pc?(String(pc).slice(0,11)==='data:image/'?`<img class="aph" src="${pc}" alt="">`:`<i class="ap" aria-hidden="true">${pc}</i>`)+`<span class="sr">${esc(n)}</span>`:`<i>${esc(inits(n))}</i>`}</span>`};
 const dDay=iso=>new Date(iso).getDate();
 const pKey=(id,name)=>id&&id!=='dealer'?id:'n:'+String(name||'').trim().toLowerCase();
 const pName=(id,name)=>(id&&typeof S!=='undefined'&&S.players&&S.players[id]&&S.players[id].name)||name;
@@ -6255,27 +6257,40 @@ const PICS=['🦀','🐂','🐉','🦁','🐯','🐺','🦊','🐻','🐼','🦈
 async function setPic(pic){
   if(!S.me||!db)return;const p=S.players[S.me.id];if(!p)return;
   const doc=Object.assign({},p);if(pic)doc.pic=pic;else delete doc.pic;
-  try{await db.doc('players/'+S.me.id).set(doc);S.players[S.me.id]=doc;LS.set('pic',pic||'');render();toast(pic?'Ecco il tuo animale '+pic:'Tornano le iniziali','ok')}catch(e){toast(errMsg(e),'err')}
+  try{await db.doc('players/'+S.me.id).set(doc);S.players[S.me.id]=doc;LS.set('pic',pic||'');render();toast(!pic?'Tornano le iniziali':pic.slice(0,5)==='data:'?'Foto del profilo aggiornata':'Ecco il tuo animale '+pic,'ok')}catch(e){toast(errMsg(e),'err')}
 }
 const _sheetPic=sheetHtml;
 sheetHtml=function(){
   if(SH&&SH.type==='pic'&&S.me){
     const cur=(S.players[S.me.id]||{}).pic||'';
     return `<div class="back" data-act="closesheet"><div class="sheet ${SH.anim?'anim':''}" role="dialog" aria-label="Scegli il tuo animale"><div class="grab"></div><div class="sheet-body">
-<div class="row sp"><h2>Il tuo animale</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
+<div class="row sp"><h2>La tua immagine</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
 <div class="pic-prev">${ava(S.me.name,'l')}<p class="mut sm" style="margin:0">Compare sulla tua fiche in tutto il tavolo: classifica, storico, cassa e tavolo virtuale.</p></div>
+<button class="btn" data-act="picphoto">${ico('camera',18)} Usa una tua foto</button>
+<div class="lbl in" style="margin-top:2px">Oppure un animale</div>
 <div class="pic-grid">${PICS.map(e=>`<button class="${cur===e?'on':''}" data-act="picset" data-e="${e}" aria-label="Scegli ${e}" aria-pressed="${cur===e}">${e}</button>`).join('')}</div>
-${cur?`<button class="btn ghost" data-act="picset" data-e="">Togli l'animale, usa le iniziali</button>`:''}
+${cur?`<button class="btn ghost" data-act="picset" data-e="">Togli l'immagine, usa le iniziali</button>`:''}
 </div></div></div>`;
   }
   let h=_sheetPic();
   if(SH&&SH.type==='me'&&S.me&&h&&h.indexOf('data-act="picopen"')<0){
-    const li=`<button class="li" data-act="picopen"><span class="lic" style="font-size:18px">${(S.players[S.me.id]||{}).pic||'🦀'}</span><span class="grow">Il tuo animale<span class="mut xs" style="display:block">Granchio, toro, drago… al posto delle iniziali</span></span>${ico('chevr',16)}</button>`;
+    const li=`<button class="li" data-act="picopen"><span class="lic" style="font-size:18px">${(S.players[S.me.id]||{}).pic?ava(S.me.name,'xs'):'🦀'}</span><span class="grow">Immagine del profilo<span class="mut xs" style="display:block">Una tua foto o un animale al posto delle iniziali</span></span>${ico('chevr',16)}</button>`;
     h=h.replace('<div class="list">','<div class="list">'+li);
   }
   return h;
 };
-Object.assign(H,{picopen(){openSheet({type:'pic'})},picset(d){setPic(d.e).then(()=>{if(SH&&SH.type==='pic'){SH={type:'me',anim:false};render()}})}});
+function picPhoto(){
+  const i=document.createElement('input');i.type='file';i.accept='image/*';
+  i.onchange=()=>{const f=i.files&&i.files[0];if(!f)return;const url=URL.createObjectURL(f),im=new Image();
+    im.onerror=()=>{URL.revokeObjectURL(url);toast('Non riesco a leggere questa immagine','err')};
+    im.onload=()=>{try{const Z=192,c=document.createElement('canvas');c.width=c.height=Z;const g=c.getContext('2d'),m=Math.min(im.width,im.height);
+      g.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,Z,Z);URL.revokeObjectURL(url);
+      let q=.82,d=c.toDataURL('image/jpeg',q);while(d.length>30000&&q>.4){q-=.1;d=c.toDataURL('image/jpeg',q)}
+      setPic(d).then(()=>{if(SH&&SH.type==='pic'){SH={type:'me',anim:false};render()}})}catch(e){toast('Non riesco a leggere questa immagine','err')}};
+    im.src=url};
+  i.click();
+}
+Object.assign(H,{picopen(){openSheet({type:'pic'})},picphoto(){picPhoto()},picset(d){setPic(d.e).then(()=>{if(SH&&SH.type==='pic'){SH={type:'me',anim:false};render()}})}});
 /* lo stesso animale ti segue negli altri tavoli */
 const _afterPic=afterData;
 afterData=async function(){
@@ -6570,7 +6585,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791921398931';
+const APP_VERSION='1791921469475';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
