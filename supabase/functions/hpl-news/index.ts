@@ -6,11 +6,14 @@
 const FEEDS = [
   { url: "https://news.google.com/rss/search?q=poker+(WSOP+OR+EPT+OR+WPT+OR+torneo+OR+%22Main+Event%22)&hl=it&gl=IT&ceid=IT:it", lang: "it" },
   { url: "https://news.google.com/rss/search?q=poker+(gossip+OR+scandalo+OR+vip+OR+celebrit%C3%A0+OR+polemica)&hl=it&gl=IT&ceid=IT:it", lang: "it", tag: "gossip" },
+  { url: "https://news.google.com/rss/search?q=poker+live+OR+%22poker+online%22+OR+pokerstars&hl=it&gl=IT&ceid=IT:it", lang: "it" },
+  { url: "https://news.google.com/rss/search?q=%22poker%22+when:7d&hl=it&gl=IT&ceid=IT:it", lang: "it" },
   { url: "https://it.pokernews.com/rss.php", lang: "it", src: "PokerNews" },
   { url: "https://www.assopoker.com/feed/", lang: "it", src: "Assopoker" },
 ];
 const TTL = 20 * 60 * 1000;
 let cache = null;
+let stats = [];
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -51,6 +54,13 @@ function parse(xml, feed) {
   }
   return out;
 }
+/* solo poker: fuori pronostici di calcio, scommesse sportive, slot e lotterie */
+const POKER = /poker|wsop|\bept\b|\bwpt\b|world series|hold.?em|omaha|bracelet|braccialett|main event|high roller|sunday million|sit\s?(&|and|n)\s?go|spin\s?(&|and)\s?go|\bmtt\b|cash game|final table|tavolo finale|\bitm\b|day ?[123][a-d]?\b|chipleader|chip leader|bluff|showdown|river|flop/i;
+const NOT_POKER = /pronostic|quote|scommess|calcio|serie a\b|champions|europa league|conference league|campionato|partita di|gol\b|slot|lotto|superenalotto|gratta|roulette|blackjack|ippica|tennis|basket|formula 1|motogp/i;
+const isPoker = (t, src) => {
+  if (NOT_POKER.test(t) && !/poker/i.test(t)) return false;
+  return POKER.test(t) || /poker/i.test(src || ""); // le testate di poker valgono anche senza la parola nel titolo
+};
 function classify(t) {
   const s = t.toLowerCase();
   if (/gossip|scandal|cheat|truff|barare|polemic|drama|vip|celebr|attor|cantant|calciat|influencer|streamer|lite|accus|arrest|denunc|squalific|ban\b|bannat/.test(s)) return "gossip";
@@ -72,11 +82,13 @@ async function grab(feed) {
 
 async function collect() {
   const lists = await Promise.all(FEEDS.map(grab));
+  stats = FEEDS.map((f, i) => ({ src: f.src || "Google News", n: lists[i].length }));
   const seen = new Set(), all = [];
   const weekAgo = Date.now() - 21 * 864e5;
   for (const it of lists.flat().sort((a, b) => b.when - a.when)) {
     const k = norm(it.title);
     if (seen.has(k) || seen.has(it.link)) continue;
+    if (!isPoker(it.title + " " + it.desc, it.src)) continue;
     if (it.when && it.when < weekAgo) continue;
     seen.add(k); seen.add(it.link);
     all.push(it);
@@ -92,7 +104,7 @@ Deno.serve(async (req) => {
       const items = await collect();
       if (items.length || !cache) cache = { at: now, items };
     }
-    return json({ ok: true, at: cache.at, items: cache.items });
+    return json({ ok: true, at: cache.at, items: cache.items, feeds: stats });
   } catch (e) {
     return json({ error: String(e?.message || e) });
   }
