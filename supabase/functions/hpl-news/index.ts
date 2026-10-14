@@ -7,8 +7,6 @@ const FEEDS = [
   { url: "https://news.google.com/rss/search?q=poker+(WSOP+OR+EPT+OR+WPT+OR+torneo+OR+%22Main+Event%22)&hl=it&gl=IT&ceid=IT:it", lang: "it" },
   { url: "https://news.google.com/rss/search?q=poker+(gossip+OR+scandalo+OR+vip+OR+celebrit%C3%A0+OR+polemica)&hl=it&gl=IT&ceid=IT:it", lang: "it", tag: "gossip" },
   { url: "https://news.google.com/rss/search?q=poker+live+OR+%22poker+online%22+OR+pokerstars&hl=it&gl=IT&ceid=IT:it", lang: "it" },
-  { url: "https://news.google.com/rss/search?q=%22poker%22+when:7d&hl=it&gl=IT&ceid=IT:it", lang: "it" },
-  { url: "https://it.pokernews.com/rss.php", lang: "it", src: "PokerNews" },
   { url: "https://www.assopoker.com/feed/", lang: "it", src: "Assopoker" },
 ];
 const TTL = 20 * 60 * 1000;
@@ -54,12 +52,15 @@ function parse(xml, feed) {
   }
   return out;
 }
-/* solo poker: fuori pronostici di calcio, scommesse sportive, slot e lotterie */
-const POKER = /poker|wsop|\bept\b|\bwpt\b|world series|hold.?em|omaha|bracelet|braccialett|main event|high roller|sunday million|sit\s?(&|and|n)\s?go|spin\s?(&|and)\s?go|\bmtt\b|cash game|final table|tavolo finale|\bitm\b|day ?[123][a-d]?\b|chipleader|chip leader|bluff|showdown|river|flop/i;
-const NOT_POKER = /pronostic|quote|scommess|calcio|serie a\b|champions|europa league|conference league|campionato|partita di|gol\b|slot|lotto|superenalotto|gratta|roulette|blackjack|ippica|tennis|basket|formula 1|motogp/i;
+/* solo poker. Attenzione: in italiano "poker" si usa anche nello sport ("il Barcellona cala il poker"),
+   quindi dalle fonti generiche servono parole tipiche del poker; le testate di poker valgono sempre,
+   tranne quando parlano di calcio, scommesse o slot */
+const STRONG = /poker\s?(online|live|room|club|tour|series|festival|texas|stars|cash|sportivo|italia)|pokerstars|texas hold|hold.?em|omaha|wsop|\bept\b|\bwpt\b|world series of poker|sunday million|main event|high roller|braccialett|bracelet|final table|tavolo finale|\bmtt\b|sit\s?(&|and|n)\s?go|spin\s?(&|and)\s?go|chip ?leader|\bitm\b|\bday ?[123][a-d]?\b|satellit|monster ?\d+|(giocator[ei]|torne[oi]|sala|campione|campionato italiano) di poker|poker player|pokerista|\bbluff/i;
+const SPORT = /pronostic|quote\b|scommess|calci|champions|europa league|conference|serie [a-d]\b|giornata|campionat|girone|squadr|allenator|partit[ae]|infortun|\bgol\b|reti\b|coppa|figc|under ?\d\d|nazionale|azzurr|derby|basket|volley|pallavolo|rugby|tennis|ciclism|motogp|formula 1|rally|team\b|slot|lotto|superenalotto|gratta|roulette|ippica/i;
 const isPoker = (t, src) => {
-  if (NOT_POKER.test(t) && !/poker/i.test(t)) return false;
-  return POKER.test(t) || /poker/i.test(src || ""); // le testate di poker valgono anche senza la parola nel titolo
+  if (SPORT.test(t) && !STRONG.test(t)) return false;
+  if (/poker/i.test(src || "")) return true;
+  return STRONG.test(t);
 };
 function classify(t) {
   const s = t.toLowerCase();
