@@ -1612,8 +1612,42 @@ body::after{opacity:1;mix-blend-mode:normal;background-image:
 .vt3 .t3-mine:has(.cd:nth-child(4)) .cd.h{width:44px;height:64px;margin-left:-8px}
 .vt3 .t3-mine:has(.cd:nth-child(4)) .cd.h:first-child{margin-left:0}
 .vt3 .t3-stagelbl{display:none}
-.vt3 .s3.topr .s3-act{position:absolute;left:calc(100% - 2px);top:64px;margin:0}
-.vt3 .s3.topr.rgt .s3-act{left:auto;right:calc(100% - 2px)}
+.vt3 .t3-center{top:51%}
+.vt3:has(.t3-win) .t3-logo,.vt3.many .t3-logo{opacity:0}
+.vt3 .t3-win{max-width:178px;text-align:center;padding:5px 12px 6px;border-radius:12px}.vt3 .t3-win b{font-size:14px;line-height:1.2}.vt3 .t3-win span{font-size:11.5px;line-height:1.25}
+.vt3.many .t3-center{top:53%}
+
+.vt3 .s3{width:90px}
+.vt3 .s3 .s3-plate{min-width:80px;max-width:90px}
+.vt3 .s3-plate,.vt3 .t3-mystk{box-sizing:border-box}
+/* carte coperte: spuntano sopra l'avatar; scoperte: davanti all'avatar */
+.vt3 .s3 .s3-cards,.vt3 .s3.rgt .s3-cards,.vt3 .s3.topr .s3-cards,.vt3 .s3.topr.rgt .s3-cards{left:50%;right:auto;top:-15px;transform:translateX(-50%);z-index:1}
+.vt3 .s3 .s3-cc .cd{width:24px;height:34px}
+.vt3 .s3 .s3-cc .cd:first-child{transform:rotate(-8deg) translateX(3px)}.vt3 .s3 .s3-cc .cd:last-child{transform:rotate(8deg) translateX(-3px)}
+.vt3 .s3 .s3-cc.o4 .cd{width:20px;height:29px;margin-left:-9px}.vt3 .s3 .s3-cc.o4 .cd:first-child{margin-left:0}
+.vt3 .s3 .s3-cards:has(.up),.vt3 .s3.rgt .s3-cards:has(.up),.vt3 .s3.topr .s3-cards:has(.up){top:5px;z-index:3}
+.vt3.many .s3 .s3-cards:has(.up),.vt3.many .s3.rgt .s3-cards:has(.up),.vt3.many .s3.topr .s3-cards:has(.up){top:-5px}
+.vt3 .s3 .s3-cc.up{top:0;gap:2px}
+.vt3 .s3 .s3-cc.up .cd{width:28px;height:40px;box-shadow:0 3px 8px rgba(0,0,0,.6)}
+.vt3 .s3 .s3-cc.up.o4,.vt3 .s3 .s3-cc.up:has(.cd:nth-child(4)){gap:0}
+.vt3 .s3 .s3-cc.up:has(.cd:nth-child(4)) .cd{width:22px;height:32px;margin-left:-4px}
+/* ultima mossa: dentro la targhetta, al posto del nome */
+.vt3 .s3-act{position:absolute;left:50%;top:49px;transform:translateX(-50%);margin:0;min-height:0;z-index:5;width:84px;display:flex;justify-content:center}
+.vt3 .s3 .la{width:100%;text-align:center;padding:1px 4px;border-radius:4px 4px 0 0;font-size:11.5px;line-height:15px;box-shadow:none;background:#2C2D31;animation:none}
+.vt3 .s3 .la.la-blind{color:#CFD1D6}
+/* con più di 6 giocatori tutto un po' più piccolo */
+.vt3.many .s3{width:78px}
+.vt3.many .s3-av{width:46px;height:46px}
+.vt3.many .s3-ava .ava{width:42px;height:42px;font-size:13px}
+.vt3.many .s3-ring{left:-6px;top:-6px;width:58px;height:58px}
+.vt3.many .s3 .s3-plate{min-width:72px;max-width:78px;padding:2px 5px 3px}
+.vt3.many .s3-nm{font-size:10.5px}.vt3.many .s3-stk{font-size:12px}
+.vt3.many .s3-act{top:39px;width:72px}
+.vt3.many .s3 .la{font-size:10.5px;line-height:14px}
+.vt3.many .t3-slot,.vt3.many .cd.b{width:38px;height:54px}
+.vt3.many .cd.b .cd-ix b{font-size:16px}.vt3.many .cd.b .cd-pip{font-size:21px}
+.vt3.many .t3-board{gap:4px}
+.vt3.many .s3 .s3-cc.up:has(.cd:nth-child(4)) .cd{width:18px;height:26px;margin-left:-3px}
 .vt3 .t3-meR .t3-hand{white-space:normal;text-align:center;line-height:1.25;max-width:100%}
 .vt3 .t3-mystk{display:flex;flex-direction:column;align-items:center;gap:0;min-width:116px;margin-top:-10px;position:relative;z-index:2;padding:3px 12px 4px;border-radius:5px;background:linear-gradient(180deg,#2C2D31,#18191B);box-shadow:inset 0 0 0 1px #4A4B50,0 4px 10px rgba(0,0,0,.6);line-height:1.2}
 .t3-mynm{font-size:12px;font-weight:600;color:#E6E7EA;max-width:120px}
@@ -1658,6 +1692,57 @@ body::after{opacity:1;mix-blend-mode:normal;background-image:
 .bj .t3-go:active{filter:brightness(.88);transform:translateY(1px)}
 .bj .btn{border-radius:8px;background:linear-gradient(180deg,#E8343D,#B3141D)!important;color:#fff}
 .bj .bj-bank{border-radius:8px;background:#0F1012;box-shadow:inset 0 0 0 1px #55575C;color:#fff}
+
+/* schermi bassi (iPhone SE e simili): tutto un po' più compatto, il tavolo respira */
+@media (max-height:740px){
+  .vt3 .t3-stage{padding-top:12px}
+  .vt3 .s3{width:78px}
+  .vt3 .s3-av{width:46px;height:46px;transform:none}
+  .vt3 .s3-ava .ava{width:42px;height:42px;font-size:13px}
+  .vt3 .s3-ring{left:-6px;top:-6px;width:58px;height:58px}
+  .vt3 .s3 .s3-plate{min-width:72px;max-width:78px;padding:2px 5px 3px}
+  .vt3 .s3-nm{font-size:10.5px}.vt3 .s3-stk{font-size:12px}
+  .vt3 .s3-act{top:39px;width:72px}
+  .vt3 .s3 .la{font-size:10.5px;line-height:14px}
+  .vt3 .s3 .s3-cc .cd{width:20px;height:29px}
+  .vt3 .s3 .s3-cards,.vt3 .s3.rgt .s3-cards,.vt3 .s3.topr .s3-cards,.vt3 .s3.topr.rgt .s3-cards{top:-12px}
+  .vt3 .s3 .s3-cc.up .cd{width:24px;height:34px}
+  .vt3.vt3 .s3 .s3-cards:has(.up),.vt3.vt3 .s3.rgt .s3-cards:has(.up),.vt3.vt3 .s3.topr .s3-cards:has(.up){top:-6px}
+  .vt3 .t3-slot,.vt3 .cd.b{width:36px;height:51px}
+  .vt3 .cd.b .cd-ix b{font-size:15px}.vt3 .cd.b .cd-pip{font-size:19px}
+  .vt3 .t3-board{gap:4px}
+  .vt3 .t3-pot{padding:3px 12px}.vt3 .t3-potv b{font-size:13px}.vt3 .t3-potv small{font-size:10.5px}
+  .vt3 .t3-msg{min-height:38px}
+  .vt3 .t3-win{padding:4px 12px 5px}.vt3 .t3-win b{font-size:13.5px}.vt3 .t3-win span{font-size:11.5px}
+  .vt3 .t3-hero{min-height:88px;margin-top:-58px;pointer-events:none}
+  .vt3 .t3-hero>*{pointer-events:auto}
+  .vt3 .t3-mine .cd.h{width:50px;height:71px}
+  .vt3 .t3-mine:has(.cd:nth-child(4)) .cd.h{width:38px;height:55px}
+  .vt3 .t3-mine .cd.h .cd-ix b{font-size:21px}.vt3 .t3-mine .cd.h .cd-pip{font-size:28px}
+  .vt3 .t3-mystk{min-width:104px;margin-top:-8px;padding:2px 10px 3px}.vt3 .t3-mystk b{font-size:14px}.t3-mynm{font-size:11px}
+  .vt3 .t3-go{min-height:50px;font-size:16px}.vt3 .t3-go small{font-size:13px}
+  .t3-szv,.vt3 .t3-step{height:34px}.vt3 .t3-step{width:34px}
+  .vt3 .t3-pre button{min-height:46px}
+}
+/* tavolo basso e tanti giocatori: posti ancora più piccoli */
+.vt3.short.many .s3{width:68px}
+.vt3.short.many .s3-av{width:38px;height:38px}
+.vt3.short.many .s3-ava .ava{width:34px;height:34px;font-size:11px}
+.vt3.short.many .s3-ring{left:-6px;top:-6px;width:50px;height:50px}
+.vt3.short.many .s3 .s3-plate{min-width:64px;max-width:68px;padding:1px 4px 2px;margin-top:-6px}
+.vt3.short.many .s3-nm{font-size:10px}.vt3.short.many .s3-stk{font-size:11px}
+.vt3.short.many .s3-act{top:33px;width:64px}
+.vt3.short.many .s3 .la{font-size:10px;line-height:13px}
+.vt3.short.many .s3 .s3-cc .cd{width:17px;height:24px}
+.vt3.short.many .s3 .s3-cards,.vt3.short.many .s3.rgt .s3-cards,.vt3.short.many .s3.topr .s3-cards{top:-10px}
+.vt3.short.many .s3 .s3-cc.up .cd{width:21px;height:30px}
+.vt3.short .t3-rail{inset:7% 6% 8%}
+
+/* targhetta ed etichetta della mossa: stessa larghezza, sempre */
+.vt3.vt3 .s3 .s3-plate{width:90px;min-width:0;max-width:none}.vt3.vt3 .s3-act{width:90px}
+.vt3.vt3.many .s3 .s3-plate{width:78px}.vt3.vt3.many .s3-act{width:78px}
+@media (max-height:740px){.vt3.vt3 .s3 .s3-plate{width:78px}.vt3.vt3 .s3-act{width:78px}}
+.vt3.vt3.short.many .s3 .s3-plate{width:68px}.vt3.vt3.short.many .s3-act{width:68px}
 </style>
 
 <div id="app"></div>
@@ -4437,7 +4522,7 @@ function vtBar(st,me){
 <button class="va" data-act="vtmove" data-m="${toCall?'call':'check'}" ${S.vt.busy?'disabled':''}>${toCall?(toCall>=s.stack?'All-in '+fchip(s.stack):'Chiama '+fchip(toCall)):'Passa'}</button>
 ${canRaise?`<button class="va up" data-act="vtraise" ${S.vt.busy?'disabled':''}>${h.curBet?'Rilancia':'Punta'}</button>`:''}</div>`);
   }
-  if(live){const t=h.toAct!=null&&st.seats[h.toAct];return wrap(`<div class="vwait">${t?`${ava(t.name,'xs')}<span>Tocca a <b>${esc(firstName(t.name))}</b></span><span class="tpill" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span class="mut">…</span>'}</div>`)}
+  if(live){const t=h.toAct!=null&&st.seats[h.toAct];return wrap(`<div class="vwait">${t?`${ava(t.name,'xs')}<span>Tocca a <b>${esc(t.bot?t.name:firstName(t.name))}</b></span><span class="tpill" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span class="mut">…</span>'}</div>`)}
   if(h&&h.stage==='done'&&st.running&&HE.eligible(st).length>=2&&s.stack>0)return wrap(`<div class="vwait"><span class="mut sm">Prossima mano tra</span><span class="tpill" data-dl="${(h.endedAt||0)+HE.NEXT_DELAY}"><span class="tsec"></span></span></div>`);
   if(s.stack===0)return wrap(`<button class="btn" data-act="vtrebuy">Ricarica ${fchip(st.cfg.stack)} fiches</button>`);
   if(!st.running){const n=HE.eligible(st).length;return wrap(n>=2?`<button class="btn" data-act="vtstart">Inizia la partita · ${n} giocatori</button>`:`<div class="vwait"><span class="mut sm">Aspetta che si sieda almeno un altro giocatore.</span></div><button class="btn" data-act="vtinvite">${ico('user',18)} Invita giocatori</button>`)}
@@ -4789,10 +4874,10 @@ ${canRaise?`<button class="v2-go raise" data-act="vtraise" ${S.vt.busy?'disabled
     const toCall=Math.max(0,h.curBet-P.bet),pre=F.vt.pre&&F.vt.pre.no===h.no&&F.vt.pre.stage===h.stage?F.vt.pre:null;
     const opts=[['cf',toCall?'Lascia':'Passa / Lascia'],toCall?['cl','Chiama '+fchip(Math.min(toCall,s.stack))]:['ck','Passa'],['ca','Chiama tutto']];
     const t=h.toAct!=null&&st.seats[h.toAct];
-    return `<div class="v2-turn">${t?`<span>Tocca a <b>${esc(firstName(t.name))}</b></span><span class="tsec-w" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span>…</span>'}</div>
+    return `<div class="v2-turn">${t?`<span>Tocca a <b>${esc(t.bot?t.name:firstName(t.name))}</b></span><span class="tsec-w" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span>…</span>'}</div>
 <div class="v2-preacts">${opts.map(([k,l])=>`<button class="${pre&&pre.k===k?'on':''}" data-act="vtpreact" data-k="${k}"><span class="pchk">${ico('check',13)}</span>${l}</button>`).join('')}</div>`;
   }
-  if(live){const t=h.toAct!=null&&st.seats[h.toAct];return `<div class="v2-turn wide">${t?`<span>Tocca a <b>${esc(firstName(t.name))}</b></span><span class="tsec-w" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span>Si girano le carte…</span>'}</div>`}
+  if(live){const t=h.toAct!=null&&st.seats[h.toAct];return `<div class="v2-turn wide">${t?`<span>Tocca a <b>${esc(t.bot?t.name:firstName(t.name))}</b></span><span class="tsec-w" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span>Si girano le carte…</span>'}</div>`}
   if(h&&h.stage==='done'&&P&&!(h.reveal&&h.reveal[me])&&S.vt.cardsHand===h.no&&S.vt.cards){
     return `<div class="v2-acts two"><button class="v2-go call" data-act="vtshow">${ico('eye',18)} Mostra le carte</button>${st.running&&HE.eligible(st).length>=2?`<div class="v2-next">Prossima mano<span class="tsec-w" data-dl="${(h.endedAt||0)+HE.NEXT_DELAY}"><span class="tsec"></span></span></div>`:''}</div>`;
   }
@@ -5275,10 +5360,10 @@ ${canRaise?`<button class="v2-go raise" data-act="vtraise" ${S.vt.busy?'disabled
     const toCall=Math.max(0,h.curBet-P.bet),pre=F.vt.pre&&F.vt.pre.no===h.no&&F.vt.pre.stage===h.stage?F.vt.pre:null;
     const opts=[['cf',toCall?'Fold':'Check / Fold'],toCall?['cl','Call '+fchip(Math.min(toCall,s.stack))]:['ck','Check'],['ca','Call any']];
     const t=h.toAct!=null&&st.seats[h.toAct];
-    return `<div class="v2-turn">${t?`<span>Tocca a <b>${esc(firstName(t.name))}</b></span><span class="tsec-w" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span>…</span>'}</div>
+    return `<div class="v2-turn">${t?`<span>Tocca a <b>${esc(t.bot?t.name:firstName(t.name))}</b></span><span class="tsec-w" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span>…</span>'}</div>
 <div class="v2-preacts">${opts.map(([k,l])=>`<button class="${pre&&pre.k===k?'on':''}" data-act="vtpreact" data-k="${k}"><span class="pchk">${ico('check',13)}</span>${l}</button>`).join('')}</div>`;
   }
-  if(live){const t=h.toAct!=null&&st.seats[h.toAct];return `<div class="v2-turn wide">${t?`<span>Tocca a <b>${esc(firstName(t.name))}</b></span><span class="tsec-w" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span>Si girano le carte…</span>'}</div>`}
+  if(live){const t=h.toAct!=null&&st.seats[h.toAct];return `<div class="v2-turn wide">${t?`<span>Tocca a <b>${esc(t.bot?t.name:firstName(t.name))}</b></span><span class="tsec-w" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span>Si girano le carte…</span>'}</div>`}
   /* mano finita */
   if(h&&h.stage==='done'&&P&&!(h.reveal&&h.reveal[me])&&S.vt.cardsHand===h.no&&S.vt.cards)
     return `<div class="v2-acts two"><button class="v2-go call" data-act="vtshow">${ico('eye',18)} Mostra le carte</button>${st.running&&HE.eligible(st).length>=2?`<div class="v2-next">Prossima mano<span class="tsec-w" data-dl="${(h.endedAt||0)+HE.NEXT_DELAY}"><span class="tsec"></span></span></div>`:''}</div>`;
@@ -6249,10 +6334,20 @@ const T3={no:null,board:0,lastFlip:0,resAt:0,timer:null,prev:null,stk:{},heroFli
 const T3_LA={Fold:'Lascia',Check:'Passa',Call:'Chiama',Raise:'Rilancia',Bet:'Punta','All-in':'All-in',Lascia:'Lascia',Passa:'Passa',Chiama:'Chiama',Rilancia:'Rilancia',Punta:'Punta'};
 const T3_LAC={Lascia:'fold',Passa:'check',Chiama:'call',Rilancia:'raise',Punta:'raise','All-in':'allin'};
 const T3_STAGE={preflop:'Pre-flop',flop:'Flop',turn:'Turn',river:'River'};
-const T3_P9=[[50,92],[13,77],[9,52],[13,28],[31,10],[69,10],[87,28],[91,52],[87,77]];
-const T3_P6=[[50,92],[10,66],[12,27],[50,9],[88,27],[90,66]];
+const T3_P9=[[50,92],[15,78],[13,52],[15,27],[33,9],[67,9],[85,27],[87,52],[85,78]];
+const T3_P6=[[50,92],[14,66],[14,27],[50,9],[86,27],[86,66]];
 const T3_P2=[[50,92],[50,9]];
-const t3Layout=st=>{const ms=st?HE.maxSeats(st):9;return {ms,L:ms<=2?T3_P2:ms<=6?T3_P6:T3_P9}};
+/* dove finiscono le puntate di ciascun posto: accanto alla targhetta, lontano da piatto e carte */
+const T3_B9=[[50,78],[34,73],[30,62],[36,31],[38,22],[62,22],[64,31],[70,62],[66,73]];
+const T3_B6=[[50,78],[36,64],[35,32],[50,25],[65,32],[64,64]];
+const T3_B2=[[50,78],[50,29]];
+/* tavolo basso (telefoni piccoli): posti ai bordi, accanto alle carte comuni */
+const T3_S9=[[50,92],[11,80],[11,55],[11,30],[31,9],[69,9],[89,30],[89,55],[89,80]];
+const T3_SB9=[[50,86],[27,86],[27,63],[27,36],[42,24],[58,24],[73,36],[73,63],[73,86]];
+const T3_S6=[[50,92],[11,72],[11,32],[50,9],[89,32],[89,72]];
+const T3_SB6=[[50,86],[27,82],[27,24],[50,30],[73,24],[73,82]];
+const t3Short=()=>{const t=$$id('v2-tbl');return !!(t&&t.clientWidth&&t.clientHeight/t.clientWidth<1.05)};
+const t3Layout=st=>{const ms=st?HE.maxSeats(st):9,sh=t3Short();return {ms,sh,L:ms<=2?T3_P2:ms<=6?(sh?T3_S6:T3_P6):(sh?T3_S9:T3_P9),B:ms<=2?T3_B2:ms<=6?(sh?T3_SB6:T3_B6):(sh?T3_SB9:T3_B9)}};
 const t3Sched=(ms,fn)=>{if(T3.timer)return;T3.timer=setTimeout(()=>{T3.timer=null;fn();if(V&&V.name==='vt')vtPaint()},ms)};
 
 /* la mano non è finita sul telefono finché non si è vista: il prossimo giro aspetta */
@@ -6269,7 +6364,7 @@ vVT=function(){
 <header class="t3-top" id="t3-top"></header>
 <div class="t3-stage"><div class="t3-tbl" id="v2-tbl">
 <div class="t3-rail"><div class="t3-felt"><div class="t3-logo" id="t3-logo"></div></div></div>
-<div class="t3-center"><div class="t3-stagelbl" id="t3-stg"></div><div class="t3-pot" id="t3-pot"></div><div class="t3-board">${[0,1,2,3,4].map(k=>`<span class="t3-slot" id="t3-c${k}"></span>`).join('')}</div><div class="t3-msg" id="t3-msg" aria-live="polite"></div></div>
+<div class="t3-center"><div class="t3-stagelbl" id="t3-stg"></div><div class="t3-board">${[0,1,2,3,4].map(k=>`<span class="t3-slot" id="t3-c${k}"></span>`).join('')}</div><div class="t3-pot" id="t3-pot"></div><div class="t3-msg" id="t3-msg" aria-live="polite"></div></div>
 ${[...Array(9)].map((_,i)=>`<div class="s3 off" id="vs${i}"><div class="s3-cards"></div><div class="s3-av"><svg class="s3-ring" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29"/></svg><div class="s3-ava"></div></div><div class="s3-plate"><b class="s3-nm"></b><span class="s3-stk num"></span></div><div class="s3-act"></div></div><div class="b3" id="vb${i}"></div>`).join('')}
 <div class="t3-dbtn" id="t3-dbtn" aria-hidden="true">D</div>
 <div class="v2-over" id="v2-over"></div>
@@ -6296,7 +6391,7 @@ function t3Ctl(st,me,disp){
   if(!st)return `<button class="btn" data-act="vtsit" data-seat="-1">Siediti al tavolo</button>`;
   if(st.closed)return `<button class="btn" data-act="vtlobby">Torna ai tavoli</button>`;
   const h=st.hand,live=vtLive(),s=me>=0&&st.seats[me],P=h&&me>=0&&h.p[me];
-  const turnOf=(cls)=>{const t=h&&h.toAct!=null&&st.seats[h.toAct];return `<div class="t3-wait ${cls||''}">${t?`<span class="t3-who">${ava(t.name,'xs')}Tocca a <b>${esc(firstName(t.name))}</b></span><span class="t3-sec" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span>Si girano le carte…</span>'}</div>`};
+  const turnOf=(cls)=>{const t=h&&h.toAct!=null&&st.seats[h.toAct];return `<div class="t3-wait ${cls||''}">${t?`<span class="t3-who">${ava(t.name,'xs')}Tocca a <b>${esc(t.bot?t.name:firstName(t.name))}</b></span><span class="t3-sec" data-dl="${h.deadline}"><span class="tsec"></span></span>`:'<span>Si girano le carte…</span>'}</div>`};
   if(h&&h.stage==='done'&&!disp.showRes)return `<div class="t3-wait wide"><span>Si scoprono le carte…</span></div>`;
   if(me<0){
     const was=vtBusted(st),left=vtLeft(st),free=st.seats.some((x,i)=>!x&&i<HE.maxSeats(st));
@@ -6313,11 +6408,9 @@ function t3Ctl(st,me,disp){
     const rk=h.no+'|'+h.stage+'|'+h.curBet;if(F.vt.raiseKey!==rk){F.vt.raiseKey=rk;F.vt.raise=null}
     let sizer='',val=minTo;
     if(canRaise){
-      const pot=potOf(h),step=Math.max(1,st.cfg.sb||1),cl=v=>Math.max(minTo,Math.min(maxTo,Math.round(v/step)*step));
+      const step=Math.max(1,st.cfg.sb||1);
       val=Math.max(minTo,Math.min(maxTo,F.vt.raise!=null?F.vt.raise:minTo));
-      const pres=[['Min',minTo],h.stage==='preflop'&&!h.curBet||h.stage==='preflop'&&h.curBet<=bb?['3 BB',cl(bb*3)]:['½ Piatto',cl(h.curBet+(pot+toCall)/2)],['Piatto',cl(h.curBet+pot+toCall)],['Max',maxTo]];
-      sizer=`<div class="t3-sz"><div class="t3-szp">${pres.map(([l,v])=>`<button class="${v===val?'on':''}" data-act="vtpre" data-v="${v}">${l}</button>`).join('')}</div>
-<div class="t3-szr"><span class="t3-szv num" id="vt-rv">${fchip(val)}</span><button class="t3-step" data-act="vtstep" data-d="-1" aria-label="Meno">−</button><input type="range" id="vt-range" min="${minTo}" max="${maxTo}" step="${step}" value="${val}" aria-label="Quanto punti" style="--f:${maxTo>minTo?((val-minTo)/(maxTo-minTo)*100).toFixed(1):100}%"><button class="t3-step" data-act="vtstep" data-d="1" aria-label="Più">+</button></div></div>`;
+      sizer=`<div class="t3-sz"><div class="t3-szr"><span class="t3-szv num" id="vt-rv">${fchip(val)}</span><button class="t3-step" data-act="vtstep" data-d="-1" aria-label="Meno">−</button><input type="range" id="vt-range" min="${minTo}" max="${maxTo}" step="${step}" value="${val}" aria-label="Quanto punti" style="--f:${maxTo>minTo?((val-minTo)/(maxTo-minTo)*100).toFixed(1):100}%"><button class="t3-step" data-act="vtstep" data-d="1" aria-label="Più">+</button></div></div>`;
     }
     const rl=v=>v>=allIn?`All-in<small class="num">${fchip(v)}</small>`:`${h.curBet?'Rilancia a':'Punta'}<small class="num">${fchip(v)}</small>`;
     return `${bar}${sizer}<div class="t3-acts ${canRaise?'':'two'}"><button class="t3-go fold" data-act="vtmove" data-m="fold" ${busy}>Lascia</button>
@@ -6370,7 +6463,7 @@ vtPaint=function(){
   }
   const showRes=!!(h&&h.stage==='done'&&T3.resAt);
   const disp={showRes};
-  const {ms,L}=t3Layout(st),base=me>=0?me:(T3.base||0),rel=i=>((i-base)%ms+ms)%ms;
+  const {ms,sh,L,B}=t3Layout(st),base=me>=0?me:(T3.base||0),rel=i=>((i-base)%ms+ms)%ms;
   const won={};if(showRes&&h.results)h.results.forEach(r=>{if(r.win>0)won[r.seat]=r});
   const top=showRes&&h.results&&h.results[0]&&h.results[0].win>0?h.results[0]:null;
   const best=new Set(top&&top.best?top.best:[]);
@@ -6378,12 +6471,13 @@ vtPaint=function(){
   const D={no:h?h.no:null,stage:h?h.stage:null,bets:{},la:{},board:T3.board,showRes,inHand:{},rev:{}};
 
   /* --- posti --- */
+  let laNext=1e9;
   for(let i=0;i<9;i++){
     const el=$$id('vs'+i),s=st?st.seats[i]:null,bt=$$id('vb'+i);
     if(i>=ms){setCl(el,'s3 off');delete el.dataset.act;setCl(bt,'b3');setH(bt,'');continue}
     const [x,y]=L[rel(i)],hero=me>=0&&i===me;
     if(el.__pos!==x+','+y){el.style.left=x+'%';el.style.top=y+'%';el.__pos=x+','+y;el.classList.toggle('lft',x<35);el.classList.toggle('rgt',x>65);el.classList.toggle('topr',y<20)}
-    const bx=x+(50-x)*(hero?.12:.5),by=y+(50-y)*(hero?.38:.36);
+    const [bx,by]=B[rel(i)];
     if(bt.__pos!==bx+','+by){bt.style.left=bx+'%';bt.style.top=by+'%';bt.__pos=bx+','+by}
     if(!s){
       const canSit=me<0&&st&&!st.closed&&!HE.sngOn(st)&&(!st.busted||!st.busted[myAcct()]||HE.rebuysLeft(st,myAcct())>0);
@@ -6420,14 +6514,18 @@ vtPaint=function(){
     else if(P&&P.la&&live){const t=T3_LA[P.la]||P.la;la=`<span class="la la-${T3_LAC[t]||'call'}">${t}</span>`}
     else if(h&&live&&P&&!P.la&&h.stage==='preflop'&&(i===h.sb||i===h.bb))la=`<span class="la la-blind">${i===h.sb?'P. buio':'G. buio'}</span>`;
     else if(!P&&hero&&h&&live&&!out&&!s.away)la='<span class="la la-blind">Entri alla prossima</span>';
+    /* la mossa resta sulla targhetta 2 secondi, poi torna il nome */
+    {const k=h?h.no+'|'+la:la;T3.la=T3.la||{};if(!T3.la[i]||T3.la[i].k!==k)T3.la[i]={k,t:now};
+     if(la&&!won[i]){const age=now-T3.la[i].t;if(age>2200)la='';else laNext=Math.min(laNext,2250-age)}}
     setH(el.querySelector('.s3-act'),la);
     /* puntata davanti al posto */
     const bet=P&&live?P.bet:0;D.bets[i]=bet;
     setCl(bt,'b3'+(bet?' on':''));setH(bt,bet?`<span class="chips">${chipStack(bet)}</span><b class="num">${fchip(bet)}</b>`:'');
   }
+  clearTimeout(T3.laT);if(laNext<1e9)T3.laT=setTimeout(()=>{if(V&&V.name==='vt')vtPaint()},laNext);
   /* mazziere */
   const dbn=$$id('t3-dbtn');
-  if(h&&st.seats[h.dealer]&&h.dealer<ms){const [x,y]=L[rel(h.dealer)];const dx=x+(50-x)*.2+(x<=50?7:-7),dy=y+(50-y)*.2+(y>50?-2:3);dbn.style.left=dx+'%';dbn.style.top=dy+'%';dbn.classList.add('on')}else dbn.classList.remove('on');
+  if(h&&st.seats[h.dealer]&&h.dealer<ms){const [x,y]=L[rel(h.dealer)];const dx=rel(h.dealer)===0?66:x+(50-x)*.2+(x<=50?7:-7),dy=rel(h.dealer)===0?86:y+(50-y)*.2+(y>50?-2:3);dbn.style.left=dx+'%';dbn.style.top=dy+'%';dbn.classList.add('on')}else dbn.classList.remove('on');
 
   /* --- centro: piatto, board, messaggio --- */
   const potLive=h?(h.stage==='done'?(h.pot||potOf(h)):potOf(h)-betsOf(h)):0;
@@ -6460,7 +6558,7 @@ vtPaint=function(){
   let hero='';
   if(me>=0&&st){
     let label='',lc='';
-    if(cards){const bd=board.slice(0,T3.board),ev=st.cfg.game==='omaha'?(bd.length>=3?HE.bestOmaha(cards,bd):null):HE.evalHand(cards.concat(bd));label=ev?ev.n:(st.cfg.game==='omaha'?'Omaha: usi 2 carte tue + 3 del tavolo':'')}
+    if(cards){const bd=board.slice(0,T3.board),ev=st.cfg.game==='omaha'?(bd.length>=3?HE.bestOmaha(cards,bd):null):HE.evalHand(cards.concat(bd));label=ev?ev.n:''}
     if(won[me]){label='Hai vinto '+fchip(won[me].win)+(won[me].hand?' · '+won[me].hand:'');lc='win'}
     else if(P&&P.folded){label='Hai lasciato';lc='mut'}
     const s=st.seats[me],myStack=Math.max(0,s.stack-(h&&h.stage==='done'&&!showRes&&h.results?((h.results.find(r=>r.seat===me)||{}).win||0):0)),note=!P?(s.out?'Sei fuori dal torneo':s.stack===0?'Hai finito le fiches':s.away?'Sei in pausa':live?'Entri dalla prossima mano':''):'';
@@ -6472,7 +6570,7 @@ ${F.vt.emo?`<div class="v2-emos t3-emos">${EMO.map(e=>`<button data-act="vtreact
   }
   setH($$id('t3-hero'),hero);
   if(me>=0&&st){const el=$$id('t3-mystk'),v=T3.stk[me];if(el&&v!=null&&T3.myStk!==v){if(T3.myStk!=null&&!st.seats[me].out)t3Tween(el,T3.myStk,v,showRes?900:500);T3.myStk=v}}
-  root.classList.toggle('seated',me>=0);
+  root.classList.toggle('seated',me>=0);root.classList.toggle('many',ms>6);root.classList.toggle('short',sh);
   root.classList.toggle('myturn',!!(live&&h.toAct===me&&me>=0));
   setH($$id('t3-ctl'),t3Ctl(st0,vtSeat(),disp));
   const rg=$$id('vt-range');if(rg)rg.style.setProperty('--f',(+rg.max>+rg.min?((rg.value-rg.min)/(rg.max-rg.min)*100):100).toFixed(1)+'%');
@@ -7364,7 +7462,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791982194015';
+const APP_VERSION='1791989054796';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
