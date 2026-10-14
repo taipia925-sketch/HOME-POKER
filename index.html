@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Playfair+Display:wght@700;800;900&family=Instrument+Sans:wght@400;500;600;700&display=swap">
 <style>
 /* Home Poker — design system "Notte al casinò".
    Fondo d'inchiostro verde con luci che respirano, superfici di vetro con filo d'oro,
@@ -1722,54 +1722,6 @@ body::after{opacity:1;mix-blend-mode:normal;background-image:
 /* targhetta ed etichetta della mossa: stessa larghezza, sempre */
 .vt3.vt3 .s3 .s3-plate{width:90px;min-width:0;max-width:none}.vt3.vt3 .s3-act{width:90px}
 .vt3.vt3.many .s3 .s3-plate{width:78px}.vt3.vt3.many .s3-act{width:78px}
-
-/* ===================== INGRESSO: CASINÒ ESCLUSIVO ===================== */
-.cas.lx{--g:#C9A55C;--g2:#E6CF97;--ink:#F3EDE1;--mute:#9A958C;background:#0A0A0B;padding-left:20px;padding-right:20px}
-.cas.lx::before{background:radial-gradient(90% 38% at 50% 0%,rgba(201,165,92,.13),transparent 70%),radial-gradient(70% 40% at 50% 100%,rgba(120,20,30,.10),transparent 70%)}
-.lx-hd{position:relative;text-align:center;padding:44px 0 26px}
-.lx-me{position:absolute;right:-6px;top:0;border-radius:50%;padding:2px;box-shadow:inset 0 0 0 1px rgba(201,165,92,.55)}
-.lx-me .ava{width:38px;height:38px;font-size:13px}
-.lx-crest{display:flex;align-items:center;justify-content:center;gap:12px;color:var(--g);font-size:10.5px;font-weight:600;letter-spacing:.42em;text-transform:uppercase;padding-left:.42em}
-.lx-crest i{width:34px;height:1px;background:linear-gradient(90deg,transparent,var(--g))}.lx-crest i:last-child{background:linear-gradient(90deg,var(--g),transparent)}
-.lx-hd h1{margin:14px 0 0;font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:clamp(32px,10.5vw,44px);line-height:1.08;letter-spacing:-.01em;color:var(--ink);text-wrap:balance;background:none;-webkit-text-fill-color:currentColor}
-.lx-hd p{margin:10px 0 0;font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:16px;color:var(--mute)}
-.lx-main{display:flex;flex-direction:column;gap:12px;flex:none}
-.lx-card{position:relative;display:flex;align-items:center;gap:8px;width:100%;min-height:132px;padding:20px 14px 20px 20px;border-radius:14px;text-align:left;color:var(--ink);overflow:hidden;
-  background:linear-gradient(135deg,#17171A 0%,#111113 60%,#0E0E10 100%);box-shadow:inset 0 0 0 1px rgba(201,165,92,.28),0 20px 40px -24px rgba(0,0,0,.9);transition:box-shadow .25s,transform .2s var(--ease)}
-.lx-card::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 90% at 100% 50%,var(--tint),transparent 70%)}
-.lx-real{--tint:rgba(120,24,34,.22)}.lx-virt{--tint:rgba(18,92,62,.22)}
-.lx-card:active{transform:scale(.985)}
-@media (hover:hover){.lx-card:hover{box-shadow:inset 0 0 0 1px rgba(201,165,92,.6),0 20px 40px -24px rgba(0,0,0,.9)}}
-.lx-card:focus-visible{outline:2px solid var(--g);outline-offset:3px}
-.lx-tx{position:relative;z-index:1;flex:1;min-width:0;display:flex;flex-direction:column}
-.lx-k{font-size:10px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--g)}
-.lx-tx b{margin-top:8px;font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:30px;line-height:1.05;color:var(--ink)}
-.lx-d{margin-top:7px;font-size:13.5px;line-height:1.4;color:var(--mute)}
-.lx-st{margin-top:12px;display:block;font-size:12.5px;color:#C7C1B6;letter-spacing:.01em}
-.lx-st em{font-style:normal;color:var(--g2)}
-.lx-live{display:inline-block;vertical-align:middle;margin:-2px 8px 0 0;width:6px;height:6px;border-radius:50%;background:#7FD3A2;box-shadow:0 0 0 3px rgba(127,211,162,.15);flex:none}
-.lx-art{position:relative;z-index:1;flex:none;width:112px;height:88px;color:var(--g);opacity:.95}
-.lx-go{position:relative;z-index:1;flex:none;color:rgba(201,165,92,.7);margin-left:-2px}
-.lx-link{color:var(--mute);font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:15px;text-decoration-color:rgba(201,165,92,.4)}
-/* notizie: elenco sobrio con filetti */
-.lx .nw{margin:30px 0 8px}
-.lx .nw-hd{flex-direction:column;align-items:flex-start;gap:6px;margin:0 0 6px;padding-bottom:12px;border-bottom:1px solid rgba(201,165,92,.25)}
-.lx .nw-sub{order:-1}
-.lx .nw-h{gap:0;color:var(--ink)}.lx .nw-h svg{display:none}
-.lx .nw-h b{font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:26px;color:var(--ink);white-space:nowrap}
-.lx .nw-sub{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--g)}
-.lx .nw-list{gap:0}
-.lx .nw-it{padding:14px 0;border-radius:0;background:none;box-shadow:none;border-bottom:1px solid rgba(255,255,255,.07);gap:14px}
-.lx .nw-th,.lx .t-gossip .nw-th,.lx .t-news .nw-th{width:46px;height:46px;border-radius:10px;background:#141416;box-shadow:inset 0 0 0 1px rgba(201,165,92,.3)}
-.lx .nw-th i,.lx .t-news .nw-th i{font-size:19px;color:var(--g);text-shadow:none}
-.lx .t-gossip .nw-th i{color:#C9615A}
-.lx .nw-k{font-size:9.5px;letter-spacing:.24em}
-.lx .nw-k b,.lx .t-news .nw-k b{color:var(--mute);font-weight:600}.lx .t-tornei .nw-k b{color:var(--g)}.lx .t-gossip .nw-k b{color:#C9615A}
-.lx .nw-t{font-size:15px;font-weight:600;line-height:1.32;color:var(--ink)}
-.lx .nw-m{font-size:12px;color:#7D786F}
-.lx .nw-all{margin-top:14px;padding:13px;border-radius:12px;background:none;box-shadow:inset 0 0 0 1px rgba(201,165,92,.35);color:var(--g2);font-weight:600;letter-spacing:.02em}
-.lx .nw-all .num{background:rgba(201,165,92,.14);color:var(--g2)}
-.lx .nw-empty{box-shadow:none;border-top:1px solid rgba(255,255,255,.07);border-radius:0}
 </style>
 
 <div id="app"></div>
@@ -5624,36 +5576,28 @@ vMode=function(){
   const net=mine?sum(mine.get.map(x=>x.amt))-sum(mine.give.map(x=>x.amt)):0;
   const rStat=liveG?'Partita in corso':gs.length?`${gs.length} serat${gs.length===1?'a':'e'} giocate`:'Nessuna serata ancora';
   const vStat=S.vt.missing?'Da attivare in Supabase':R.length?`${R.length} tavol${R.length===1?'o':'i'} · ${ppl} giocator${ppl===1?'e':'i'}`:'Nessun tavolo aperto';
-  /* illustrazioni incise in oro: niente cartoni, solo filetti */
-  const chipsArt=`<svg class="lx-art" viewBox="0 0 132 104" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.15" stroke-linejoin="round">
-<g transform="rotate(-14 96 40)"><rect x="66" y="18" width="62" height="34" rx="3"/><rect x="71" y="23" width="52" height="24" rx="2" stroke-opacity=".55"/><circle cx="97" cy="35" r="7.5" stroke-opacity=".8"/><text x="97" y="39.2" text-anchor="middle" font-family="Playfair Display,Georgia,serif" font-size="11" fill="currentColor" stroke="none">€</text></g>
-${[0,1,2,3].map(i=>{const y=86-i*11;return `<path d="M14 ${y}v7a33 10.5 0 0 0 66 0v-7" fill="#0E0E10"/><ellipse cx="47" cy="${y}" rx="33" ry="10.5" fill="#0E0E10"/>`}).join('')}
-<ellipse cx="47" cy="53" rx="23" ry="7" stroke-dasharray="4 5" stroke-opacity=".7"/><ellipse cx="47" cy="53" rx="12" ry="3.8" stroke-opacity=".8"/>
-${[0,1,2].map(i=>{const y=86-i*11;return [20,32,47,62,74].map(x=>`<path d="M${x} ${y+4}v5" stroke-opacity=".6"/>`).join('')}).join('')}</g></svg>`;
-  const cardsArt=`<svg class="lx-art" viewBox="0 0 132 104" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.15">
-<g transform="rotate(-12 56 60)"><rect x="30" y="14" width="50" height="72" rx="5" fill="#0E0E10"/><rect x="34" y="18" width="42" height="64" rx="3" stroke-opacity=".35"/><text x="38" y="34" font-family="Playfair Display,Georgia,serif" font-size="15" font-weight="600" fill="currentColor" stroke="none">A</text><text x="55" y="60" font-size="20" fill="currentColor" stroke="none" text-anchor="middle">♠</text></g>
-<g transform="rotate(10 86 58)"><rect x="62" y="16" width="50" height="72" rx="5" fill="#0E0E10"/><rect x="66" y="20" width="42" height="64" rx="3" stroke-opacity=".35"/><text x="70" y="36" font-family="Playfair Display,Georgia,serif" font-size="15" font-weight="600" fill="currentColor" stroke="none">K</text><text x="87" y="62" font-size="20" fill="#B8463F" stroke="none" text-anchor="middle">♥</text></g></g></svg>`;
-  return `<div class="cas lx">
-<header class="lx-hd">
-  <button class="lx-me" data-act="meopen" aria-label="Il mio profilo">${ava(S.me?S.me.name:'?')}</button>
-  <div class="lx-crest" aria-hidden="true"><i></i><span>Home Poker</span><i></i></div>
+  const chip=(c,x,y,r)=>`<span class="cs-chip" style="--c:${c};left:${x}%;top:${y}%;--r:${r}deg"></span>`;
+  return `<div class="cas">
+<header class="cas-hd">
+  <div class="marquee" aria-hidden="true"><i>♠</i><b>Home Poker</b><i>♦</i></div>
   <h1>${esc(S.table.name)}</h1>
-  <p>Come giocate stasera?</p>
+  <p>Come giocate oggi?</p>
+  <button class="me-btn cas-me" data-act="meopen" aria-label="Il mio profilo">${ava(S.me?S.me.name:'?')}</button>
 </header>
-<main class="lx-main">
-  <button class="lx-card lx-real" data-act="goreal">
-    <span class="lx-tx"><span class="lx-k">Tavolo vero</span><b>Reale</b><span class="lx-d">Buy-in, debiti e classifica delle vostre serate</span>
-    <span class="lx-st">${liveG?'<i class="lx-live"></i>':''}${esc(rStat)}${net?` · <em>${net>0?'ti devono':'devi'} ${eurS(Math.abs(net))}</em>`:''}</span></span>
-    ${chipsArt}<span class="lx-go">${ico('chevr',18)}</span>
+<main class="cas-main">
+  <button class="cas-card real" data-act="goreal">
+    <span class="cas-tx"><span class="cas-k">Tavolo vero</span><b>Reale</b><span class="cas-d">Buy-in, debiti e classifica delle vostre serate.</span>
+    <span class="cas-st ${liveG?'live':''}">${esc(rStat)}${net?` · ${net>0?'ti devono':'devi'} ${eurS(Math.abs(net))}`:''}</span></span>
+    <span class="cas-art">${chip('#C8283E',6,30,-12)}${chip('#2F6FD6',40,10,8)}${chip('#E2B65B',24,52,-4)}<span class="cs-note"><b>€</b></span></span>
   </button>
-  <button class="lx-card lx-virt" data-act="govt">
-    <span class="lx-tx"><span class="lx-k">Fiches finte</span><b>Sala giochi</b><span class="lx-d">Hold'em con gli amici, Omaha e blackjack</span>
-    <span class="lx-st">${liveR?'<i class="lx-live"></i>':''}${esc(vStat)}</span></span>
-    ${cardsArt}<span class="lx-go">${ico('chevr',18)}</span>
+  <button class="cas-card virt" data-act="govt">
+    <span class="cas-tx"><span class="cas-k">Fiches finte · gratis</span><b>Sala giochi</b><span class="cas-d">Hold'em con gli amici, Omaha e blackjack contro il computer.</span>
+    <span class="cas-st ${liveR?'live':''}">${esc(vStat)}</span></span>
+    <span class="cas-art casfelt"><span class="cs-oval"></span><span class="cs-cd a">A<i>♠</i></span><span class="cs-cd b">K<i class="r">♥</i></span>${chip('#E2B65B',56,56,10)}${chip('#2E9E5B',34,64,-8)}</span>
   </button>
 </main>
 ${newsHtml()}
-<footer class="cas-ft"><button class="link lx-link" data-act="totables">Cambia tavolo</button></footer>
+<footer class="cas-ft"><button class="link" data-act="totables">Cambia tavolo</button></footer>
 </div>`;
 };
 
@@ -7501,7 +7445,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792013168764';
+const APP_VERSION='1792013173812';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
