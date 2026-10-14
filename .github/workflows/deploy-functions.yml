@@ -14,7 +14,7 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: latest
-      - name: Deploy hpl-holdem
+      - name: Deploy di tutte le funzioni
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
@@ -22,4 +22,4 @@ jobs:
             echo "::error::Manca il secret SUPABASE_ACCESS_TOKEN (Settings > Secrets and variables > Actions)"
             exit 1
           fi
-          supabase functions deploy hpl-holdem --project-ref nqlywzjhxykrfyrpkjdw --use-api
+          supabase functions deploy --project-ref nqlywzjhxykrfyrpkjdw --use-api
