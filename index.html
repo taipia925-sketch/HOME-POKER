@@ -6811,6 +6811,30 @@ const _sheetG=sheetHtml;
 sheetHtml=function(){if(SH&&SH.type==='lnew'&&F.ln)return lnewSheet();if(SH&&SH.type==='rules')return rulesSheet();return _sheetG()};
 H.rules=function(d){const g=['holdem','omaha','blackjack','ranks'].includes(d.g)?d.g:'holdem';if(SH&&SH.type==='rules'){SH.g=g;render();const b=document.querySelector('.sheet-body');if(b)b.scrollTop=0;return}openSheet({type:'rules',g})};
 
+
+/* ---------- le tue carte arrivano sempre ----------
+   Se la richiesta delle carte risponde con la mano precedente, senza carte o
+   non risponde, si riprova da soli finché non arrivano (prima si aspettava di
+   puntare, perché la risposta alla puntata le contiene). */
+const _vtCallCards=vtCall;
+vtCall=async function(action,extra,quiet){
+  if(action==='state'){S.vt.cardsAskAt=Date.now()}
+  const before=S.vt.cardsHand+'|'+JSON.stringify(S.vt.cards);
+  const r=await _vtCallCards(action,extra,quiet);
+  /* le carte nuove si devono vedere subito, anche se il resto del tavolo non è cambiato */
+  if(S.vt.cardsHand+'|'+JSON.stringify(S.vt.cards)!==before&&V&&V.name==='vt')vtPaint();
+  return r;
+};
+setInterval(()=>{
+  if(!(V&&V.name==='vt')||document.hidden)return;
+  const st=S.vt.st,h=st&&st.hand,i=vtSeat();
+  if(!h||i<0||!h.p||!h.p[i]||S.vt.cardsHand===h.no)return;
+  const now=Date.now(),last=S.vt.cardsAskAt||0;
+  if(S.vt.fetchingCards&&now-last>6000)S.vt.fetchingCards=false;   /* richiesta rimasta appesa */
+  if(!S.vt.fetchingCards&&now-last>1200)vtCall('state',{},true);
+},400);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&V&&V.name==='vt'&&vtSeat()>=0){S.vt.cardsAskAt=0}});
+
 /* =====================================================================
    Effetti e accessibilità, tutto attorno a render():
    - passaggio tra schermate: la pagina vecchia scivola via mentre entra la nuova
@@ -7096,7 +7120,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791977016337';
+const APP_VERSION='1791978289572';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
