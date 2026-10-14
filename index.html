@@ -5415,7 +5415,7 @@ ${newsHtml()}
    ===================================================================== */
 Object.assign(IP,{news:'M5 5h11v14H6a1 1 0 01-1-1zM16 9h3v9a1 1 0 01-1 1h-2M8 9h5M8 12h5M8 15h3',ext:'M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5',refresh:'M20 11a8 8 0 10-2.3 5.7M20 4v7h-7'});
 const NW={items:null,at:0,busy:false,err:false,tried:0};
-(()=>{const c=LS.get('news',null);if(c&&Array.isArray(c.items)){NW.items=c.items;NW.at=c.at||0}})();
+(()=>{const c=LS.get('news',null);if(c&&Array.isArray(c.items)){NW.items=c.items.filter(x=>x.lang!=='en');NW.at=c.at||0}})();
 const NW_TAG={tornei:['Tornei','♠'],gossip:['Gossip','♥'],news:['Notizie','♦']};
 async function newsLoad(force){
   const now=Date.now();
@@ -5424,7 +5424,8 @@ async function newsLoad(force){
   if(!force&&now-NW.tried<60e3)return;
   NW.busy=true;NW.tried=now;NW.err=false;if(force)render();
   try{const r=await BASE.fn('hpl-news',{});
-    if(r&&r.ok&&Array.isArray(r.items)&&r.items.length){NW.items=r.items.slice(0,60);NW.at=Date.now();LS.set('news',{at:NW.at,items:NW.items})}
+    const it=r&&r.ok&&Array.isArray(r.items)?r.items.filter(x=>x.lang!=='en'):[];
+    if(it.length){NW.items=it.slice(0,60);NW.at=Date.now();LS.set('news',{at:NW.at,items:NW.items})}
     else if(!NW.items)NW.err=true}
   catch(e){if(!NW.items)NW.err=true}
   NW.busy=false;
@@ -7229,7 +7230,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791979161619';
+const APP_VERSION='1791979921380';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;

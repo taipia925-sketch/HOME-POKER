@@ -1,15 +1,12 @@
 // @ts-nocheck
 // Supabase Edge Function "hpl-news": raccoglie le notizie di poker da alcuni feed RSS
-// (tornei mondiali, risultati, curiosità e gossip) e le restituisce già pulite all'app.
+// (tornei mondiali, risultati, curiosità e gossip), solo in italiano, e le restituisce già pulite all'app.
 // I feed si leggono qui perché dal browser sarebbero bloccati (CORS).
 
 const FEEDS = [
   { url: "https://news.google.com/rss/search?q=poker+(WSOP+OR+EPT+OR+WPT+OR+torneo+OR+%22Main+Event%22)&hl=it&gl=IT&ceid=IT:it", lang: "it" },
   { url: "https://news.google.com/rss/search?q=poker+(gossip+OR+scandalo+OR+vip+OR+celebrit%C3%A0+OR+polemica)&hl=it&gl=IT&ceid=IT:it", lang: "it", tag: "gossip" },
-  { url: "https://news.google.com/rss/search?q=poker+(WSOP+OR+EPT+OR+WPT+OR+%22high+roller%22)&hl=en-US&gl=US&ceid=US:en", lang: "en" },
-  { url: "https://news.google.com/rss/search?q=poker+(drama+OR+cheating+OR+scandal+OR+celebrity)&hl=en-US&gl=US&ceid=US:en", lang: "en", tag: "gossip" },
   { url: "https://it.pokernews.com/rss.php", lang: "it", src: "PokerNews" },
-  { url: "https://www.pokernews.com/rss.php", lang: "en", src: "PokerNews" },
   { url: "https://www.assopoker.com/feed/", lang: "it", src: "Assopoker" },
 ];
 const TTL = 20 * 60 * 1000;
