@@ -57,7 +57,10 @@ function parse(xml, feed) {
    tranne quando parlano di calcio, scommesse o slot */
 const STRONG = /poker\s?(online|live|room|club|tour|series|festival|texas|stars|cash|sportivo|italia)|pokerstars|texas hold|hold.?em|omaha|wsop|\bept\b|\bwpt\b|world series of poker|sunday million|main event|high roller|braccialett|bracelet|final table|tavolo finale|\bmtt\b|sit\s?(&|and|n)\s?go|spin\s?(&|and)\s?go|chip ?leader|\bitm\b|\bday ?[123][a-d]?\b|satellit|monster ?\d+|(giocator[ei]|torne[oi]|sala|campione|campionato italiano) di poker|poker player|pokerista|\bbluff/i;
 const SPORT = /pronostic|quote\b|scommess|calci|champions|europa league|conference|serie [a-d]\b|giornata|campionat|girone|squadr|allenator|partit[ae]|infortun|\bgol\b|reti\b|coppa|figc|under ?\d\d|nazionale|azzurr|derby|basket|volley|pallavolo|rugby|tennis|ciclism|motogp|formula 1|rally|team\b|slot|lotto|superenalotto|gratta|roulette|ippica/i;
+/* articoli pubblicitari: classifiche di siti, bonus, recensioni, guide all'iscrizione */
+const ADS = /bonus|recension|migliori siti|siti (di )?poker|classifica (dei )?siti|codice promo|registrazione|scegliere il sito|casin[òo] online|senza deposito/i;
 const isPoker = (t, src) => {
+  if (ADS.test(t)) return false;
   if (SPORT.test(t) && !STRONG.test(t)) return false;
   if (/poker/i.test(src || "")) return true;
   return STRONG.test(t);
