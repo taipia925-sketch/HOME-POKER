@@ -1528,6 +1528,136 @@ body::after{opacity:1;mix-blend-mode:normal;background-image:
   .btn,.btn-s,button.chip,.seg button,.tab{border:1px solid ButtonText}
   .ava{forced-color-adjust:none}
 }
+/* ===== sala giochi a lista, stile app di poker ===== */
+.gl-banner{position:relative;height:118px;border-radius:16px;overflow:hidden;margin:2px 0 10px;display:grid;place-items:center;background:#120607;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 14px 30px -14px rgba(0,0,0,.9)}
+.gl-sw{position:absolute;inset:-60%;background:conic-gradient(from 0deg,#2A0306,#C21722,#FF7A2F,#5A0710,#1A0204,#D7262F,#FFB04A,#3A0509,#2A0306);filter:blur(10px) saturate(1.2);animation:glSpin 18s linear infinite}
+.gl-sw::after{content:"";position:absolute;inset:0;background:repeating-radial-gradient(circle at 50% 50%,rgba(0,0,0,.0) 0 14px,rgba(0,0,0,.28) 15px 18px)}
+@keyframes glSpin{to{transform:rotate(360deg)}}
+.gl-bt{position:relative;display:flex;flex-direction:column;align-items:center;line-height:1}
+.gl-bt b{font-family:var(--sans);font-style:italic;font-weight:900;font-size:40px;letter-spacing:-.02em;text-transform:uppercase;color:#fff;-webkit-text-stroke:1.5px rgba(0,0,0,.35);text-shadow:0 3px 0 #7A0A12,0 0 24px rgba(255,140,60,.8)}
+.gl-bt i{margin-top:6px;font-style:normal;font-weight:800;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#FFE0B8;background:rgba(0,0,0,.45);padding:3px 10px;border-radius:4px}
+.gl-list{display:flex;flex-direction:column;border-radius:14px;overflow:hidden;background:#F4F4F6;box-shadow:0 14px 30px -14px rgba(0,0,0,.9)}
+.gl-row{display:flex;align-items:stretch;border-bottom:1px solid #DADBE0}
+.gl-row:last-child{border-bottom:0}
+.gl-main{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:10px 4px 10px 10px;text-align:left;color:#1B1C1F}
+.gl-main:active{background:#E6E7EB}
+.gl-tile{position:relative;flex:none;width:76px;height:76px;border-radius:10px;overflow:hidden;display:grid;place-items:center;background:#120607;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}
+.gl-tile .gl-sw{animation-duration:26s}
+.gl-tile b{position:relative;font-style:italic;font-weight:900;font-size:16px;line-height:.95;text-align:center;text-transform:uppercase;color:#fff;letter-spacing:-.02em;-webkit-text-stroke:.6px rgba(0,0,0,.4);text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 12px rgba(255,170,90,.7)}
+.gl-omaha .gl-sw{background:conic-gradient(from 0deg,#03112A,#1660D8,#3FD0FF,#071C4A,#020A1A,#2A7BFF,#9AE6FF,#0A2560,#03112A)}
+.gl-omaha .gl-tile b{text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 12px rgba(90,200,255,.8)}
+.gl-blackjack .gl-sw{background:conic-gradient(from 0deg,#0E0B04,#6B5310,#F2CB72,#2A2006,#050402,#B8902A,#FFE9A8,#3A2C08,#0E0B04)}
+.gl-holdem .gl-tile b{font-size:14px}
+.gl-blackjack .gl-tile b{font-size:15px;text-shadow:0 2px 0 rgba(0,0,0,.5),0 0 12px rgba(255,220,120,.8)}
+.gl-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.gl-tags{display:flex;gap:4px;flex-wrap:wrap}
+.gl-tg{font-style:normal;font-size:9.5px;font-weight:800;letter-spacing:.04em;padding:2px 6px;border-radius:4px;color:#fff;background:#6A2BC2}
+.gl-tg.t{background:#0E8F86}.gl-tg.o{background:#D7262F}
+.gl-t{font-size:15.5px;font-weight:800;color:#141518}
+.gl-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;font-size:13px;font-weight:800;color:#1B1C1F}
+.gl-cols span{display:flex;flex-direction:column;line-height:1.2;white-space:nowrap}
+.gl-cols small{font-size:11px;font-weight:600;color:#7A7C84}
+.gl-i{flex:none;width:44px;display:grid;place-items:center;font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:15px;color:#7A7C84}
+.gl-i::before{content:"";position:absolute}
+.gl-i{position:relative}
+.gl-i:after{content:"";position:absolute;width:24px;height:24px;border-radius:50%;border:1.5px solid #A9ABB2;top:50%;left:50%;transform:translate(-50%,-50%)}
+@media (prefers-reduced-motion:reduce){.gl-sw{animation:none}}
+/* ===================== TAVOLO STILE "APP DI POKER" ===================== */
+.vt3{--pr:#D7262F;--pr2:#A9141D;background:radial-gradient(90% 55% at 50% 42%,#3A3B3E,#1C1D1F 70%,#141516)}
+.vt3::before{display:none}
+.t3-top{min-height:52px;padding:6px 8px 0}
+.t3-ib{width:40px;height:40px;border-radius:11px;background:linear-gradient(180deg,#4A4B4F,#2E2F33);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 6px rgba(0,0,0,.5)}
+.t3-ib.on{background:linear-gradient(180deg,#E8434B,var(--pr2));color:#fff}
+.t3-tt b{font-family:var(--sans);font-size:15.5px;font-weight:800}
+.t3-tt span{color:#A9ABB0}
+/* il tavolo: panno verde acceso, bordo grigio scuro imbottito */
+.vt3 .t3-rail{inset:9% 9% 10%;padding:13px;background:linear-gradient(180deg,#55575C,#2B2C30 55%,#1E1F22);box-shadow:0 0 0 2px #0E0E10,0 24px 50px rgba(0,0,0,.75),inset 0 2px 1px rgba(255,255,255,.18),inset 0 -3px 6px rgba(0,0,0,.6)}
+.vt3 .t3-felt{background:radial-gradient(70% 55% at 50% 45%,#2FB25A,#1A8C3F 55%,#0F6A2E 100%);box-shadow:inset 0 0 0 3px rgba(0,0,0,.35),inset 0 0 40px rgba(0,0,0,.45)}
+.vt3 .t3-felt::before{inset:10px;border:2px solid rgba(255,255,255,.08)}
+.vt3 .t3-felt::after{background:radial-gradient(50% 26% at 50% 24%,rgba(255,255,255,.1),transparent 70%)}
+.vt3 .t3-logo{top:74%;font-family:var(--sans);color:rgba(0,0,0,.22);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;line-height:1.3}
+.vt3 .t3-logo b{display:block;font-size:15px;letter-spacing:.02em;text-transform:none;color:rgba(0,0,0,.2)}
+.vt3 .t3-logo span{display:block;font-size:10.5px;margin:0}
+.vt3 .t3-stagelbl{color:rgba(255,255,255,.5)}
+.vt3 .t3-slot{border-color:rgba(255,255,255,.14);border-radius:6px}
+/* piatto: pillola marrone a due righe */
+.vt3 .t3-pot{padding:5px 16px;border-radius:999px;background:rgba(92,58,22,.82);box-shadow:inset 0 0 0 1px rgba(255,214,140,.35),0 4px 12px rgba(0,0,0,.35)}
+.vt3 .t3-potv{flex-direction:column;align-items:center;gap:0;line-height:1.2}
+.vt3 .t3-potv b{font-family:var(--sans);font-size:14px;font-weight:800;color:#fff}
+.vt3 .t3-potv small{font-size:11.5px;font-weight:700;color:#F3DDB4}
+/* giocatori: foto tonda, targhetta scura con nome e fiches */
+.vt3 .s3{width:96px}
+.vt3 .s3-ava .ava{box-shadow:0 0 0 2px #111,0 0 0 3.5px rgba(255,255,255,.18),0 6px 14px rgba(0,0,0,.55)}
+.vt3 .s3-plate{margin-top:-8px;min-width:84px;max-width:96px;padding:3px 8px 4px;border-radius:5px;background:linear-gradient(180deg,#2C2D31,#18191B);box-shadow:inset 0 0 0 1px #4A4B50,0 4px 10px rgba(0,0,0,.6)}
+.vt3 .s3-nm{font-size:11.5px;font-weight:600;color:#E6E7EA}
+.vt3 .s3-stk{font-size:13px;font-weight:800;color:#fff}
+.vt3 .s3.act .s3-plate{box-shadow:inset 0 0 0 1.5px #FFD54A,0 0 14px rgba(255,213,74,.45)}
+.vt3 .s3-ring circle{stroke:#FFD54A}
+.vt3 .s3.allin .s3-plate{box-shadow:inset 0 0 0 1.5px var(--pr),0 0 14px rgba(215,38,47,.5)}
+.vt3 .s3 .la{border-radius:5px;padding:2px 8px;background:#2A2B2F;color:#fff;box-shadow:inset 0 0 0 1px #4A4B50}
+.vt3 .s3 .la.la-fold{color:#B9BBC0}
+.vt3 .s3 .la.la-raise,.vt3 .s3 .la.la-allin{background:var(--pr2);box-shadow:none}
+.vt3 .s3 .la.win{background:linear-gradient(180deg,#FFE27A,#E8B21E);color:#2A1C00}
+.vt3 .s3.empty .s3-av{border-color:rgba(255,255,255,.35);background:rgba(0,0,0,.35)}
+/* puntate: fiche blu e cifra, senza riquadro */
+.vt3 .b3{background:none;box-shadow:none;padding:0;gap:4px}
+.vt3 .b3 b{font-size:12.5px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+/* le mie carte: in basso a sinistra, con targhetta sotto */
+.vt3 .t3-hero{min-height:118px;justify-content:space-between;align-items:flex-end;padding:0 12px 4px}
+.t3-meL{display:flex;flex-direction:column;align-items:center;gap:0;flex:none}
+.vt3 .t3-mine{min-height:0;justify-content:flex-start}
+.vt3 .t3-mine .cd.h{width:62px;height:88px}
+.vt3 .t3-mine .cd.h:first-child{transform:rotate(-4deg) translate(6px,2px)}.vt3 .t3-mine .cd.h:last-child{transform:rotate(4deg) translate(-6px,2px)}
+.vt3 .t3-mine .cd.h.hi:first-child{transform:rotate(-4deg) translate(6px,-8px)}.vt3 .t3-mine .cd.h.hi:last-child{transform:rotate(4deg) translate(-6px,-8px)}
+.vt3 .t3-mine:has(.cd:nth-child(4)) .cd.h{width:44px;height:64px;margin-left:-8px}
+.vt3 .t3-mine:has(.cd:nth-child(4)) .cd.h:first-child{margin-left:0}
+.vt3 .t3-stagelbl{display:none}
+.vt3 .s3.topr .s3-act{position:absolute;left:calc(100% - 2px);top:64px;margin:0}
+.vt3 .s3.topr.rgt .s3-act{left:auto;right:calc(100% - 2px)}
+.vt3 .t3-meR .t3-hand{white-space:normal;text-align:center;line-height:1.25;max-width:100%}
+.vt3 .t3-mystk{display:flex;flex-direction:column;align-items:center;gap:0;min-width:116px;margin-top:-10px;position:relative;z-index:2;padding:3px 12px 4px;border-radius:5px;background:linear-gradient(180deg,#2C2D31,#18191B);box-shadow:inset 0 0 0 1px #4A4B50,0 4px 10px rgba(0,0,0,.6);line-height:1.2}
+.t3-mynm{font-size:12px;font-weight:600;color:#E6E7EA;max-width:120px}
+.vt3 .t3-mystk b{font-family:var(--sans);font-size:15px;font-weight:800;color:#fff}
+.vt3.myturn .t3-mystk{box-shadow:inset 0 0 0 1.5px #FFD54A,0 0 14px rgba(255,213,74,.45)}
+.t3-meR{flex:1;min-width:0;display:flex;align-items:center;justify-content:flex-end;gap:10px;padding-bottom:6px}
+.vt3 .t3-hand{position:static;transform:none;font-family:var(--sans);font-size:13px;padding:5px 11px;border-radius:6px;background:#202124;box-shadow:inset 0 0 0 1px #4A4B50;color:#fff}
+.vt3 .t3-hand.win{background:linear-gradient(180deg,#FFE27A,#E8B21E);color:#2A1C00}
+.vt3 .t3-meR .t3-note{text-align:right}
+.vt3 .t3-emos{bottom:64px}
+/* comandi: barra di puntata e pulsanti rossi */
+.vt3 .t3-ctl{gap:7px;padding-top:4px}
+.vt3 .t3-tbar{height:4px}.vt3 .t3-tbar i{background:linear-gradient(90deg,#FFD54A,#F5A623)}
+.t3-sz{display:flex;flex-direction:column;gap:7px;animation:ctlIn .3s var(--snap) both}
+.t3-szp{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.t3-szp button{min-height:36px;border-radius:6px;font-size:13.5px;font-weight:700;color:#fff;background:linear-gradient(180deg,#B3232B,#86141A);box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 2px 4px rgba(0,0,0,.4)}
+.t3-szp button.on{background:linear-gradient(180deg,#F04A52,var(--pr));box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55)}
+.t3-szr{display:flex;align-items:center;gap:7px}
+.t3-szv{flex:none;min-width:78px;height:38px;display:grid;place-items:center;padding:0 10px;border-radius:6px;background:#0F1012;box-shadow:inset 0 0 0 1px #55575C;font-weight:800;font-size:15px;color:#fff}
+.vt3 .t3-step{width:38px;height:38px;border-radius:6px;background:linear-gradient(180deg,#4A4B4F,#2E2F33);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);font-size:20px;color:#fff}
+.vt3 #vt-range::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,#E8434B var(--f),#55575C var(--f))}
+.vt3 #vt-range::-moz-range-track{height:6px;border-radius:3px;background:linear-gradient(90deg,#E8434B var(--f),#55575C var(--f))}
+.vt3 #vt-range::-webkit-slider-thumb{width:26px;height:26px;margin-top:-10px;border-radius:6px;background:linear-gradient(180deg,#FFFFFF,#C9CBD0);box-shadow:0 2px 6px rgba(0,0,0,.6)}
+.vt3 #vt-range::-moz-range-thumb{width:26px;height:26px;border-radius:6px;background:linear-gradient(180deg,#FFFFFF,#C9CBD0)}
+.vt3 .t3-acts{grid-template-columns:1fr 1fr 1fr;gap:7px}
+.vt3 .t3-acts.two{grid-template-columns:1fr 1fr}
+.vt3 .t3-go{min-height:58px;border-radius:8px;font-size:17px;font-weight:700;color:#fff;background:linear-gradient(180deg,#E8343D,#B3141D);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -2px 0 rgba(0,0,0,.25),0 4px 10px rgba(0,0,0,.5)}
+.vt3 .t3-go small{font-size:14px;font-weight:700;opacity:1}
+.vt3 .t3-go.fold,.vt3 .t3-go.call,.vt3 .t3-go.raise{color:#fff;background:linear-gradient(180deg,#E8343D,#B3141D)}
+.vt3 .t3-go:active{filter:brightness(.88);transform:translateY(1px)}
+.vt3 .t3-pre button{border-radius:8px;background:linear-gradient(180deg,#3A3B3F,#26272A);box-shadow:inset 0 0 0 1px #55575C;color:#fff}
+.vt3 .t3-pre button.on{box-shadow:inset 0 0 0 1.5px #E8434B;background:linear-gradient(180deg,#4A2427,#2E1517)}
+.vt3 .t3-wait{border-radius:8px;background:#202124;box-shadow:inset 0 0 0 1px #3E3F44}
+.vt3 .btn{border-radius:8px;background:linear-gradient(180deg,#E8343D,#B3141D)!important;color:#fff}
+.vt3 .btn.ghost{background:linear-gradient(180deg,#3A3B3F,#26272A)!important;box-shadow:inset 0 0 0 1px #55575C}
+.vt3.myturn .t3-ctl::before{background:linear-gradient(transparent,rgba(232,52,61,.07))}
+/* blackjack: stessa veste del tavolo da poker */
+.bj{background:radial-gradient(90% 55% at 50% 42%,#3A3B3E,#1C1D1F 70%,#141516)}
+.bj .bj-table{background:radial-gradient(70% 55% at 50% 40%,#2FB25A,#1A8C3F 55%,#0F6A2E 100%);box-shadow:0 0 0 12px #2B2C30,0 0 0 14px #0E0E10,inset 0 0 40px rgba(0,0,0,.45),0 24px 50px rgba(0,0,0,.75);margin:14px 20px 0}
+.bj .t3-go{min-height:58px;border-radius:8px;font-size:17px;font-weight:700;color:#fff;background:linear-gradient(180deg,#E8343D,#B3141D);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -2px 0 rgba(0,0,0,.25),0 4px 10px rgba(0,0,0,.5)}
+.bj .t3-go.fold{background:linear-gradient(180deg,#4A4B4F,#2E2F33);color:#fff}
+.bj .t3-go:active{filter:brightness(.88);transform:translateY(1px)}
+.bj .btn{border-radius:8px;background:linear-gradient(180deg,#E8343D,#B3141D)!important;color:#fff}
+.bj .bj-bank{border-radius:8px;background:#0F1012;box-shadow:inset 0 0 0 1px #55575C;color:#fff}
 </style>
 
 <div id="app"></div>
@@ -6178,22 +6308,21 @@ function t3Ctl(st,me,disp){
   if(s.away)return `<div class="t3-away"><span>Sei in pausa: salti le mani${HE.sngOn(st)?' (i bui li paghi lo stesso)':''}.</span><button class="btn" data-act="vtback">Torno a giocare</button></div>`;
   if(S.vt.optPending&&h&&h.toAct==null&&h.stage!=='done')return `<div class="t3-wait"><span class="mut">Fatto</span></div>`;
   if(live&&h.toAct===me){
-    const toCall=Math.max(0,h.curBet-P.bet),maxTo=Math.min(P.bet+s.stack,HE.potCap(st,me)),bb=h.bbAmt||st.cfg.bb,minTo=Math.min(maxTo,h.curBet>0?h.curBet+h.minRaise:bb),canRaise=s.stack>toCall&&maxTo>h.curBet,busy=S.vt.busy?'disabled':'';
+    const toCall=Math.max(0,h.curBet-P.bet),allIn=P.bet+s.stack,maxTo=Math.min(allIn,HE.potCap(st,me)),bb=h.bbAmt||st.cfg.bb,minTo=Math.min(maxTo,h.curBet>0?h.curBet+h.minRaise:bb),canRaise=s.stack>toCall&&maxTo>h.curBet,busy=S.vt.busy?'disabled':'';
     const bar=`<div class="t3-tbar" data-dl="${h.deadline}"><i></i></div>`;
-    if(F.vt.raise!=null&&canRaise){
+    const rk=h.no+'|'+h.stage+'|'+h.curBet;if(F.vt.raiseKey!==rk){F.vt.raiseKey=rk;F.vt.raise=null}
+    let sizer='',val=minTo;
+    if(canRaise){
       const pot=potOf(h),step=Math.max(1,st.cfg.sb||1),cl=v=>Math.max(minTo,Math.min(maxTo,Math.round(v/step)*step));
-      const pre=h.stage==='preflop'?[['Min',minTo],['3 bui',cl(bb*3)],['½ piatto',cl(h.curBet+(pot+toCall)/2)],['Piatto',cl(h.curBet+pot+toCall)],['All-in',maxTo]]:[['Min',minTo],['½',cl(h.curBet+(pot+toCall)/2)],['¾',cl(h.curBet+(pot+toCall)*.75)],['Piatto',cl(h.curBet+pot+toCall)],[st.cfg.limit==='pot'?'Max':'All-in',maxTo]];
-      const seen=new Set(),pres=pre.filter(([,v])=>!seen.has(v)&&seen.add(v));
-      const val=Math.max(minTo,Math.min(maxTo,F.vt.raise));
-      return `${bar}<div class="t3-raise">
-<div class="t3-rtop"><button class="t3-rx" data-act="vtraisex" aria-label="Annulla">${ico('close',20)}</button><div class="t3-ramt"><small>${h.curBet?'Rilanci a':'Punti'}</small><b class="num" id="vt-rv">${fchip(val)}</b></div><span class="t3-rmax num">${st.cfg.limit==='pot'&&maxTo<P.bet+s.stack?'max':'hai'} ${fchip(maxTo)}</span></div>
-<div class="t3-rrow"><button class="t3-step" data-act="vtstep" data-d="-1" aria-label="Meno">−</button><input type="range" id="vt-range" min="${minTo}" max="${maxTo}" step="${step}" value="${val}" aria-label="Quanto punti" style="--f:${maxTo>minTo?((val-minTo)/(maxTo-minTo)*100).toFixed(1):100}%"><button class="t3-step" data-act="vtstep" data-d="1" aria-label="Più">+</button></div>
-<div class="v2-pres t3-pres" style="grid-template-columns:repeat(${pres.length},minmax(0,1fr))">${pres.map(([l,v])=>`<button class="${v===val?'on':''}" data-act="vtpre" data-v="${v}">${l}</button>`).join('')}</div>
-<button class="t3-go raise big" data-act="vtraiseok" ${busy}>${val>=P.bet+s.stack?'All-in '+fchip(maxTo):(h.curBet?'Rilancia a ':'Punta ')+fchip(val)}</button></div>`;
+      val=Math.max(minTo,Math.min(maxTo,F.vt.raise!=null?F.vt.raise:minTo));
+      const pres=[['Min',minTo],h.stage==='preflop'&&!h.curBet||h.stage==='preflop'&&h.curBet<=bb?['3 BB',cl(bb*3)]:['½ Piatto',cl(h.curBet+(pot+toCall)/2)],['Piatto',cl(h.curBet+pot+toCall)],['Max',maxTo]];
+      sizer=`<div class="t3-sz"><div class="t3-szp">${pres.map(([l,v])=>`<button class="${v===val?'on':''}" data-act="vtpre" data-v="${v}">${l}</button>`).join('')}</div>
+<div class="t3-szr"><span class="t3-szv num" id="vt-rv">${fchip(val)}</span><button class="t3-step" data-act="vtstep" data-d="-1" aria-label="Meno">−</button><input type="range" id="vt-range" min="${minTo}" max="${maxTo}" step="${step}" value="${val}" aria-label="Quanto punti" style="--f:${maxTo>minTo?((val-minTo)/(maxTo-minTo)*100).toFixed(1):100}%"><button class="t3-step" data-act="vtstep" data-d="1" aria-label="Più">+</button></div></div>`;
     }
-    return `${bar}<div class="t3-acts ${canRaise?'':'two'}"><button class="t3-go fold" data-act="vtmove" data-m="fold" ${busy}>Lascia</button>
+    const rl=v=>v>=allIn?`All-in<small class="num">${fchip(v)}</small>`:`${h.curBet?'Rilancia a':'Punta'}<small class="num">${fchip(v)}</small>`;
+    return `${bar}${sizer}<div class="t3-acts ${canRaise?'':'two'}"><button class="t3-go fold" data-act="vtmove" data-m="fold" ${busy}>Lascia</button>
 <button class="t3-go call" data-act="vtmove" data-m="${toCall?'call':'check'}" ${busy}>${toCall?(toCall>=s.stack?`All-in<small class="num">${fchip(s.stack)}</small>`:`Chiama<small class="num">${fchip(toCall)}</small>`):'Passa'}</button>
-${canRaise?`<button class="t3-go raise" data-act="vtraise" ${busy}>${h.curBet?'Rilancia':'Punta'}<small class="num">${h.curBet?'min '+fchip(minTo):'da '+fchip(minTo)}</small></button>`:''}</div>`;
+${canRaise?`<button class="t3-go raise" data-act="vtraiseok" data-all="${allIn}" ${busy}>${rl(val)}</button>`:''}</div>`;
   }
   if(live&&P&&!P.folded&&!P.allin){
     const toCall=Math.max(0,h.curBet-P.bet),pre=F.vt.pre&&F.vt.pre.no===h.no&&F.vt.pre.stage===h.stage?F.vt.pre:null;
@@ -6225,7 +6354,7 @@ vtPaint=function(){
   let me=st?st.seats.findIndex(x=>x&&x.acct===acct):-1;
   if(me>=0&&st&&st.room)T3.base=me;
   setH($$id('t3-top'),t3Top(st));
-  setH($$id('t3-logo'),`<span>♠</span>${esc(S.table.name)}`);
+  setH($$id('t3-logo'),`<b>${esc(S.table.name)}</b><span>Tavolo fiches finte</span>`);
   if(S.vt.missing){setH($$id('t3-msg'),'<span class="t3-hint">Il tavolo virtuale va attivato in Supabase.</span>');setH($$id('t3-ctl'),'');return}
 
   /* --- il regista: quanto della mano si è già visto --- */
@@ -6254,7 +6383,7 @@ vtPaint=function(){
     if(i>=ms){setCl(el,'s3 off');delete el.dataset.act;setCl(bt,'b3');setH(bt,'');continue}
     const [x,y]=L[rel(i)],hero=me>=0&&i===me;
     if(el.__pos!==x+','+y){el.style.left=x+'%';el.style.top=y+'%';el.__pos=x+','+y;el.classList.toggle('lft',x<35);el.classList.toggle('rgt',x>65);el.classList.toggle('topr',y<20)}
-    const bx=x+(50-x)*(hero?.12:.38),by=y+(50-y)*(hero?.38:.34);
+    const bx=x+(50-x)*(hero?.12:.5),by=y+(50-y)*(hero?.38:.36);
     if(bt.__pos!==bx+','+by){bt.style.left=bx+'%';bt.style.top=by+'%';bt.__pos=bx+','+by}
     if(!s){
       const canSit=me<0&&st&&!st.closed&&!HE.sngOn(st)&&(!st.busted||!st.busted[myAcct()]||HE.rebuysLeft(st,myAcct())>0);
@@ -6304,8 +6433,9 @@ vtPaint=function(){
   const potLive=h?(h.stage==='done'?(h.pot||potOf(h)):potOf(h)-betsOf(h)):0;
   const potShown=h&&!showRes?potLive:0;
   const pe=$$id('t3-pot');
-  setH(pe,potShown?`<span class="chips">${chipStack(potShown)}</span><span class="t3-potv"><small>Piatto</small><b class="num">${fchip(potShown)}</b></span>`:'');
-  pe.classList.toggle('on',!!potShown);
+  const potTot=h&&!showRes&&h.stage!=='done'?potOf(h):potShown;
+  setH(pe,potShown||potTot?`<span class="t3-potv"><b>Piatto: <span class="num">${fchip(potTot)}</span></b>${potShown&&potTot>potShown?`<small>Al centro: <span class="num">${fchip(potShown)}</span></small>`:''}</span>`:'');
+  pe.classList.toggle('on',!!(potShown||potTot));
   setH($$id('t3-stg'),h&&!showRes&&h.stage!=='done'?(h.runout?'All-in':T3_STAGE[h.stage]||''):'');
   const board=h?h.board:[];
   for(let k=0;k<5;k++){
@@ -6336,8 +6466,8 @@ vtPaint=function(){
     const s=st.seats[me],myStack=Math.max(0,s.stack-(h&&h.stage==='done'&&!showRes&&h.results?((h.results.find(r=>r.seat===me)||{}).win||0):0)),note=!P?(s.out?'Sei fuori dal torneo':s.stack===0?'Hai finito le fiches':s.away?'Sei in pausa':live?'Entri dalla prossima mano':''):'';
     const fresh=cards&&T3.heroFlip!==h.no;if(fresh)T3.heroFlip=h.no;
     const cc=P?(cards?cards.map((c,k)=>cardHTML(c,'h',(top?(best.has(c)&&won[me]?'hi ':'dim '):'')+(fresh?'deal3':''),fresh?`animation-delay:${180+k*150}ms`:'')).join(''):(st.cfg.game==='omaha'?[0,1,2,3]:[0,1]).map(()=>cardHTML(null,'h')).join('')):'';
-    hero=`<div class="t3-mine ${P&&P.folded?'gone':''}">${cc||`<span class="t3-note sm">${esc(note)}</span>`}</div>
-<div class="t3-me"><span class="t3-mystk">${ava(s.name,'xs')}<b class="num" id="t3-mystk">${s.out?'Eliminato':fchip(T3.myStk!=null?T3.myStk:myStack)}</b></span>${label?`<span class="t3-hand ${lc}">${esc(label)}</span>`:''}<button class="t3-ib emo ${F.vt.emo?'on':''}" data-act="vtemo" aria-label="Reazioni">${ico('smile',21)}</button></div>
+    hero=`<div class="t3-meL"><div class="t3-mine ${P&&P.folded?'gone':''}">${cc||''}</div><span class="t3-mystk"><span class="t3-mynm ell">${esc(s.name)}</span><b class="num" id="t3-mystk">${s.out?'Eliminato':fchip(T3.myStk!=null?T3.myStk:myStack)}</b></span></div>
+<div class="t3-meR">${label?`<span class="t3-hand ${lc}">${esc(label)}</span>`:note?`<span class="t3-note sm">${esc(note)}</span>`:''}<button class="t3-ib emo ${F.vt.emo?'on':''}" data-act="vtemo" aria-label="Reazioni">${ico('smile',21)}</button></div>
 ${F.vt.emo?`<div class="v2-emos t3-emos">${EMO.map(e=>`<button data-act="vtreact" data-e="${e}" aria-label="Reazione ${e}">${e}</button>`).join('')}</div>`:''}`;
   }
   setH($$id('t3-hero'),hero);
@@ -6397,7 +6527,8 @@ setInterval(()=>{
 const _t3Open=vtOpenRoom;
 vtOpenRoom=function(rid){if(S.vt.rid!==rid){clearTimeout(T3.timer);Object.assign(T3,{no:null,board:0,lastFlip:0,resAt:0,timer:null,prev:null,stk:{},heroFlip:null,base:0,myStk:null})}return _t3Open(rid)};
 /* il cursore della puntata colora la barra fin dove arrivi */
-document.addEventListener('input',e=>{if(e.target&&e.target.id==='vt-range'){const r=e.target;r.style.setProperty('--f',(+r.max>+r.min?((r.value-r.min)/(r.max-r.min)*100):100).toFixed(1)+'%')}});
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='vt-range'){const r=e.target;r.style.setProperty('--f',(+r.max>+r.min?((r.value-r.min)/(r.max-r.min)*100):100).toFixed(1)+'%');
+  const b=document.querySelector('.t3-go[data-act="vtraiseok"]'),v=+r.value,st=S.vt.st;if(b){const all=+b.dataset.all;b.innerHTML=v>=all?`All-in<small class="num">${fchip(v)}</small>`:`${st&&st.hand&&st.hand.curBet?'Rilancia a':'Punta'}<small class="num">${fchip(v)}</small>`}}});
 
 /* =====================================================================
    Musica ovunque nell'app (non solo al tavolo virtuale), serata
@@ -6837,11 +6968,15 @@ const GAMES={
   blackjack:{t:'Blackjack',s:'Contro il banco · paga 3 a 2',cards:['Ac','Kc'],c:'gm-b'}
 };
 function gamesSection(){
-  const card=(k)=>{const g=GAMES[k];return `<div class="gm ${g.c}"><div class="gm-art" aria-hidden="true">${g.cards.map((c,i)=>cardHTML(c,'s','',`--i:${i};--n:${g.cards.length}`)).join('')}</div>
-<div class="gm-tx"><b>${g.t}</b><span>${g.s}</span></div>
-<div class="gm-acts"><button class="gm-play" data-act="${k==='blackjack'?'bjopen':'lnew'}" data-g="${k}">Gioca</button><button class="gm-rules" data-act="rules" data-g="${k}" aria-label="Regolamento ${g.t}">Regole</button></div></div>`};
+  const G=[
+    ['holdem','lnew',"Texas<br>Hold'em",'Texas Hold\'em',[['NL HOLD\'EM','p'],['VS PC','t']],[['Bui','da 5/10'],['Gioc.','2 – 6'],['Carte','2']]],
+    ['omaha','lnew','Omaha','Omaha Pot Limit',[['PL OMAHA','p'],['4 CARTE','o']],[['Bui','da 5/10'],['Gioc.','2 – 6'],['Carte','4']]],
+    ['blackjack','bjopen','Black<br>jack','Blackjack',[['BANCO','t'],['PAGA 3:2','o']],[['Puntata','da 10'],['Mazzi','6'],['Paga','3 a 2']]]];
   return `<div class="lob-lbl">Sala giochi · contro il computer</div>
-<div class="gm-grid">${['holdem','omaha','blackjack'].map(card).join('')}</div>
+<div class="gl-banner" aria-hidden="true"><span class="gl-sw"></span><span class="gl-bt"><b>Casinò</b><i>contro il computer</i></span></div>
+<div class="gl-list">${G.map(([k,act,tile,t,tags,cols])=>`<div class="gl-row gl-${k}"><button class="gl-main" data-act="${act}" data-g="${k}" aria-label="Gioca a ${esc(t)}"><span class="gl-tile"><span class="gl-sw"></span><b>${tile}</b></span>
+<span class="gl-info"><span class="gl-tags">${tags.map(([l,c])=>`<i class="gl-tg ${c}">${l}</i>`).join('')}</span><b class="gl-t">${t}</b><span class="gl-cols">${cols.map(([l,v])=>`<span><small>${l}</small>${v}</span>`).join('')}</span></span></button>
+<button class="gl-i" data-act="rules" data-g="${k}" aria-label="Regolamento ${esc(t)}">i</button></div>`).join('')}</div>
 <button class="link gm-ranks" data-act="rules" data-g="ranks">${ico('list',16)}&nbsp;I punti del poker, dal più alto</button>`;
 }
 const _vLobbyG=vLobby;
@@ -7229,7 +7364,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791979995194';
+const APP_VERSION='1791982194015';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
