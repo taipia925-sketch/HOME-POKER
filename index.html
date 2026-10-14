@@ -3891,7 +3891,7 @@ function config(st,c){
   const mode=c.mode==='sng'?'sng':'cash',lvlMin=n(c.lvlMin||st.cfg.lvlMin||8,2,60);
   const mr=c.maxRebuys==null?(st.cfg.maxRebuys==null?2:st.cfg.maxRebuys):n(c.maxRebuys,0,99);
   if(bb<sb||stack<bb*2)E('bad_config');
-  const gm=c.game||st.cfg.game,lm=c.limit||st.cfg.limit;
+  const gm=(c.game||st.cfg.game)==='omaha'?'omaha':null,lm=gm==='omaha'||(c.limit||st.cfg.limit)==='pot'?'pot':null;
   st.cfg={sb,bb,stack,turnSec:t,mode,lvlMin,maxRebuys:mr};if(gm)st.cfg.game=gm;if(lm)st.cfg.limit=lm;
   if(mode==='cash')st.sng=null;
   /* passare a torneo richiede un avvio esplicito: niente mani a metà strada */
@@ -5805,7 +5805,7 @@ function vtMiniSvg(ms,names,big){
   return `<svg class="vmini${big?' big':''}" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><ellipse cx="${W/2}" cy="${H/2}" rx="${W*.36}" ry="${H*.31}" fill="#5A3424"/><ellipse cx="${W/2}" cy="${H/2}" rx="${W*.36-(big?5:3)}" ry="${H*.31-(big?5:3)}" fill="url(#vmf${big?'b':''})"/><defs><radialGradient id="vmf${big?'b':''}" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="#22966C"/><stop offset="1" stop-color="#0B4232"/></radialGradient></defs>${seats}</svg>`;
 }
 const vtMiniOf=(st,big)=>{const ms=HE.maxSeats(st),acct=myAcct();return vtMiniSvg(ms,st.seats.slice(0,ms).map(x=>x?(x.acct===acct?true:x.name):null),big)};
-const vtFmt=st=>(st.cfg.game==='omaha'?'Omaha':'')+(st.room&&st.room.local?(st.cfg.game==='omaha'?' · ':'')+'Contro il computer':st.cfg.mode==='sng'?'Torneo':HE.maxSeats(st)===2?'Testa a testa':'Cash');
+const vtFmt=st=>(st.cfg.game==='omaha'?'Omaha · ':'')+(st.room&&st.room.local?'Contro il computer':st.cfg.mode==='sng'?'Torneo':HE.maxSeats(st)===2?'Testa a testa':'Cash');
 const vtRebTxt=m=>m>=99?'illimitate':m?String(m):'nessuna';
 function vtRules(cfg,ms){
   const r=[['Formato',cfg.mode==='sng'?'Torneo Sit & Go':ms===2?'Testa a testa (cash)':'Cash game'],['Posti',String(ms)],[cfg.mode==='sng'?'Bui iniziali':'Bui',fchip(cfg.sb)+' / '+fchip(cfg.bb)],['Fiches iniziali',fchip(cfg.stack)+' · '+Math.round(cfg.stack/cfg.bb)+' bui'],['Tempo per turno',cfg.turnSec+' secondi']];
@@ -5894,7 +5894,7 @@ const vcDefaults=(fmt,prev)=>{
   const f=fmt||'cash';
   return Object.assign(p,{fmt:f,mode:f==='sng'?'sng':'cash',ms:f==='duel'?2:(prev&&prev.ms&&prev.ms>2?prev.ms:6),maxRebuys:f==='duel'?99:f==='sng'?0:(prev&&prev.maxRebuys!=null&&prev.fmt!=='duel'?prev.maxRebuys:2),name:prev&&prev.name||'',busy:false});
 };
-const vcSummary=c=>{const bits=[c.mode==='sng'?'Torneo':+c.ms===2?'Testa a testa':'Cash',c.ms+' posti','bui '+fchip(+c.sb)+'/'+fchip(+c.bb),fchip(+c.stack)+' fiches',c.turnSec+'s'];
+const vcSummary=c=>{const bits=[c.game==='omaha'?'Omaha PL':'Hold\'em',c.mode==='sng'?'Torneo':+c.ms===2?'Testa a testa':'Cash',c.ms+' posti','bui '+fchip(+c.sb)+'/'+fchip(+c.bb),fchip(+c.stack)+' fiches',c.turnSec+'s'];
   bits.push(c.mode==='sng'?'livelli '+c.lvlMin+'′':'ricariche '+vtRebTxt(+c.maxRebuys));return bits.join(' · ')};
 
 /* ---------- schermata: nuovo tavolo ---------- */
@@ -5907,6 +5907,7 @@ function vCreate(){
 <h1 class="vl-h">Nuovo tavolo</h1>
 <div class="vc-prev"><div class="vc-prev-mini">${vtMiniSvg(Math.min(9,Math.max(2,+c.ms||2)),names,true)}</div><div class="vc-prev-tx"><span class="vl-k">Anteprima</span><b class="ell">${esc(c.name.trim()||nm)}</b><span>${esc(vcSummary(c))}</span></div></div>
 <section class="vc-sec"><div class="vc-lab">Formato</div><div class="vc-fmts">${FM.map(([k,t,s,ic])=>`<button class="vc-fmt ${c.fmt===k?'on':''}" data-act="vcfmt" data-o="vc" data-v="${k}"><span class="vc-fmt-ic">${ico(ic,22)}</span><b>${t}</b><span>${s}</span></button>`).join('')}</div></section>
+<section class="vc-sec"><div class="vc-lab">Gioco</div><div class="vc-opts c2">${vcOpt(c.game!=='omaha','vcgame','vc','holdem','Texas Hold\'em','2 carte a testa')}${vcOpt(c.game==='omaha','vcgame','vc','omaha','Omaha Pot Limit','4 carte, ne usi 2')}</div></section>
 <label class="field vc-sec"><span class="vc-lab">Nome del tavolo</span><input class="in" id="vc-name" data-bind="vc.name" value="${esc(c.name)}" placeholder="${esc(nm)}" maxlength="28" autocapitalize="sentences"></label>
 ${vcRows(c,'vc',c.fmt!=='duel')}
 </main>
@@ -5917,9 +5918,11 @@ async function vcCreate(){
   c.busy=true;render();
   const nm=c.name.trim()||'Tavolo di '+firstName(S.acct?S.acct.name:S.me.name);
   const cfg={sb:+c.sb,bb:+c.bb,stack:+c.stack,turnSec:+c.turnSec,mode:c.mode,lvlMin:+c.lvlMin||6,maxRebuys:c.mode==='sng'?0:+c.maxRebuys};
+  if(c.game==='omaha'){cfg.game='omaha';cfg.limit='pot'}
   const r=await vtCall('create',{name:nm,maxSeats:+c.ms,cfg});
   c.busy=false;
-  if(r&&r.rid){S.vt.rooms[r.rid]=r.state;F.vc=null;F.vcAdv=false;vtOpenRoom(r.rid);toast('Tavolo pronto: invita gli altri','ok');
+  if(r&&r.rid){const old=cfg.game==='omaha'&&!(r.state&&r.state.cfg&&r.state.cfg.game==='omaha');
+    S.vt.rooms[r.rid]=r.state;F.vc=null;F.vcAdv=false;vtOpenRoom(r.rid);toast(old?'Il server non è ancora aggiornato: questo tavolo sarà Texas Hold\'em':'Tavolo pronto: invita gli altri',old?'err':'ok');
     if(vtInvList().some(x=>!x.at&&x.push)){F.vinv={};setTimeout(()=>{if(V.name==='vt')openSheet({type:'vtinv'})},700)}}
   else render();
 }
@@ -5985,6 +5988,7 @@ Object.assign(H,{
   vcfmt(d){const o=vcTgt(d);if(d.o==='cfg'){o.mode=d.v;if(d.v==='sng')o.lvlMin=+o.lvlMin||6;else if(o.maxRebuys==null)o.maxRebuys=2;render();return}
     F.vc=vcDefaults(d.v,Object.assign({},o,{fmt:o.fmt}));render()},
   vcms(d){vcTgt(d).ms=+d.v;render()},
+  vcgame(d){vcTgt(d).game=d.v==='omaha'?'omaha':'holdem';render()},
   vcbl(d){const o=vcTgt(d),[sb,bb]=VC_BL[+d.v],dep=Math.max(2,Math.round((+o.stack||0)/(+o.bb||1))||100);o.sb=sb;o.bb=bb;o.stack=bb*dep;render()},
   vcdepth(d){const o=vcTgt(d);o.stack=(+o.bb||1)*(+d.v);render()},
   vcspeed(d){const o=vcTgt(d),s=VC_SPEED[+d.v];o.turnSec=s[1];o.lvlMin=s[2];render()},
@@ -7120,7 +7124,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791978289572';
+const APP_VERSION='1791978976099';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
