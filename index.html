@@ -4008,12 +4008,11 @@ tabStorico=function(D){
   const live=d=>d.remainingAmount>0&&!isNetted(d);
   const owe=g=>g.status==='closed'&&(g.debts||[]).some(d=>live(d)&&meIsFrom(d)),get=g=>g.status==='closed'&&(g.debts||[]).some(d=>live(d)&&isCreditor(d));
   const shown=all.filter(g=>f==='open'?owe(g):f==='get'?get(g):f==='mine'?myP(g):true);
-  const nOpen=closed.filter(owe).length,nGet=closed.filter(get).length;
   let h=`<section class="hero hs-sum">
 <div class="hs-top"><div><div class="mut sm">Serate giocate</div><div class="bignum" style="font-size:44px">${closed.length}</div></div><div style="text-align:right"><div class="mut sm">Montepremi totale</div><div class="hs-big num">${eurS(totPot)}</div><div class="mut xs">media ${eurS(Math.round(totPot/Math.max(1,closed.length)))} a serata</div></div></div>
 ${mine.length?`<div class="hs-me"><div class="grow"><div class="mut xs">Il tuo bilancio · ${mine.length} serat${mine.length===1?'a':'e'}, ${myWins} in vincita</div><div class="hs-big num ${myTot>0?'green':myTot<0?'red':''}">${sgnS(myTot)}</div></div>${spark}</div>`:''}
 </section>
-<div class="seg hs-seg">${[['all','Tutte',0],['mine','Le mie',0],['open','Da saldare',nOpen],['get','Da ricevere',nGet]].map(([k,l,n])=>`<button class="${f===k?'on':''}" data-act="stf" data-f="${k}">${l}${n?` <span class="hs-n">${n}</span>`:''}</button>`).join('')}</div>`;
+<div class="seg hs-seg">${[['all','Tutte',0],['mine','Le mie',0],['open','Da saldare',debtPeopleList('open').length],['get','Da ricevere',debtPeopleList('get').length]].map(([k,l,n])=>`<button class="${f===k?'on':''}" data-act="stf" data-f="${k}">${l}${n?` <span class="hs-n">${n}</span>`:''}</button>`).join('')}</div>`;
   if(f==='get'||f==='open')return h+debtPeople(f)+`<button class="link" style="align-self:center;margin-top:10px" data-act="export">${ico('share',16)}&nbsp;Esporta in Excel o backup</button>`;
   if(!shown.length)h+=`<div class="card" style="margin-top:12px;text-align:center"><p class="mut sm" style="margin:0">${f==='open'?'Non devi niente a nessuno 🎉':f==='get'?'Nessuno ti deve dei soldi.':'Nessuna partita qui.'}</p></div>`;
   const groups=[];shown.forEach(g=>{const d=new Date(g.scheduledAt),k=d.getFullYear()*12+d.getMonth();let G=groups[groups.length-1];if(!G||G.k!==k)groups.push(G={k,m:d.toLocaleDateString('it-IT',{month:'long',year:'numeric'}),list:[]});G.list.push(g)});
@@ -6845,7 +6844,7 @@ H.openplan=function(d){SH=null;go('book',d.gid)};
 
 
 /* ---------- Storico: da ricevere / da saldare raggruppati per persona ---------- */
-function debtPeople(f){
+function debtPeopleList(f){
   const get=f==='get',M={};
   Object.entries(S.games).forEach(([gid,g])=>{if(g.status!=='closed')return;(g.debts||[]).forEach(d=>{
     if(!(d.remainingAmount>0)||isNetted(d))return;
@@ -6853,7 +6852,10 @@ function debtPeople(f){
     const id=get?d.fromPlayerId:d.toPlayerId,nm=get?d.fromPlayerName:d.toPlayerName,k=pKey(id,nm);
     const P=M[k]||(M[k]={k,name:pName(id,nm),tot:0,items:[]});P.tot+=d.remainingAmount;P.items.push({gid,g,d});
   })});
-  const L=Object.values(M).sort((a,b)=>b.tot-a.tot);
+  return Object.values(M).sort((a,b)=>b.tot-a.tot);
+}
+function debtPeople(f){
+  const get=f==='get',L=debtPeopleList(f);
   if(!L.length)return `<div class="card" style="margin-top:12px;text-align:center"><p class="mut sm" style="margin:0">${get?'Nessuno ti deve dei soldi.':'Non devi niente a nessuno 🎉'}</p></div>`;
   const tot=sum(L.map(x=>x.tot));
   return `<div class="dp-sum ${get?'get':'give'}"><span>${get?'Ti devono in tutto':'Devi in tutto'}</span><b class="num">${eur(tot)}</b><span class="mut xs">${L.length} person${L.length===1?'a':'e'}</span></div>
@@ -7581,7 +7583,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791995946097';
+const APP_VERSION='1792001649619';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
