@@ -1616,6 +1616,7 @@ body::after{opacity:1;mix-blend-mode:normal;background-image:
 .vt3:has(.t3-win) .t3-logo,.vt3.many .t3-logo{opacity:0}
 .vt3 .t3-win{max-width:178px;text-align:center;padding:5px 12px 6px;border-radius:12px}.vt3 .t3-win b{font-size:14px;line-height:1.2}.vt3 .t3-win span{font-size:11.5px;line-height:1.25}
 .vt3.many .t3-center{top:53%}
+.vt3.few .t3-center{top:58%}
 
 .vt3 .s3{width:90px}
 .vt3 .s3 .s3-plate{min-width:80px;max-width:90px}
@@ -1693,56 +1694,34 @@ body::after{opacity:1;mix-blend-mode:normal;background-image:
 .bj .btn{border-radius:8px;background:linear-gradient(180deg,#E8343D,#B3141D)!important;color:#fff}
 .bj .bj-bank{border-radius:8px;background:#0F1012;box-shadow:inset 0 0 0 1px #55575C;color:#fff}
 
-/* schermi bassi (iPhone SE e simili): tutto un po' più compatto, il tavolo respira */
+/* schermi bassi: solo le tue carte e i pulsanti si compattano, il tavolo si scala da solo */
 @media (max-height:740px){
-  .vt3 .t3-stage{padding-top:12px}
-  .vt3 .s3{width:78px}
-  .vt3 .s3-av{width:46px;height:46px;transform:none}
-  .vt3 .s3-ava .ava{width:42px;height:42px;font-size:13px}
-  .vt3 .s3-ring{left:-6px;top:-6px;width:58px;height:58px}
-  .vt3 .s3 .s3-plate{min-width:72px;max-width:78px;padding:2px 5px 3px}
-  .vt3 .s3-nm{font-size:10.5px}.vt3 .s3-stk{font-size:12px}
-  .vt3 .s3-act{top:39px;width:72px}
-  .vt3 .s3 .la{font-size:10.5px;line-height:14px}
-  .vt3 .s3 .s3-cc .cd{width:20px;height:29px}
-  .vt3 .s3 .s3-cards,.vt3 .s3.rgt .s3-cards,.vt3 .s3.topr .s3-cards,.vt3 .s3.topr.rgt .s3-cards{top:-12px}
-  .vt3 .s3 .s3-cc.up .cd{width:24px;height:34px}
-  .vt3.vt3 .s3 .s3-cards:has(.up),.vt3.vt3 .s3.rgt .s3-cards:has(.up),.vt3.vt3 .s3.topr .s3-cards:has(.up){top:-6px}
-  .vt3 .t3-slot,.vt3 .cd.b{width:36px;height:51px}
-  .vt3 .cd.b .cd-ix b{font-size:15px}.vt3 .cd.b .cd-pip{font-size:19px}
-  .vt3 .t3-board{gap:4px}
-  .vt3 .t3-pot{padding:3px 12px}.vt3 .t3-potv b{font-size:13px}.vt3 .t3-potv small{font-size:10.5px}
-  .vt3 .t3-msg{min-height:38px}
-  .vt3 .t3-win{padding:4px 12px 5px}.vt3 .t3-win b{font-size:13.5px}.vt3 .t3-win span{font-size:11.5px}
-  .vt3 .t3-hero{min-height:88px;margin-top:-58px;pointer-events:none}
-  .vt3 .t3-hero>*{pointer-events:auto}
-  .vt3 .t3-mine .cd.h{width:50px;height:71px}
-  .vt3 .t3-mine:has(.cd:nth-child(4)) .cd.h{width:38px;height:55px}
-  .vt3 .t3-mine .cd.h .cd-ix b{font-size:21px}.vt3 .t3-mine .cd.h .cd-pip{font-size:28px}
-  .vt3 .t3-mystk{min-width:104px;margin-top:-8px;padding:2px 10px 3px}.vt3 .t3-mystk b{font-size:14px}.t3-mynm{font-size:11px}
+  .vt3 .t3-hero{min-height:92px}
+  .vt3 .t3-mine .cd.h{width:54px;height:77px}
+  .vt3 .t3-mine .cd.h .cd-ix b{font-size:22px}.vt3 .t3-mine .cd.h .cd-pip{font-size:30px}
+  .vt3 .t3-mystk{min-width:108px;margin-top:-8px;padding:2px 10px 3px}.vt3 .t3-mystk b{font-size:14px}.t3-mynm{font-size:11px}
   .vt3 .t3-go{min-height:50px;font-size:16px}.vt3 .t3-go small{font-size:13px}
   .t3-szv,.vt3 .t3-step{height:34px}.vt3 .t3-step{width:34px}
   .vt3 .t3-pre button{min-height:46px}
 }
-/* tavolo basso e tanti giocatori: posti ancora più piccoli */
-.vt3.short.many .s3{width:68px}
-.vt3.short.many .s3-av{width:38px;height:38px}
-.vt3.short.many .s3-ava .ava{width:34px;height:34px;font-size:11px}
-.vt3.short.many .s3-ring{left:-6px;top:-6px;width:50px;height:50px}
-.vt3.short.many .s3 .s3-plate{min-width:64px;max-width:68px;padding:1px 4px 2px;margin-top:-6px}
-.vt3.short.many .s3-nm{font-size:10px}.vt3.short.many .s3-stk{font-size:11px}
-.vt3.short.many .s3-act{top:33px;width:64px}
-.vt3.short.many .s3 .la{font-size:10px;line-height:13px}
-.vt3.short.many .s3 .s3-cc .cd{width:17px;height:24px}
-.vt3.short.many .s3 .s3-cards,.vt3.short.many .s3.rgt .s3-cards,.vt3.short.many .s3.topr .s3-cards{top:-10px}
-.vt3.short.many .s3 .s3-cc.up .cd{width:21px;height:30px}
-.vt3.short .t3-rail{inset:7% 6% 8%}
+/* il riquadro del tavolo: misure fisse, poi scalato */
+.vt3 .t3-stage{position:relative;padding:0;min-height:0}
+.vt3 .t3-tbl{position:absolute;left:50%;top:calc(50% + 9px);width:380px;height:500px;max-width:none;min-height:0;transform-origin:50% 50%;transform:translate(-50%,-50%)}
+.vt3 .t3-tbl .s3:not(.act) .s3-av{transform:none}
+.vt3 .t3-tbl .cd.b,.vt3 .t3-tbl .t3-slot{width:46px;height:65px}
+.vt3 .t3-tbl .cd.b .cd-ix b{font-size:19px}.vt3 .t3-tbl .cd.b .cd-pip{font-size:26px}
+.vt3.many .t3-tbl .t3-slot,.vt3.many .t3-tbl .cd.b{width:38px;height:54px}
+.vt3.many .t3-tbl .cd.b .cd-ix b{font-size:16px}.vt3.many .t3-tbl .cd.b .cd-pip{font-size:21px}
+/* le tue 4 carte di Omaha: indice e seme in proporzione, leggibili */
+.vt3 .t3-mine:has(.cd:nth-child(4)) .cd.h{width:52px;height:74px;margin-left:-10px}
+.vt3 .t3-mine:has(.cd:nth-child(4)) .cd.h:first-child{margin-left:0}
+.vt3 .t3-mine:has(.cd:nth-child(4)) .cd.h .cd-ix b{font-size:20px}.vt3 .t3-mine:has(.cd:nth-child(4)) .cd.h .cd-ix i{font-size:13px}
+.vt3 .t3-mine:has(.cd:nth-child(4)) .cd.h .cd-pip{font-size:22px;right:4px;bottom:3px}
+
 
 /* targhetta ed etichetta della mossa: stessa larghezza, sempre */
 .vt3.vt3 .s3 .s3-plate{width:90px;min-width:0;max-width:none}.vt3.vt3 .s3-act{width:90px}
 .vt3.vt3.many .s3 .s3-plate{width:78px}.vt3.vt3.many .s3-act{width:78px}
-@media (max-height:740px){.vt3.vt3 .s3 .s3-plate{width:78px}.vt3.vt3 .s3-act{width:78px}}
-.vt3.vt3.short.many .s3 .s3-plate{width:68px}.vt3.vt3.short.many .s3-act{width:68px}
 </style>
 
 <div id="app"></div>
@@ -4705,7 +4684,7 @@ render=function(){
 };
 
 /* ---------- disegno ---------- */
-function relRect(el){const t=$$id('v2-tbl').getBoundingClientRect(),r=el.getBoundingClientRect();return {x:r.left-t.left,y:r.top-t.top,w:r.width,h:r.height}}
+function relRect(el){const tb=$$id('v2-tbl'),k=tb.__k||1,t=tb.getBoundingClientRect(),r=el.getBoundingClientRect();return {x:(r.left-t.left)/k,y:(r.top-t.top)/k,w:r.width/k,h:r.height/k}}
 const potOf=h=>h?Object.values(h.p).reduce((a,x)=>a+x.contrib,0):0;
 const betsOf=h=>h?Object.values(h.p).reduce((a,x)=>a+(x.bet||0),0):0;
 function topHtml(st){
@@ -6334,20 +6313,22 @@ const T3={no:null,board:0,lastFlip:0,resAt:0,timer:null,prev:null,stk:{},heroFli
 const T3_LA={Fold:'Lascia',Check:'Passa',Call:'Chiama',Raise:'Rilancia',Bet:'Punta','All-in':'All-in',Lascia:'Lascia',Passa:'Passa',Chiama:'Chiama',Rilancia:'Rilancia',Punta:'Punta'};
 const T3_LAC={Lascia:'fold',Passa:'check',Chiama:'call',Rilancia:'raise',Punta:'raise','All-in':'allin'};
 const T3_STAGE={preflop:'Pre-flop',flop:'Flop',turn:'Turn',river:'River'};
-const T3_P9=[[50,92],[15,78],[13,52],[15,27],[33,9],[67,9],[85,27],[87,52],[85,78]];
-const T3_P6=[[50,92],[14,66],[14,27],[50,9],[86,27],[86,66]];
-const T3_P2=[[50,92],[50,9]];
-/* dove finiscono le puntate di ciascun posto: accanto alla targhetta, lontano da piatto e carte */
-const T3_B9=[[50,78],[34,73],[30,62],[36,31],[38,22],[62,22],[64,31],[70,62],[66,73]];
-const T3_B6=[[50,78],[36,64],[35,32],[50,25],[65,32],[64,64]];
-const T3_B2=[[50,78],[50,29]];
-/* tavolo basso (telefoni piccoli): posti ai bordi, accanto alle carte comuni */
-const T3_S9=[[50,92],[11,80],[11,55],[11,30],[31,9],[69,9],[89,30],[89,55],[89,80]];
-const T3_SB9=[[50,86],[27,86],[27,63],[27,36],[42,24],[58,24],[73,36],[73,63],[73,86]];
-const T3_S6=[[50,92],[11,72],[11,32],[50,9],[89,32],[89,72]];
-const T3_SB6=[[50,86],[27,82],[27,24],[50,30],[73,24],[73,82]];
-const t3Short=()=>{const t=$$id('v2-tbl');return !!(t&&t.clientWidth&&t.clientHeight/t.clientWidth<1.05)};
-const t3Layout=st=>{const ms=st?HE.maxSeats(st):9,sh=t3Short();return {ms,sh,L:ms<=2?T3_P2:ms<=6?(sh?T3_S6:T3_P6):(sh?T3_S9:T3_P9),B:ms<=2?T3_B2:ms<=6?(sh?T3_SB6:T3_B6):(sh?T3_SB9:T3_B9)}};
+/* il tavolo si disegna in un riquadro fisso 380x500 che poi si ingrandisce o rimpicciolisce
+   tutto insieme: così è identico su ogni telefono. Ogni posto: [x,y, puntata x,y] in % */
+const T3D={w:380,h:500};
+const _H=[50,92,50,78],
+  _BL6=[14,66,36,64],_TL6=[14,24,35,30],_T6=[50,9,50,25],_TR6=[86,24,65,30],_BR6=[86,66,64,64],
+  _BL9=[15,78,34,73],_ML9=[13,52,30,62],_TL9=[15,27,36,31],_TLL9=[33,9,38,22],_TRR9=[67,9,62,22],_TR9=[85,27,64,31],_MR9=[87,52,70,62],_BR9=[85,78,66,73];
+const T3_LAY={2:[_H,_T6],3:[_H,_TL6,_TR6],4:[_H,_TL6,_T6,_TR6],5:[_H,_BL6,_TL6,_TR6,_BR6],6:[_H,_BL6,_TL6,_T6,_TR6,_BR6],
+  7:[_H,_BL9,_TL9,_TLL9,_TRR9,_TR9,_BR9],8:[_H,_BL9,_ML9,_TL9,_T6,_TR9,_MR9,_BR9],9:[_H,_BL9,_ML9,_TL9,_TLL9,_TRR9,_TR9,_MR9,_BR9]};
+const t3Layout=st=>{const ms=Math.max(2,Math.min(9,st?HE.maxSeats(st):9)),T=T3_LAY[ms];return {ms,L:T.map(p=>[p[0],p[1]]),B:T.map(p=>[p[2],p[3]])}};
+/* scala del tavolo: riempie lo spazio libero senza deformarsi */
+function t3Fit(){
+  const tb=$$id('v2-tbl'),stg=tb&&tb.parentElement;if(!stg)return;
+  const k=Math.max(.5,Math.min((stg.clientWidth-6)/T3D.w,(stg.clientHeight-22)/T3D.h,1.2));
+  if(tb.__k!==k){tb.__k=k;tb.style.transform=`translate(-50%,-50%) scale(${k.toFixed(4)})`}
+}
+addEventListener('resize',()=>{if(V&&V.name==='vt')t3Fit()});
 const t3Sched=(ms,fn)=>{if(T3.timer)return;T3.timer=setTimeout(()=>{T3.timer=null;fn();if(V&&V.name==='vt')vtPaint()},ms)};
 
 /* la mano non è finita sul telefono finché non si è vista: il prossimo giro aspetta */
@@ -6463,7 +6444,7 @@ vtPaint=function(){
   }
   const showRes=!!(h&&h.stage==='done'&&T3.resAt);
   const disp={showRes};
-  const {ms,sh,L,B}=t3Layout(st),base=me>=0?me:(T3.base||0),rel=i=>((i-base)%ms+ms)%ms;
+  const {ms,L,B}=t3Layout(st),base=me>=0?me:(T3.base||0),rel=i=>((i-base)%ms+ms)%ms;
   const won={};if(showRes&&h.results)h.results.forEach(r=>{if(r.win>0)won[r.seat]=r});
   const top=showRes&&h.results&&h.results[0]&&h.results[0].win>0?h.results[0]:null;
   const best=new Set(top&&top.best?top.best:[]);
@@ -6570,7 +6551,7 @@ ${F.vt.emo?`<div class="v2-emos t3-emos">${EMO.map(e=>`<button data-act="vtreact
   }
   setH($$id('t3-hero'),hero);
   if(me>=0&&st){const el=$$id('t3-mystk'),v=T3.stk[me];if(el&&v!=null&&T3.myStk!==v){if(T3.myStk!=null&&!st.seats[me].out)t3Tween(el,T3.myStk,v,showRes?900:500);T3.myStk=v}}
-  root.classList.toggle('seated',me>=0);root.classList.toggle('many',ms>6);root.classList.toggle('short',sh);
+  root.classList.toggle('seated',me>=0);root.classList.toggle('many',ms>6);root.classList.toggle('few',ms<=4);t3Fit();
   root.classList.toggle('myturn',!!(live&&h.toAct===me&&me>=0));
   setH($$id('t3-ctl'),t3Ctl(st0,vtSeat(),disp));
   const rg=$$id('vt-range');if(rg)rg.style.setProperty('--f',(+rg.max>+rg.min?((rg.value-rg.min)/(rg.max-rg.min)*100):100).toFixed(1)+'%');
@@ -7462,7 +7443,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791989054796';
+const APP_VERSION='1791991173395';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
