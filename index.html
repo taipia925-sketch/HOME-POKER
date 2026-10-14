@@ -6824,7 +6824,7 @@ Object.assign(H,{
   bjhit(){bjAct('hit')},bjstand(){bjAct('stand')},bjdouble(){bjAct('double')},bjsplit(){bjAct('split')},
   bjnewbet(){BJ.phase='bet';BJ.hands=[];BJ.dealer=[];BJ.msg='';render()},
   bjagain(){BJ.phase='bet';BJ.hands=[];BJ.dealer=[];BJ.msg='';bjDeal()},
-  bjrefill(){bankSet(CASINO_START);toast('Saldo ricaricato: '+fchip(CASINO_START)+' fiches','ok');render()}
+  bjrefill(){bankSet(CASINO_START);toast('Fiches ricaricate','ok');render()}
 });
 
 /* =====================================================================
@@ -6837,12 +6837,10 @@ const GAMES={
   blackjack:{t:'Blackjack',s:'Contro il banco · paga 3 a 2',cards:['Ac','Kc'],c:'gm-b'}
 };
 function gamesSection(){
-  const b=bank();
   const card=(k)=>{const g=GAMES[k];return `<div class="gm ${g.c}"><div class="gm-art" aria-hidden="true">${g.cards.map((c,i)=>cardHTML(c,'s','',`--i:${i};--n:${g.cards.length}`)).join('')}</div>
 <div class="gm-tx"><b>${g.t}</b><span>${g.s}</span></div>
 <div class="gm-acts"><button class="gm-play" data-act="${k==='blackjack'?'bjopen':'lnew'}" data-g="${k}">Gioca</button><button class="gm-rules" data-act="rules" data-g="${k}" aria-label="Regolamento ${g.t}">Regole</button></div></div>`};
   return `<div class="lob-lbl">Sala giochi · contro il computer</div>
-<div class="gm-bank"><span class="gm-coin" aria-hidden="true"></span><span class="grow">Il tuo saldo del casinò<b class="num">${fchip(b)} fiches</b></span>${b<1000?`<button class="btn-s go" data-act="bjrefill">Ricarica</button>`:''}</div>
 <div class="gm-grid">${['holdem','omaha','blackjack'].map(card).join('')}</div>
 <button class="link gm-ranks" data-act="rules" data-g="ranks">${ico('list',16)}&nbsp;I punti del poker, dal più alto</button>`;
 }
@@ -6864,7 +6862,8 @@ function lnewSheet(){
 <section class="vc-sec"><div class="vc-lab">Avversari</div><div class="vc-seats" style="grid-template-columns:repeat(5,minmax(0,1fr))">${[1,2,3,4,5].map(k=>`<button class="vc-seat ${n.bots===k?'on':''}" data-act="lnset" data-k="bots" data-v="${k}">${k}</button>`).join('')}</div></section>
 <section class="vc-sec"><div class="vc-lab">Bui</div><div class="vc-opts c4">${VC_BL.map(([s,b2,l],i)=>`<button class="vc-opt ${n.bi===i?'on':''}" data-act="lnset" data-k="bi" data-v="${i}"><b>${l}</b><span>${fchip(s)}/${fchip(b2)}</span></button>`).join('')}</div></section>
 <section class="vc-sec"><div class="vc-lab">Fiches con cui ti siedi</div><div class="vc-opts c3">${VC_DEPTH.map(([d,l])=>`<button class="vc-opt ${n.depth===d?'on':''}" data-act="lnset" data-k="depth" data-v="${d}" ${bb*d>b?'disabled':''}><b>${l}</b><span>${fchip(bb*d)}</span></button>`).join('')}</div></section>
-<p class="vc-hint" style="margin:0">Prendi ${fchip(stack)} fiches dal tuo saldo (${fchip(b)}). Quando ti alzi, quelle che hai davanti tornano nel saldo.</p>
+<p class="vc-hint" style="margin:0">Ti siedi con ${fchip(stack)} fiches. Quando ti alzi, quelle che hai davanti restano tue per le prossime partite.</p>
+${stack>b?`<button class="btn ghost" data-act="bjrefill">${ico('coins',18)} Ricarica le fiches</button>`:''}
 <button class="btn" data-act="lcreate" ${stack>b||n.busy?'disabled':''}>${ico('chip',18)} ${n.busy?'Preparo il tavolo…':'Siediti al tavolo'}</button>
 <button class="link" style="align-self:center" data-act="rules" data-g="${n.g}">Leggi il regolamento</button>
 </div></div></div>`;
@@ -7230,7 +7229,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1791979921380';
+const APP_VERSION='1791979995194';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
