@@ -1867,6 +1867,46 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .vl-badge i{font-style:normal;font-size:24px;line-height:1;text-shadow:0 2px 4px rgba(0,0,0,.35)}
 .vl-badge b{font-family:var(--sans);font-weight:800;font-style:italic;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
 .vl-card .vl-t b{font-family:var(--sans)!important;font-weight:800!important;font-style:normal}
+
+/* ===== Sala giochi a schede ===== */
+.app.sg .pg{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+.sg .pkb{margin:6px 0 4px}
+.pkb-holdem{--glow:rgba(30,200,110,.45);background:radial-gradient(circle at 80% 45%,#7CF5B0 0%,#1FB866 24%,#0D6B3A 58%,#04210F 100%)}
+.pkb-omaha{--glow:rgba(70,90,255,.5);background:radial-gradient(circle at 80% 45%,#6FE3FF 0%,#3A7BFF 24%,#3B1FB5 58%,#12062F 100%)}
+.pkb-bj{--glow:rgba(255,170,0,.45);background:radial-gradient(circle at 80% 45%,#FFE29A 0%,#E0A100 24%,#6E3B00 58%,#1E0E00 100%)}
+.pkb .pkt-cards{right:16px;top:22px}
+.sg-tabs .tab{position:relative}
+.sg-ic{font-style:normal;font-size:22px;line-height:24px;height:24px;font-weight:800}
+.sgi-omaha{color:#FF6B6B}.tab.on .sgi-omaha{color:#B0101C}
+.sgi-bj{font-size:22px}
+.sg-dot{position:absolute;top:8px;right:calc(50% - 22px);width:9px;height:9px;border-radius:50%;background:#3DFF8F;box-shadow:0 0 0 2px #1A1422,0 0 8px rgba(61,255,143,.7)}
+.sg-h{display:flex;align-items:center;gap:8px;margin:22px 2px 10px;font-weight:800;font-style:italic;text-transform:uppercase;font-size:15px;letter-spacing:.03em;color:#fff}
+.sg-h::before{content:"";width:16px;height:16px;border-radius:50%;flex:none;background:radial-gradient(circle,#E01E37 0 38%,transparent 40%),repeating-conic-gradient(#fff 0 20deg,#E01E37 20deg 45deg);box-shadow:0 0 0 1.5px #7A0A12}
+.sg-acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sg-act{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:14px;border-radius:18px;text-align:left;color:#fff;min-height:132px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),inset 0 1px 0 rgba(255,255,255,.2),0 12px 26px -14px rgba(0,0,0,.9)}
+.sg-act.friends{background:linear-gradient(160deg,#3A2A5A,#1E1530)}
+.sg-act.bots{background:linear-gradient(160deg,#5A1A22,#2A0C12)}
+.sg-act-ic{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;margin-bottom:8px;font-size:26px;color:#2A1600;background:linear-gradient(180deg,#FFE680,#FFC21A 55%,#F09A00);box-shadow:0 6px 16px -4px rgba(255,180,0,.5),inset 0 1px 0 rgba(255,255,255,.7)}
+.sg-act b{font-weight:800;font-size:16.5px;line-height:1.15}
+.sg-act span:last-child{font-size:12.5px;color:rgba(255,255,255,.75)}
+.sg-act:active,.sg-play:active{transform:scale(.97)}
+.sg-room{border-radius:16px;background:linear-gradient(180deg,#241B2F,#18121F);box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);overflow:hidden}
+.sg-room-main{display:flex;width:100%;padding:13px 14px 10px;text-align:left;color:#fff}
+.sg-room-main b{display:block;font-weight:800;font-size:16px}
+.sg-room-meta{display:block;font-size:12.5px;color:#BDB3C9;margin-top:2px}
+.sg-room-ppl{display:block;margin-top:8px}
+.sg-room-foot{display:flex;align-items:center;justify-content:space-between;padding:8px 10px 10px 14px;border-top:1px solid rgba(255,255,255,.07)}
+.sg-empty{margin:0;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);font-size:13.5px;line-height:1.45;color:#CFC6DA}
+.sg-empty b{color:#fff}
+.sg-rules{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:18px;padding:13px;border-radius:14px;font-weight:700;color:#fff;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.18)}
+.sg-play{display:flex;align-items:center;gap:12px;width:100%;margin-top:16px;padding:14px;border-radius:18px;text-align:left;color:#fff;background:linear-gradient(160deg,#5A3A00,#2A1800);box-shadow:inset 0 0 0 1px rgba(255,210,90,.35),0 14px 30px -14px rgba(255,170,0,.4)}
+.sg-play-ic{display:grid;place-items:center;width:50px;height:50px;border-radius:14px;font-size:28px;background:#fff;color:#111;flex:none;box-shadow:0 6px 14px -6px rgba(0,0,0,.6)}
+.sg-play b{display:block;font-weight:800;font-size:17px}
+.sg-play .grow span{font-size:12.5px;color:rgba(255,255,255,.75)}
+.sg-play-go{flex:none;padding:12px 16px;border-radius:12px;font-weight:800;letter-spacing:.06em;color:#2A1600;background:linear-gradient(180deg,#FFE680,#FFC21A 55%,#F09A00);box-shadow:0 6px 16px -4px rgba(255,180,0,.5),inset 0 1px 0 rgba(255,255,255,.7)}
+.sg-how{display:grid;gap:8px;margin-top:14px}
+.sg-how>div{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);font-size:14px;color:#E8E1F0}
+.sg-how b{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;flex:none;font-weight:800;color:#2A1600;background:linear-gradient(180deg,#FFE680,#FFC21A)}
 </style>
 
 <div id="app"></div>
@@ -7248,6 +7288,66 @@ vLobby=function(){
   return h.slice(0,i)+gamesSection()+h.slice(i);
 };
 
+/* =====================================================================
+   SALA GIOCHI A SCHEDE: barra in basso HOLD'EM · OMAHA · BLACKJACK,
+   come Serata/Storico/Classifica. Ogni scheda mostra solo il suo gioco.
+   ===================================================================== */
+const SG_TABS=[['holdem','♠',"Hold'em"],['omaha','♦','Omaha'],['bj','♣','Blackjack']];
+vLobby=function(){
+  const acct=myAcct(),u=S.vt.unread;
+  const all=Object.values(S.vt.rooms).filter(st=>st.room&&(!st.closed||st.seats.some(x=>x&&x.acct===acct)));
+  const isMine=st=>st.seats.some(x=>x&&x.acct===acct);
+  const gameOf=st=>st.cfg.game==='omaha'?'omaha':'holdem';
+  const mine=all.filter(st=>isMine(st)&&!st.closed);
+  if(!F.sala){let v=null;try{v=LS.get('salatab',null)}catch(e){}F.sala=v||(mine[0]?gameOf(mine[0]):'holdem')}
+  const t=SG_TABS.some(x=>x[0]===F.sala)?F.sala:'holdem';
+  const playing={holdem:mine.some(st=>gameOf(st)==='holdem'),omaha:mine.some(st=>gameOf(st)==='omaha'),bj:false};
+  const top=`<div class="vl-top"><button class="back-l" data-act="mode">${ico('back',20)}${esc(S.table.name)}</button><span class="row" style="gap:8px"><button class="vl-ib ${F.vt.chatOpen?'on':''}" data-act="vtchat" aria-label="Chat del tavolo">${ico('chat',20)}${u?`<i class="v2-dot">${u>9?'9+':u}</i>`:''}</button><button class="vl-ib" data-act="vtinvite" aria-label="Invita al tavolo">${ico('uplus',20)}</button></span></div>`;
+  const nav=`<nav class="tabs sg-tabs" aria-label="Giochi"><i class="tab-ind" style="--ti:${SG_TABS.findIndex(x=>x[0]===t)}"></i>${SG_TABS.map(([k,ic,l])=>`<button class="tab ${t===k?'on':''}" data-act="salatab" data-t="${k}" ${t===k?'aria-current="page"':''}><i class="sg-ic sgi-${k}">${ic}</i><span>${l}</span>${playing[k]&&t!==k?'<b class="sg-dot" aria-label="Stai giocando"></b>':''}</button>`).join('')}</nav>`;
+  if(S.vt.missing)return `<div class="app"><main class="pg vl">${top}<div class="box o sm">Per i tavoli virtuali va attivata la funzione hpl-holdem in Supabase.</div></main>${nav}</div>`;
+  const banner=(k)=>{
+    const B={holdem:["Texas Hold'em",'2 carte a testa, 5 in tavola: vince la mano migliore',`<span class="pk-cards pkt-cards"><span class="c1">${cardHTML('As','b')}</span><span class="c2">${cardHTML('Kh','b')}</span></span>`],
+      omaha:['Omaha','4 carte a testa, ne usi esattamente 2 · pot limit',`<span class="pk-cards pkt-cards o"><span class="c1">${cardHTML('Ad','b')}</span><span class="c2">${cardHTML('Kd','b')}</span><span class="c3">${cardHTML('Qs','b')}</span></span>`],
+      bj:['Blackjack','Batti il banco: arriva a 21 senza sballare · paga 3 a 2',`<span class="pk-cards pkt-cards"><span class="c1">${cardHTML('Ac','b')}</span><span class="c2">${cardHTML('Jh','b')}</span></span>`]}[k];
+    return `<section class="pkb pkb-${k}"><span class="pk-rays"></span><span class="pkb-art">${B[2]}</span><span class="pkb-tx"><span class="pk-k">Sala giochi · fiches finte</span><b>${B[0]}</b><span class="pkb-sub">${B[1]}</span></span></section>`};
+  const rules=k=>`<button class="sg-rules" data-act="rules" data-g="${k==='bj'?'blackjack':k}">${ico('list',17)} Regolamento ${k==='bj'?'del blackjack':k==='omaha'?"dell'Omaha":"del Texas Hold'em"}</button>`;
+  let body='';
+  if(t==='bj'){
+    body=`${banner('bj')}
+<button class="sg-play" data-act="bjopen"><span class="sg-play-ic">♣</span><span class="grow"><b>Gioca a blackjack</b><span>Tu contro il banco · 6 mazzi · subito</span></span><span class="sg-play-go">GIOCA</span></button>
+<div class="sg-how"><div><b>1</b><span>Punta le fiches e distribuisci</span></div><div><b>2</b><span>Chiedi carta o stai: non superare 21</span></div><div><b>3</b><span>Batti il banco: blackjack paga 3 a 2</span></div></div>
+${rules('bj')}`;
+  }else{
+    const my=mine.filter(st=>gameOf(st)===t),others=all.filter(st=>!isMine(st)&&!st.closed&&gameOf(st)===t&&!(st.room&&st.room.local));
+    const mode=st=>st.room&&st.room.local?'Contro il computer':st.cfg.mode==='sng'?'Torneo':HE.maxSeats(st)===2?'Testa a testa':'Cash';
+    const hero=st=>{const me=st.seats.find(x=>x&&x.acct===acct),[stt,cls]=roomStatus(st),b=HE.blinds(st,vtNow()),rid=esc(st.room.id);
+      return `<div class="pkt pkt-${t}"><span class="pk-rays"></span>
+<button class="pkt-go" data-act="vtopen" data-rid="${rid}" aria-label="Torna a ${esc(st.room.name)}">
+<span class="pkt-pills"><i class="pk-pill ${cls==='live'?'live':''}">${cls==='live'?'● ':''}${esc(stt)}</i><i class="pk-pill">${mode(st)}</i></span>
+<b class="pkt-t">${esc(st.room.name)}</b>
+<span class="pkt-stats"><span><small>Le tue fiches</small><b class="num">${me.out?'Eliminato':fchip(me.stack)}</b></span><span><small>Bui</small><b class="num">${fchip(b.sb)}/${fchip(b.bb)}</b></span><span><small>Al tavolo</small><b class="num">${st.seats.filter(Boolean).length}/${HE.maxSeats(st)}</b></span></span></button>
+<div class="pkt-acts"><button class="pkt-cta" data-act="vtopen" data-rid="${rid}">${ico('play',18)} Torna al tavolo</button><button class="pkt-more" data-act="vroom" data-rid="${rid}" aria-label="Dettagli del tavolo">${ico('dots',22)}</button></div></div>`};
+    const card=st=>{const [stt,cls]=roomStatus(st),[jl,jc]=vtJoinLabel(st),rid=esc(st.room.id),b=HE.blinds(st,vtNow()),sat=st.seats.filter(Boolean);
+      return `<div class="sg-room"><button class="sg-room-main" data-act="vroom" data-rid="${rid}"><span class="grow"><b class="ell">${esc(st.room.name)}</b><span class="sg-room-meta">${mode(st)} · bui ${fchip(b.sb)}/${fchip(b.bb)} · ${sat.length}/${HE.maxSeats(st)} seduti</span>${sat.length?`<span class="sg-room-ppl">${stackAva(sat.map(x=>x.name),5)}</span>`:''}</span></button>
+<div class="sg-room-foot"><span class="vl-st ${cls}"><i></i>${esc(stt)}</span><button class="vl-go ${jc}" data-act="vtjoin" data-rid="${rid}">${jl}</button></div></div>`};
+    body=`${banner(t)}
+${my.length?`<div class="sg-h">Stai giocando</div><div class="stack" style="gap:12px">${my.map(hero).join('')}</div>`:''}
+<div class="sg-h">${my.length?'Nuova partita':'Inizia a giocare'}</div>
+<div class="sg-acts">
+<button class="sg-act friends" data-act="salanew" data-g="${t}"><span class="sg-act-ic">${ico('uplus',26)}</span><b>Con gli amici</b><span>Crea un tavolo e invitali</span></button>
+<button class="sg-act bots" data-act="lnew" data-g="${t}"><span class="sg-act-ic">🤖</span><b>Contro il computer</b><span>Si parte subito</span></button>
+</div>
+<div class="sg-h">Tavoli degli amici${others.length?' · '+others.length:''}</div>
+${!S.vt.roomsLoaded&&!all.length?'<div class="stack" aria-hidden="true"><div class="sk"></div></div>':others.length?`<div class="stack" style="gap:10px">${others.map(card).join('')}</div>`:`<p class="sg-empty">Nessun tavolo di ${t==='omaha'?'Omaha':"Hold'em"} aperto in questo momento. Creane uno con <b>Con gli amici</b>: gli altri ricevono l'invito sul telefono.</p>`}
+${rules(t)}`;
+  }
+  return `<div class="app sg"><main class="pg vl">${top}${body}</main>${nav}</div>`;
+};
+Object.assign(H,{
+  salatab(d){F.sala=d.t;try{LS.set('salatab',d.t)}catch(e){}render();scrollTo(0,0)},
+  salanew(d){H.vtnew();if(F.vc){F.vc.game=d.g==='omaha'?'omaha':'holdem';render()}}
+});
+
 /* ---------- nuovo tavolo contro il computer ---------- */
 function lnewSheet(){
   const n=F.ln,g=GAMES[n.g],b=bank(),[sb,bb]=VC_BL[n.bi],stack=bb*n.depth;
@@ -7624,7 +7724,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792046282348';
+const APP_VERSION='1792047335488';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
