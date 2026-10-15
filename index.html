@@ -1728,8 +1728,8 @@ body::after{opacity:1;mix-blend-mode:normal;background-image:
 .cas.pk::before{display:none}
 .pk-hd{display:flex;align-items:center;justify-content:space-between;padding:6px 0 0}
 .pk-logo{display:flex;align-items:center;gap:8px}
-.pk-logo span{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:linear-gradient(180deg,#FF4D57,#B0101C);color:#fff;font-size:20px;box-shadow:0 4px 14px rgba(255,60,70,.5),inset 0 1px 0 rgba(255,255,255,.35)}
-.pk-logo b{font-family:var(--sans);font-weight:800;font-style:italic;font-size:21px;letter-spacing:.02em;background:linear-gradient(180deg,#FFF,#FFD27A);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 10px rgba(255,190,90,.35))}
+.pk-emb{width:40px;height:40px;flex:none;filter:drop-shadow(0 4px 10px rgba(255,40,60,.45))}
+.pk-logo b{font-family:var(--sans);font-weight:800;font-style:italic;font-size:22px;letter-spacing:.03em;color:#FFC93C;padding-right:6px;white-space:nowrap;text-shadow:0 0 14px rgba(255,190,60,.35)}.pk-logo b i{font-style:italic;color:#fff}
 .pk-me{position:static}
 .pk-hello{margin:18px 2px 14px}
 .pk-hello span{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#FF8A8F}
@@ -1836,6 +1836,37 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .num.green,.green.num,.tval.green{color:#3DFF8F!important;text-shadow:0 0 14px rgba(61,255,143,.25)}
 .num.red,.red.num{color:#FF6B6B!important}
 @media (max-width:360px){.pkb-tx b{font-size:28px}}
+
+/* ===== Sala giochi: tessere "stai giocando" e altri tavoli ===== */
+.pkt{position:relative;border-radius:20px;overflow:hidden;isolation:isolate;color:#fff;padding:16px 16px 14px;box-shadow:0 16px 36px -16px var(--glow),inset 0 0 0 1px rgba(255,255,255,.14),inset 0 1px 0 rgba(255,255,255,.25)}
+.pkt-omaha{--glow:rgba(70,90,255,.5);background:radial-gradient(circle at 82% 30%,#6FE3FF 0%,#3A7BFF 22%,#3B1FB5 56%,#12062F 100%)}
+.pkt-holdem{--glow:rgba(30,200,110,.45);background:radial-gradient(circle at 82% 30%,#7CF5B0 0%,#1FB866 22%,#0D6B3A 56%,#04210F 100%)}
+.pkt .pk-rays{-webkit-mask:radial-gradient(circle at 82% 30%,#000 0,transparent 48%);mask:radial-gradient(circle at 82% 30%,#000 0,transparent 48%);background:repeating-conic-gradient(from 0deg at 82% 30%,rgba(255,255,255,.13) 0 5deg,transparent 5deg 15deg);transform-origin:82% 30%}
+.pkt::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(0,0,0,.5),rgba(0,0,0,.2) 60%,transparent)}
+.pkt-cards{position:absolute;right:10px;top:14px;width:96px;height:84px;z-index:0;pointer-events:none}
+.pkt-cards .cd.b{width:46px;height:65px}
+.pkt-cards .c1{left:0;transform:rotate(-12deg)}.pkt-cards .c2{left:28px;transform:rotate(8deg) translateY(3px)}
+.pkt-cards.o .c1{left:-6px}.pkt-cards.o .c2{left:18px;transform:rotate(0deg)}.pkt-cards.o .c3{left:42px;transform:rotate(12deg) translateY(4px)}
+.pkt-cards>span{position:absolute;top:0;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45))}
+.pkt-go{position:relative;z-index:1;display:block;width:100%;text-align:left;color:#fff}
+.pkt-pills{display:flex;flex-wrap:wrap;gap:5px;max-width:calc(100% - 96px)}
+.pkt-pills .pk-pill{font-size:11.5px;padding:3px 8px}
+.pkt-t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:10px;max-width:calc(100% - 92px);font-family:var(--sans);font-weight:800;font-size:21px;line-height:1.15;letter-spacing:-.01em;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.pkt-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:14px;padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.32);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.pkt-stats span{display:flex;flex-direction:column;min-width:0}
+.pkt-stats small{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.72);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pkt-stats b{font-family:var(--sans);font-weight:800;font-size:18px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pkt-acts{position:relative;z-index:1;display:flex;gap:8px;margin-top:12px}
+.pkt-cta{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;border-radius:14px;font-weight:800;font-size:15.5px;letter-spacing:.06em;text-transform:uppercase;color:#2A1600;background:linear-gradient(180deg,#FFE680,#FFC21A 55%,#F09A00);box-shadow:0 6px 18px rgba(255,180,0,.4),inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 0 rgba(0,0,0,.15)}
+.pkt-more{flex:none;width:50px;min-height:50px;border-radius:14px;display:grid;place-items:center;color:#fff;background:rgba(0,0,0,.35);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+.pkt-cta:active,.pkt-more:active,.pkt-go:active{transform:scale(.98)}
+/* altri tavoli */
+.vl-card .vl-badge{flex:none;width:64px;height:64px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),0 6px 14px -6px rgba(0,0,0,.6)}
+.vl-badge.pkb-holdem{background:radial-gradient(circle at 35% 25%,#7CF5B0,#1FB866 40%,#0D6B3A)}
+.vl-badge.pkb-omaha{background:radial-gradient(circle at 35% 25%,#6FE3FF,#3A7BFF 40%,#3B1FB5)}
+.vl-badge i{font-style:normal;font-size:24px;line-height:1;text-shadow:0 2px 4px rgba(0,0,0,.35)}
+.vl-badge b{font-family:var(--sans);font-weight:800;font-style:italic;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.vl-card .vl-t b{font-family:var(--sans)!important;font-weight:800!important;font-style:normal}
 </style>
 
 <div id="app"></div>
@@ -2129,6 +2160,8 @@ const pkChips=(cols,id)=>{const C={r:['#FF5A5F','#C1121F','#7A0A12'],b:['#5AA9FF
     return `<svg viewBox="0 0 100 100" aria-hidden="true"><defs>${defs}</defs>${body}</svg>`};
 /* banner luminoso in cima alle sezioni: titolo grande, cosa trovi qui, disegno a tema */
 const pkTrophy=`<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="trg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF3B0"/><stop offset=".45" stop-color="#F5C02A"/><stop offset="1" stop-color="#9A6400"/></linearGradient></defs><path d="M28 14h44v18c0 16-9 27-22 29-13-2-22-13-22-29z" fill="url(#trg)" stroke="#7A4E00" stroke-width="1.5"/><path d="M28 20H14c0 14 8 22 18 23M72 20h14c0 14-8 22-18 23" fill="none" stroke="url(#trg)" stroke-width="6" stroke-linecap="round"/><rect x="44" y="60" width="12" height="14" fill="url(#trg)"/><rect x="30" y="74" width="40" height="12" rx="3" fill="url(#trg)" stroke="#7A4E00" stroke-width="1.5"/><path d="M50 24l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z" fill="#fff" fill-opacity=".85"/><ellipse cx="40" cy="22" rx="5" ry="2.5" fill="#fff" fill-opacity=".5"/></svg>`;
+/* stemma: una fiche da casinò vista dall'alto con il picche al centro */
+const pkEmblem=`<svg class="pk-emb" viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="emg" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#FF6B6B"/><stop offset=".6" stop-color="#D3122A"/><stop offset="1" stop-color="#7A0A12"/></radialGradient></defs><circle cx="32" cy="32" r="30" fill="url(#emg)" stroke="#5A0610" stroke-width="1.5"/>${[0,45,90,135,180,225,270,315].map(a=>`<rect x="28.5" y="2.5" width="7" height="9" rx="1.5" fill="#fff" transform="rotate(${a} 32 32)"/>`).join('')}<circle cx="32" cy="32" r="19" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="3 3.2" stroke-opacity=".85"/><circle cx="32" cy="32" r="15" fill="#B50F24" stroke="#fff" stroke-opacity=".5"/><path d="M32 21c-4.2 5.3-9.2 8.1-9.2 12.3 0 3.3 3.6 5.2 6.9 2.9-.4 2.6-1.4 4.4-3.1 5.6h10.8c-1.7-1.2-2.7-3-3.1-5.6 3.3 2.3 6.9.4 6.9-2.9 0-4.2-5-7-9.2-12.3z" fill="#fff"/><ellipse cx="24" cy="18" rx="9" ry="4" fill="#fff" fill-opacity=".18" transform="rotate(-30 24 18)"/></svg>`;
 function pkBanner(kind,title,sub,kicker){
   const art=kind==='serata'?`<span class="pk-stack b1">${pkChips(['r','r','b','r'],'h1')}</span><span class="pk-stack b2">${pkChips(['g','g','g'],'h2')}</span>`
     :kind==='storico'?`<span class="pk-cards b3"><span class="c1">${cardHTML('Qs','b')}</span><span class="c2">${cardHTML('Jh','b')}</span></span><span class="pk-stack b4">${pkChips(['b','b'],'h4')}</span>`
@@ -5709,7 +5742,7 @@ vMode=function(){
   const vStat=S.vt.missing?'Da attivare in Supabase':R.length?`${R.length} tavol${R.length===1?'o':'i'} · ${ppl} giocator${ppl===1?'e':'i'}`:'Nessun tavolo aperto';
   return `<div class="cas pk">
 <header class="pk-hd">
-  <div class="pk-logo" aria-hidden="true"><span>♠</span><b>HOME POKER</b></div>
+  <div class="pk-logo" aria-hidden="true">${pkEmblem}<b><i>HOME</i> POKER</b></div>
   <button class="me-btn pk-me" data-act="meopen" aria-label="Il mio profilo">${ava(S.me?S.me.name:'?')}</button>
 </header>
 <div class="pk-hello"><span>Il tuo tavolo</span><h1>${esc(S.table.name)}</h1></div>
@@ -6274,14 +6307,20 @@ vLobby=function(){
   if(S.vt.missing)return `<div class="app"><main class="pg vl">${top}<div class="box o sm">Per i tavoli virtuali va eseguito <b>virtuale2.sql</b> in Supabase (e aggiornata la funzione hpl-holdem).</div></main></div>`;
   const ppl=st=>{const sat=st.seats.filter(Boolean);return `<span class="vl-ppl">${sat.length?stackAva(sat.map(x=>x.name),4):''}<span class="num">${sat.length}/${HE.maxSeats(st)} seduti</span></span>`};
   const meta=st=>{const b=HE.blinds(st,vtNow());return `${st.cfg.mode==='sng'&&HE.sngOn(st)?'livello '+(b.level+1)+' · ':''}bui ${fchip(b.sb)}/${fchip(b.bb)} · ${fchip(st.cfg.stack)} fiches`};
-  const hero=st=>{const me=st.seats.find(x=>x&&x.acct===acct),[stt,cls]=roomStatus(st);
-    return `<div class="vl-hero"><button class="vl-hero-go" data-act="vtopen" data-rid="${esc(st.room.id)}"><span class="vl-hero-mini">${vtMiniOf(st,true)}</span>
-<span class="vl-hero-tx"><span class="vl-k"><i class="dot${cls==='live'?'':' off'}"></i>${esc(stt)} · ${vtFmt(st)}</span><b>${esc(st.room.name)}</b><span class="mut sm">${meta(st)}</span>
-<span class="vl-hero-me">Le tue fiches <b class="num">${me.out?'eliminato':fchip(me.stack)}</b></span></span></button>
-<div class="vl-hero-acts"><button class="btn" data-act="vtopen" data-rid="${esc(st.room.id)}">${ico('play',18)} Torna al tavolo</button><button class="btn-s" data-act="vroom" data-rid="${esc(st.room.id)}" aria-label="Dettagli del tavolo">${ico('dots',22)}</button></div></div>`};
+  const gkind=st=>st.cfg.game==='omaha'?'omaha':'holdem';
+  const gname=st=>st.cfg.game==='omaha'?'Omaha':'Hold\'em';
+  const mode=st=>st.room&&st.room.local?'Contro il computer':st.cfg.mode==='sng'?'Torneo':HE.maxSeats(st)===2?'Testa a testa':'Cash';
+  const gart=st=>st.cfg.game==='omaha'?`<span class="pk-cards pkt-cards o"><span class="c1">${cardHTML('Ad','b')}</span><span class="c2">${cardHTML('Kd','b')}</span><span class="c3">${cardHTML('Qs','b')}</span></span>`:`<span class="pk-cards pkt-cards"><span class="c1">${cardHTML('As','b')}</span><span class="c2">${cardHTML('Kh','b')}</span></span>`;
+  const hero=st=>{const me=st.seats.find(x=>x&&x.acct===acct),[stt,cls]=roomStatus(st),b=HE.blinds(st,vtNow()),rid=esc(st.room.id);
+    return `<div class="pkt pkt-${gkind(st)}"><span class="pk-rays"></span>${gart(st)}
+<button class="pkt-go" data-act="vtopen" data-rid="${rid}" aria-label="Torna a ${esc(st.room.name)}">
+<span class="pkt-pills"><i class="pk-pill ${cls==='live'?'live':''}">${cls==='live'?'● ':''}${esc(stt)}</i><i class="pk-pill">${gname(st)}</i><i class="pk-pill">${mode(st)}</i></span>
+<b class="pkt-t">${esc(st.room.name)}</b>
+<span class="pkt-stats"><span><small>Le tue fiches</small><b class="num">${me.out?'Eliminato':fchip(me.stack)}</b></span><span><small>Bui</small><b class="num">${fchip(b.sb)}/${fchip(b.bb)}</b></span><span><small>Al tavolo</small><b class="num">${st.seats.filter(Boolean).length}/${HE.maxSeats(st)}</b></span></span></button>
+<div class="pkt-acts"><button class="pkt-cta" data-act="vtopen" data-rid="${rid}">${ico('play',18)} Torna al tavolo</button><button class="pkt-more" data-act="vroom" data-rid="${rid}" aria-label="Dettagli del tavolo">${ico('dots',22)}</button></div></div>`};
   const card=st=>{const [stt,cls]=roomStatus(st),[jl,jc]=vtJoinLabel(st),rid=esc(st.room.id);
-    return `<div class="vl-card ${cls}"><button class="vl-main" data-act="vroom" data-rid="${rid}" aria-label="Dettagli di ${esc(st.room.name)}"><span class="vl-mini">${vtMiniOf(st)}</span>
-<span class="vl-body"><span class="vl-t"><b class="ell">${esc(st.room.name)}</b><span class="vl-fmt ${st.cfg.mode==='sng'?'t':''}">${vtFmt(st)}</span></span><span class="vl-meta">${meta(st)}</span>${ppl(st)}</span></button>
+    return `<div class="vl-card ${cls}"><button class="vl-main" data-act="vroom" data-rid="${rid}" aria-label="Dettagli di ${esc(st.room.name)}"><span class="vl-badge pkb-${gkind(st)}"><i>${st.cfg.game==='omaha'?'♦':'♠'}</i><b>${gname(st)}</b></span>
+<span class="vl-body"><span class="vl-t"><b class="ell">${esc(st.room.name)}</b><span class="vl-fmt ${st.cfg.mode==='sng'?'t':''}">${mode(st)}</span></span><span class="vl-meta">${meta(st)}</span>${ppl(st)}</span></button>
 <div class="vl-foot"><span class="vl-st ${cls}"><i></i>${esc(stt)}</span><button class="vl-go ${jc}" data-act="vtjoin" data-rid="${rid}">${jl}</button></div></div>`};
   const newCard=`<button class="vl-new" data-act="vtnew"><span class="vl-new-ic">${ico('plus',26)}</span><span class="grow"><b>Crea un tavolo</b><span>Cash, torneo o testa a testa: scegli e sei già seduto</span></span>${ico('chevr',20)}</button>`;
   let body='';
@@ -7585,7 +7624,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792013670380';
+const APP_VERSION='1792046282348';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
