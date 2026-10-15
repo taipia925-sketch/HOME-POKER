@@ -1907,6 +1907,34 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .sg-how{display:grid;gap:8px;margin-top:14px}
 .sg-how>div{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);font-size:14px;color:#E8E1F0}
 .sg-how b{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;flex:none;font-weight:800;color:#2A1600;background:linear-gradient(180deg,#FFE680,#FFC21A)}
+
+/* ===== scelta del tavolo ===== */
+.app.sl{background:none}
+.app.sl .pg{padding:calc(env(safe-area-inset-top,0px) + 8px) 16px calc(40px + env(safe-area-inset-bottom,0px))}
+.sl .pk-hello h1{font-size:36px}
+.sl-list{display:flex;flex-direction:column;gap:14px}
+.sl-card{position:relative;border-radius:20px;overflow:hidden;isolation:isolate;box-shadow:0 16px 36px -16px rgba(230,30,50,.45),inset 0 0 0 1px rgba(255,255,255,.14)}
+.sl-go{position:relative;display:block;width:100%;height:210px;text-align:left;color:#fff}
+.sl-bg{position:absolute;inset:0;z-index:-2;background-size:cover;background-position:center}
+.sl-card:not(.ph) .sl-bg{filter:saturate(1.2)}
+.sl-card .pk-rays{z-index:-1;-webkit-mask:radial-gradient(circle at 78% 40%,#000 0,transparent 50%);mask:radial-gradient(circle at 78% 40%,#000 0,transparent 50%);background:repeating-conic-gradient(from 0deg at 78% 40%,rgba(255,255,255,.12) 0 5deg,transparent 5deg 15deg);transform-origin:78% 40%}
+.sl-suit{position:absolute;right:28px;top:22px;z-index:-1;font-size:96px;line-height:1;color:rgba(255,255,255,.22);text-shadow:0 6px 20px rgba(0,0,0,.35)}
+.sl-vig{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,.25) 0%,rgba(0,0,0,0) 30%,rgba(0,0,0,.55) 62%,rgba(0,0,0,.88) 100%)}
+.sl-tx{position:absolute;left:16px;right:118px;bottom:16px;display:flex;flex-direction:column}
+.sl-pills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.pk-pill.gold{background:linear-gradient(180deg,#FFE680,#FFC21A);color:#2A1600;box-shadow:none}
+.sl-tx b{font-family:var(--sans);font-weight:800;font-size:25px;line-height:1.08;letter-spacing:-.01em;text-shadow:0 2px 8px rgba(0,0,0,.6);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sl-last{margin-top:4px;font-size:13px;font-weight:600;color:rgba(255,255,255,.85);text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.sl-cta{position:absolute;right:14px;bottom:16px;padding:12px 20px;border-radius:12px;font-weight:800;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:#2A1600;background:linear-gradient(180deg,#FFE680,#FFC21A 55%,#F09A00);box-shadow:0 6px 18px rgba(255,180,0,.45),inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 0 rgba(0,0,0,.15)}
+.sl-more{position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;background:rgba(0,0,0,.45);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.sl-go:active{transform:scale(.985)}
+.sl-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:22px 18px;border-radius:20px;background:radial-gradient(circle at 50% 20%,rgba(255,80,90,.3),transparent 60%),linear-gradient(160deg,#3A0D18,#1C0A12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.sl-empty-cards{position:relative;width:110px;height:92px;margin-bottom:6px}
+.sl-empty-cards>span{position:absolute;top:0;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45))}.sl-empty-cards .cd.b{width:54px;height:77px}
+.sl-empty-cards .c1{left:10px;transform:rotate(-12deg)}.sl-empty-cards .c2{left:46px;transform:rotate(10deg)}
+.sl-empty b{font-weight:800;font-size:18px;color:#fff}.sl-empty span{font-size:13.5px;color:rgba(255,255,255,.8)}
+.sl .sg-act{min-height:150px}
+.sl-hint{margin:18px 2px 0;font-size:13px;line-height:1.5;color:#BDB3C9}.sl-hint b{color:#fff}
 </style>
 
 <div id="app"></div>
@@ -6092,30 +6120,27 @@ const dLongIt=iso=>{try{return new Date(iso).toLocaleDateString('it-IT',{day:'nu
 /* ---------- la sala ---------- */
 function vSala(){
   const T0=S.acct.tables||[],inv=parseHash();
-  const top=`<div class="lob-top"><div class="marquee" role="img" aria-label="Home Poker"><i>♠</i><b>Home Poker</b><i>♦</i></div>
-<button class="me-btn" data-act="acctopen" aria-label="Il mio account">${ava(S.acct.name)}</button></div>`;
-  const hello=`<h1 class="lob-h">Ciao ${esc(firstName(S.acct.name))}</h1><div class="lob-sub">${T0.length?'Scegli il tavolo dove vuoi giocare':'Qui compariranno i tavoli dei tuoi amici'}</div>`;
-
-  const card=x=>`<div class="tcard${covPhoto(x)?' ph':''}">
-<button class="tcard-go" data-act="opentable" data-id="${esc(x.id)}" aria-label="Entra in ${esc(x.name)}">
-<span class="tcard-bg" style="${covStyle(x)}"></span><span class="tcard-tex"></span><span class="tcard-vig"></span>
-<span class="tcard-suit">${covBase(x).s}</span>
-${x.mgr?`<span class="tcard-badge">Gestore</span>`:''}
-<span class="tcard-foot"><b>${esc(x.name)}</b><span>${x.np?x.np+' giocator'+(x.np===1?'e':'i')+' \u00b7 ':''}${x.last_at?'ultima volta '+dLongIt(x.last_at):'nuovo'}</span></span>
-<span class="tcard-enter">${ico('chevr',20)}</span></button>
-<button class="tcard-more" data-act="tbcard" data-id="${esc(x.id)}" aria-label="Opzioni di ${esc(x.name)}"><i>\u00b7\u00b7\u00b7</i></button></div>`;
-
-  const empty=`<div class="lob-empty"><div class="fan"><i class="r">\u2665</i><i>\u2660</i><i class="r">\u2666</i></div>
-<b>Non sei ancora in nessun tavolo</b><span>Il tavolo è il gruppo con cui giochi: lo crea una persona sola e tutti gli altri ci entrano con nome e password.</span></div>`;
-
-  return `<div class="app lobby"><main class="pg lob">${top}${hello}
+  const top=`<header class="pk-hd sl-hd"><div class="pk-logo" aria-hidden="true">${pkEmblem}<b><i>HOME</i> POKER</b></div>
+<button class="me-btn pk-me" data-act="acctopen" aria-label="Il mio account">${ava(S.acct.name)}</button></header>`;
+  const hello=`<div class="pk-hello"><span>Bentornato</span><h1>${esc(firstName(S.acct.name))}</h1></div>`;
+  const card=x=>{const ph=covPhoto(x);return `<div class="sl-card${ph?' ph':''}">
+<button class="sl-go" data-act="opentable" data-id="${esc(x.id)}" aria-label="Entra in ${esc(x.name)}">
+<span class="sl-bg" style="${covStyle(x)}"></span>${ph?'':`<span class="pk-rays"></span><span class="sl-suit">${covBase(x).s}</span>`}<span class="sl-vig"></span>
+<span class="sl-tx"><span class="sl-pills">${x.mgr?'<i class="pk-pill gold">★ Gestore</i>':''}${x.np?`<i class="pk-pill">${x.np} giocator${x.np===1?'e':'i'}</i>`:''}</span>
+<b>${esc(x.name)}</b><span class="sl-last">${x.last_at?'Ultima serata: '+dLongIt(x.last_at):'Tavolo nuovo: nessuna serata ancora'}</span></span>
+<span class="sl-cta">Entra</span></button>
+<button class="sl-more" data-act="tbcard" data-id="${esc(x.id)}" aria-label="Opzioni di ${esc(x.name)}">${ico('dots',20)}</button></div>`};
+  const empty=`<div class="sl-empty"><div class="sl-empty-cards"><span class="c1">${cardHTML('Ah','b')}</span><span class="c2">${cardHTML('As','b')}</span></div><b>Non sei ancora in nessun tavolo</b><span>Entra in quello dei tuoi amici oppure creane uno nuovo qui sotto.</span></div>`;
+  return `<div class="app lobby pk sl"><main class="pg lob">${top}${hello}
 ${inv&&T0.length?`<div class="lob-inv">Hai aperto un invito: entra nel tavolo della serata.</div>`:''}
-${T0.length?`<div class="lob-lbl">${T0.length===1?'Il tuo tavolo':'I tuoi tavoli'}</div><div class="tgrid">${T0.map(card).join('')}</div>`:empty}
-<div class="lob-act">
-<button class="jbig tb-join" data-act="tbstep" data-s="join"><span class="jbig-ic">${ico('key',22)}</span><span class="grow"><b>Entra in un tavolo</b><i>Ti servono il nome e la password: te li dà chi lo gestisce</i></span><span class="jbig-go">${ico('chevr',20)}</span></button>
-<div class="lob-or"><span>${T0.length?'oppure':'nessuno del gruppo ne ha uno?'}</span></div>
-<button class="tb-new lob-new" data-act="tbstep" data-s="warn">${ico('plus',17)} Crea un tavolo nuovo</button>
-</div></main></div>`;
+${T0.length?`<div class="sg-h">${T0.length===1?'Il tuo tavolo':'I tuoi tavoli · '+T0.length}</div><div class="sl-list">${T0.map(card).join('')}</div>`:empty}
+<div class="sg-h">${T0.length?'Un altro tavolo':'Inizia da qui'}</div>
+<div class="sg-acts">
+<button class="sg-act friends" data-act="tbstep" data-s="join"><span class="sg-act-ic">${ico('key',24)}</span><b>Entra in un tavolo</b><span>Con il nome e la password che ti dà chi lo gestisce</span></button>
+<button class="sg-act bots" data-act="tbstep" data-s="warn"><span class="sg-act-ic">${ico('plus',26)}</span><b>Crea un tavolo</b><span>Diventi il gestore e inviti gli amici</span></button>
+</div>
+<p class="sl-hint"><b>Cos'è un tavolo?</b> È il vostro gruppo di gioco: serate, debiti, classifica e sala giochi sono separati per ogni tavolo.</p>
+</main></div>`;
 }
 
 /* ---------- entrare / avvisare / creare ---------- */
@@ -7724,7 +7749,7 @@ toast=function(msg,kind){
 };
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792047335488';
+const APP_VERSION='1792049524145';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
