@@ -1995,6 +1995,35 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 /* un solo carattere in tutta l'app: niente più serif dei temi vecchi */
 :root{--deco:'Instrument Sans',system-ui,sans-serif!important}
 .vc-prev-tx b,.rl-sec b,.pb-info h1,.pb-lbl,.gm-tx b,.vl-hero-tx b,.t3-win b,.tcard-foot b,.lx-tx b{font-family:var(--sans)!important;font-weight:800!important}
+
+/* ===== entrata del casinò (sblocco / accesso) ===== */
+.app.ent{min-height:100dvh;background:none}
+.ent-in{max-width:460px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 16px) 20px calc(env(safe-area-inset-bottom,0px) + 28px);display:flex;flex-direction:column}
+.ent-logo{justify-content:center}
+.ent-felt{position:relative;isolation:isolate;overflow:hidden;height:210px;margin:22px 0 0;border-radius:24px;background:radial-gradient(70% 60% at 50% 55%,#2FB25A,#1A8C3F 50%,#0B4D24 85%);box-shadow:inset 0 0 0 10px #2B2C30,inset 0 0 0 12px rgba(255,194,26,.55),inset 0 0 40px 12px rgba(0,0,0,.45),0 22px 46px -20px rgba(30,200,110,.5)}
+.ent-rays{position:absolute;inset:-60%;z-index:-1;background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,255,255,.08) 0 5deg,transparent 5deg 15deg);-webkit-mask:radial-gradient(circle,#000 0,transparent 55%);mask:radial-gradient(circle,#000 0,transparent 55%);animation:pkRays 50s linear infinite}
+.ent-oval{position:absolute;left:50%;top:50%;width:62%;height:56%;transform:translate(-50%,-50%);border-radius:50%;border:2px solid rgba(255,255,255,.12)}
+.ent-ava{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;box-shadow:0 0 0 4px rgba(255,210,90,.85),0 0 30px 6px rgba(255,200,80,.45),0 14px 24px rgba(0,0,0,.55)}
+.ent-ava .ava{width:104px!important;height:104px!important;font-size:34px!important}
+.ent-felt .pk-stack.ent-c1{width:78px;height:78px;left:22px;bottom:16px}
+.ent-felt .pk-stack.ent-c2{width:60px;height:60px;right:26px;bottom:22px}
+.ent-cards{position:absolute;left:calc(50% - 52px);top:34px;width:110px;height:110px}
+.ent-cards>span{position:absolute;top:0;filter:drop-shadow(0 10px 14px rgba(0,0,0,.5))}.ent-cards .cd.b{width:62px;height:88px}
+.ent-cards .c1{left:0;transform:rotate(-12deg)}.ent-cards .c2{left:44px;transform:rotate(10deg) translateY(4px)}
+.ent-form{display:flex;flex-direction:column;gap:14px;margin-top:22px}
+.ent-hello{text-align:center}
+.ent-hello span{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#FF8A8F}
+.ent-hello h1{margin:4px 0 0;font-family:var(--sans)!important;font-weight:800!important;font-style:italic!important;text-transform:uppercase;font-size:clamp(32px,10vw,42px)!important;line-height:1.02;color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important;text-shadow:0 0 24px rgba(255,90,90,.45)}
+.ent-hello p{margin:8px 0 0;font-size:14.5px;color:#CFC6DA}
+.ent-cta{display:flex;align-items:center;justify-content:center;gap:10px;min-height:58px;margin-top:4px;border-radius:16px;font-weight:800;font-size:17px;letter-spacing:.06em;text-transform:uppercase;color:#2A1600;background:linear-gradient(180deg,#FFE680,#FFC21A 55%,#F09A00);box-shadow:0 10px 26px -8px rgba(255,180,0,.6),inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 0 rgba(0,0,0,.15)}
+.ent-cta:disabled{opacity:.6}
+.ent-alt{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;border-radius:16px;font-weight:700;font-size:15.5px;color:#fff;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.2)}
+.ent-out{align-self:center;margin-top:10px;padding:8px;font-size:13.5px;color:#A79FB3;text-decoration:underline;text-underline-offset:3px}
+.ent-err{padding:10px 12px;border-radius:12px;background:rgba(193,18,31,.2);box-shadow:inset 0 0 0 1px rgba(255,107,107,.45);color:#FFB3B3;font-size:14px;font-weight:600;text-align:center}
+.ent-pin{text-align:center;font-size:22px!important;letter-spacing:.3em}
+.ent-seg{display:flex!important;align-self:stretch}.ent-seg button{flex:1}
+.ent-note{margin:0;text-align:center;font-size:13px;color:#A79FB3}.ent-note b{color:#fff}
+@media (max-height:700px){.ent-felt{height:160px}.ent-ava .ava{width:84px!important;height:84px!important}}
 </style>
 
 <div id="app"></div>
@@ -7827,6 +7856,38 @@ toast=function(msg,kind){
 
 
 const gameBadge=g=>`<span class="vl-badge gb-big pkb-${g==='omaha'?'omaha':'holdem'}"><i>${g==='omaha'?'♦':'♠'}</i><b>${g==='omaha'?'Omaha':'Hold\'em'}</b></span>`;
+
+/* =====================================================================
+   ENTRATA DEL CASINÒ: sblocco con Face ID e accesso all'account
+   ===================================================================== */
+const entLogo=()=>`<div class="pk-logo ent-logo" aria-hidden="true">${pkEmblem}<b><i>HOME</i> POKER</b></div>`;
+const entFelt=inner=>`<div class="ent-felt" aria-hidden="true"><span class="ent-rays"></span><span class="ent-oval"></span>${inner}</div>`;
+vLock=function(){
+  const u=F.ul,n=firstName(S.acct.name);
+  return `<div class="app ent"><main class="ent-in">${entLogo()}
+${entFelt(`<span class="ent-ava">${ava(S.acct.name,'l')}</span><span class="pk-stack ent-c1">${pkChips(['r','r','b','r'],'el1')}</span><span class="pk-stack ent-c2">${pkChips(['g','g','g'],'el2')}</span>`)}
+<form id="f-unlock" class="ent-form">
+<div class="ent-hello"><span>Bentornato</span><h1>${esc(n)}</h1><p>Il tavolo ti aspetta: sblocca per entrare.</p></div>
+<button type="button" class="ent-cta" data-act="unlockbio">${ico('lock',20)} Entra con Face ID</button>
+${u.show?`<label class="field"><span>Oppure il tuo PIN</span><input class="in ent-pin" id="ul-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="ul.pin" value="${esc(u.pin)}" autocomplete="current-password" placeholder="••••"></label>
+${u.err?`<div class="ent-err">${esc(u.err)}</div>`:''}<button class="ent-alt" type="submit">Entra con il PIN</button>`:`<button type="button" class="ent-alt" data-act="ulpin">${ico('key',18)} Usa il PIN</button>`}
+<button type="button" class="ent-out" data-act="fulllogout">Non sei ${esc(n)}? Esci</button></form></main></div>`;
+};
+vAccount=function(){
+  const a=F.ac;if(a.mode===null)a.mode='login';
+  const reg=a.mode==='reg';
+  return `<div class="app ent"><main class="ent-in">${entLogo()}
+${entFelt(`<span class="pk-cards ent-cards"><span class="c1">${cardHTML('As','b')}</span><span class="c2">${cardHTML('Ah','b')}</span></span><span class="pk-stack ent-c1">${pkChips(['r','r','b','r'],'ea1')}</span><span class="pk-stack ent-c2">${pkChips(['g','g','g'],'ea2')}</span>`)}
+<form id="f-acct" class="ent-form">
+<div class="ent-hello"><span>${reg?'Benvenuto al tavolo':'Bentornato'}</span><h1>${reg?'Crea il tuo account':'Accedi'}</h1><p>${reg?'Un solo nome utente e un PIN per tutti i tuoi tavoli.':'Usa il tuo nome utente e il PIN: gli stessi di sempre.'}</p></div>
+<div class="seg ent-seg"><button type="button" class="${!reg?'on':''}" data-act="acmode" data-m="login">Accedi</button><button type="button" class="${reg?'on':''}" data-act="acmode" data-m="reg">Registrati</button></div>
+<label class="field"><span>Nome utente</span><input class="in" id="ac-name" data-bind="ac.name" value="${esc(a.name)}" autocomplete="username" maxlength="24" autocapitalize="words" placeholder="Es. Granchio"></label>
+<label class="field"><span>PIN (da 4 a 6 cifre)</span><input class="in" id="ac-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="ac.pin" value="${esc(a.pin)}" autocomplete="${reg?'new-password':'current-password'}" placeholder="••••"></label>
+${reg?`<label class="field"><span>Ripeti il PIN</span><input class="in" id="ac-pin2" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="ac.pin2" value="${esc(a.pin2)}" autocomplete="new-password" placeholder="••••"></label>`:''}
+${a.err?`<div class="ent-err">${esc(a.err)}</div>`:''}
+<button class="ent-cta" type="submit" ${a.busy?'disabled':''}>${a.busy?'Un attimo…':reg?'Crea account':'Entra'}</button>
+<p class="ent-note">${reg?'Usa nome e cognome o un soprannome. Dopo potrai attivare Face ID.':'Prima volta nell\'app? Tocca <b>Registrati</b>.'}</p></form></main></div>`;
+};
 /* =====================================================================
    INSEGNE DA CASINÒ su tutte le schermate secondarie: il titolo diventa
    un'insegna luminosa con colore e disegno della sezione.
@@ -7840,7 +7901,7 @@ function pkhArt(kind,id){
 }
 function pkSigns(){
   const app=$('#app');if(!app)return;
-  const h=app.querySelector('h1');if(!h||h.closest('.pk,.pkb,.pkh-sign,.vt3,.bj,.pb-info,.sg,.sl,.lob,.hd'))return;
+  const h=app.querySelector('h1');if(!h||h.closest('.pk,.pkb,.pkh-sign,.vt3,.bj,.pb-info,.sg,.sl,.lob,.hd,.ent,.hero,form'))return;
   const vn=V&&V.name||'home';let m=PKH[vn]||['red','chips'];
   if(vn==='live'){const g=S.games&&S.games[V.gid];if(g&&g.kind==='tournament')m=['gold','trophy']}
   let box;
@@ -7856,7 +7917,7 @@ function pkSigns(){
 const _renderSigns=render;
 render=function(){const r=_renderSigns.apply(this,arguments);try{pkSigns()}catch(e){console.warn(e)}return r};
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792347627117';
+const APP_VERSION='1792348076571';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
