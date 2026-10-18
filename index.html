@@ -3255,23 +3255,27 @@ async function makeBase(){
     const notify=()=>subs.forEach(f=>{try{f()}catch(e){console.error(e)}});
     const sig=()=>{let x='';[...cache.keys()].sort().forEach(k=>{x+=k+JSON.stringify(cache.get(k))});return x};
     async function loadAll(){const {data,error}=await sb.from(T).select('path,data').like('path',pre+'%');if(error)throw error;cache.clear();data.forEach(r=>cache.set(r.path,r.data))}
-    async function refresh(){try{const a=sig();await loadAll();if(sig()!==a)notify()}catch(e){}}
-    await loadAll();
+    /* copia locale: il tavolo si apre subito con i dati dell'ultima volta, poi si aggiorna dal server */
+    const CK='hpl.snap.'+prefix,save=()=>{try{const o={};cache.forEach((v,k)=>o[k]=v);localStorage.setItem(CK,JSON.stringify({at:Date.now(),o}))}catch(e){}};
+    async function refresh(){try{const a=sig();await loadAll();save();if(sig()!==a)notify()}catch(e){}}
+    let snap=null;try{snap=JSON.parse(localStorage.getItem(CK)||'null')}catch(e){}
+    if(snap&&snap.o&&Date.now()-snap.at<7*864e5){Object.entries(snap.o).forEach(([k,v])=>cache.set(k,v));setTimeout(refresh,0)}
+    else{await loadAll();save()}
     const ch=sb.channel('hpl-'+prefix).on('postgres_changes',{event:'*',schema:'public',table:T},pl=>{
-      if(pl.eventType==='DELETE'){const p=pl.old&&pl.old.path;if(p&&p.startsWith(pre)){cache.delete(p);notify()}}
-      else if(pl.new&&pl.new.path.startsWith(pre)){cache.set(pl.new.path,pl.new.data);notify()}
+      if(pl.eventType==='DELETE'){const p=pl.old&&pl.old.path;if(p&&p.startsWith(pre)){cache.delete(p);save();notify()}}
+      else if(pl.new&&pl.new.path.startsWith(pre)){cache.set(pl.new.path,pl.new.data);save();notify()}
     }).subscribe();
     const iv=setInterval(refresh,20000);
     const vis=()=>{if(!document.hidden)refresh()};document.addEventListener('visibilitychange',vis);
     const snapDoc=p=>({id:p.split('/').pop(),exists:cache.has(pre+p),data:()=>cache.has(pre+p)?clone(cache.get(pre+p)):undefined});
     const colDocs=c=>[...cache.keys()].filter(k=>parentOf(k)===pre+c).sort().map(k=>snapDoc(k.slice(pre.length)));
     const watch=(fn,cb)=>{const f=()=>cb(fn());subs.add(f);setTimeout(f,0);return()=>subs.delete(f)};
-    const put=async(p,d)=>{const {error}=await sb.from(T).upsert({path:pre+p,parent:parentOf(pre+p),data:d,updated_at:new Date().toISOString()});if(error)throw error;cache.set(pre+p,clone(d));notify()};
+    const put=async(p,d)=>{const {error}=await sb.from(T).upsert({path:pre+p,parent:parentOf(pre+p),data:d,updated_at:new Date().toISOString()});if(error)throw error;cache.set(pre+p,clone(d));save();notify()};
     const doc=p=>({id:p.split('/').pop(),path:p,
       async get(){const d=await getDoc(pre+p);if(d)cache.set(pre+p,d);else cache.delete(pre+p);return snapDoc(p)},
       async set(d){await put(p,d)},
       async update(d){await put(p,Object.assign({},cache.get(pre+p)||{},clone(d)))},
-      async delete(){const {error}=await sb.from(T).delete().eq('path',pre+p);if(error)throw error;cache.delete(pre+p);notify()},
+      async delete(){const {error}=await sb.from(T).delete().eq('path',pre+p);if(error)throw error;cache.delete(pre+p);save();notify()},
       onSnapshot(cb){return watch(()=>snapDoc(p),cb)}});
     const collection=c=>({path:c,doc:id=>doc(c+'/'+id),
       async get(){await refresh();const d=colDocs(c);return {docs:d,size:d.length}},
@@ -3323,7 +3327,7 @@ async function doTable(){
 Object.assign(S,{acct:null,acctReady:false,locked:false,linking:false});
 Object.assign(F,{ac:{mode:null,name:'',pin:'',pin2:'',err:'',busy:false},ul:{pin:'',err:'',show:false},clm:{pin:'',name:'',err:'',busy:false,other:false,pick:null},tbOpen:false});
 const acctBio=()=>{const b=LS.get('bio',null);return b&&S.acct&&b.acct===S.acct.id?b:null};
-async function refreshMe(){const r=await BASE.rpc('hpl_me');S.acct=r&&r.id?r:null;S.acctReady=true;return S.acct}
+async function refreshMe(){const r=await BASE.rpc('hpl_me');S.acct=r&&r.id?r:null;S.acctReady=true;if(S.acct)LS.set('acctsnap',S.acct);else LS.del('acctsnap');return S.acct}
 const firstName=n=>String(n||'').split(/\s+/)[0];
 function resetTableState(){
   try{if(db&&db.close)db.close()}catch(e){}
@@ -3336,7 +3340,7 @@ async function openTable(t){
   try{await enterTable({id:t.id,name:t.name});LS.set('lasttable',t.id);BASE.rpc('hpl_touch_table',{p_tid:t.id}).catch(()=>{})}
   catch(e){toast(errMsg(e),'err');resetTableState();render()}
 }
-async function backToTables(){resetTableState();ENTER='back';render();try{await refreshMe()}catch(e){}render()}
+async function backToTables(){S.autoTried=true;resetTableState();ENTER='back';render();try{await refreshMe()}catch(e){}render()}
 /* chi sono in questo tavolo */
 async function syncMe(){
   if(!S.acct||!S.table||!S.loaded.players)return;
@@ -3588,8 +3592,9 @@ document.addEventListener('submit',e=>{
   else if(id==='f-unlock')(async()=>{const ok=await checkMyPin(F.ul.pin);if(ok){S.locked=false;F.ul={pin:'',err:'',show:false};render()}else if(ok===false){F.ul.err='PIN errato.';render()}})();
 });
 async function fullLogout(){
+  try{Object.keys(localStorage).filter(k=>k.indexOf('hpl.snap.')===0).forEach(k=>localStorage.removeItem(k))}catch(e){}
   try{await BASE.rpc('hpl_logout')}catch(e){}
-  resetTableState();S.acct=null;S.locked=false;LS.del('bio');LS.del('pins');LS.del('active');render();
+  resetTableState();S.acct=null;S.locked=false;LS.del('bio');LS.del('pins');LS.del('active');LS.del('acctsnap');render();
 }
 Object.assign(H,{
   acmode(d){F.ac.mode=d.m;F.ac.err='';F.ac.pin='';F.ac.pin2='';render()},
@@ -3637,7 +3642,7 @@ Object.assign(H,{
     let r;try{r=await BASE.rpc('hpl_delete_account',{p_pin:F.dpin})}catch(e){toast(errMsg(e),'err');return}
     if(r==='bad_pin'){toast('PIN errato','err');return}
     if(r!=='ok'){render();return}
-    F.dpin='';SH=null;LS.del('bio');LS.del('hadacct');S.acct=null;resetTableState();render();toast('Account eliminato','ok');
+    F.dpin='';SH=null;LS.del('bio');LS.del('hadacct');LS.del('acctsnap');try{Object.keys(localStorage).filter(k=>k.indexOf('hpl.snap.')===0).forEach(k=>localStorage.removeItem(k))}catch(e){}S.acct=null;resetTableState();render();toast('Account eliminato','ok');
   },
   async rmplayer(d){
     if(!isManager())return;const p=S.players[d.id];if(!p)return;
@@ -4229,6 +4234,12 @@ const _vTablesF=vTables;
 vTables=function(){
   const d=deepLink();
   if(d&&!S.deepTried){S.deepTried=true;const t=(S.acct.tables||[]).find(x=>x.id===d.t);if(t){S.deep=d;setTimeout(()=>openTable(t),0)}}
+  /* all'apertura dell'app si entra subito nel tavolo dell'ultima volta (o nell'unico): niente tocco in più */
+  else if(!d&&!S.autoTried&&S.acct&&!S.locked){
+    S.autoTried=true;const T=S.acct.tables||[],last=LS.get('lasttable',null);
+    const t=T.find(x=>x.id===last)||(T.length===1?T[0]:null);
+    if(t&&!(parseHash()&&T.length>1)){setTimeout(()=>openTable(t),0);return skeleton()}
+  }
   return _vTablesF();
 };
 const _afterDataF=afterData;
@@ -7524,18 +7535,22 @@ const FX=(()=>{
     if(RM())return;
     const app=$('#app');if(!app)return;
     const box=app.querySelector('main.pg')||app.querySelector('.wrap')||app.querySelector('.cas-main');if(!box)return;
-    let i=0;
-    [...box.children].forEach(el=>{
-      if(i>=14||el.matches('.bar,.tabs,.hd,script'))return;
-      const cs=getComputedStyle(el);if(cs.position==='fixed'||cs.display==='none')return;
-      el.style.setProperty('--i',i++);el.classList.add('fx-in');
-      setTimeout(()=>el.classList.remove('fx-in'),i*42+760);
-    });
+    /* prima si legge tutto, poi si scrive: un solo ricalcolo degli stili invece di uno per elemento */
+    const pick=[];
+    for(const el of box.children){
+      if(pick.length>=14)break;
+      if(el.matches('.bar,.tabs,.hd,script'))continue;
+      const cs=getComputedStyle(el);if(cs.position==='fixed'||cs.display==='none')continue;
+      pick.push(el);
+    }
+    pick.forEach((el,i)=>{el.style.setProperty('--i',i);el.classList.add('fx-in')});
+    if(pick.length)setTimeout(()=>pick.forEach(el=>el.classList.remove('fx-in')),pick.length*42+760);
     app.classList.add('fx-meter');setTimeout(()=>app.classList.remove('fx-meter'),1400);
   }
 
   /* ---------- pagina che esce ---------- */
   function ghostPage(old,y,kind){
+    document.querySelectorAll('body>.page-ghost').forEach(n=>n.remove());
     const g=document.createElement('div');g.className='page-ghost '+kind;g.setAttribute('aria-hidden','true');g.inert=true;
     const inn=document.createElement('div');inn.style.transform=`translateY(${-y}px)`;
     old.classList.remove('enter-push','enter-back','enter-fade');
@@ -7608,7 +7623,7 @@ const FX=(()=>{
 
   /* ---------- intestazione che si compatta scorrendo ---------- */
   let ticking=false;
-  const onScroll=()=>{if(ticking)return;ticking=true;requestAnimationFrame(()=>{ticking=false;document.body.classList.toggle('scrolled',scrollY>14)})};
+  let wasSc=null;const onScroll=()=>{if(ticking)return;ticking=true;requestAnimationFrame(()=>{ticking=false;const sc=scrollY>14;if(sc!==wasSc){wasSc=sc;document.body.classList.toggle('scrolled',sc)}})};
   addEventListener('scroll',onScroll,{passive:true});
 
   /* ---------- aria sui controlli fatti a mano ---------- */
@@ -7766,6 +7781,7 @@ async function checkUpdate(){
   }catch(e){}
 }
 setTimeout(checkUpdate,2500);
+if('serviceWorker' in navigator&&/^https:/.test(location.protocol))addEventListener('load',()=>{setTimeout(()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})},1200)});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate()});
 setInterval(checkUpdate,15*60*1000);
 
@@ -7776,6 +7792,13 @@ setInterval(checkUpdate,15*60*1000);
   try{BASE=await makeBase()}catch(e){console.error(e);window.__dbErr=(e&&(e.message||e.details||e.code))||String(e);S.dbReady=false;render();return}
   S.dbReady=true;S.baseReady=true;
   bioSupport().then(v=>{S.bioOk=v;if(SH)render()});
+  /* l'account dell'ultima volta: si parte subito e intanto si ricontrolla col server */
+  const snapA=LS.get('acctsnap',null);
+  if(snapA&&snapA.id){
+    S.acct=snapA;S.acctReady=true;S.locked=!!acctBio();render();
+    refreshMe().then(a=>{if(!a){resetTableState();S.locked=false;render()}else render()}).catch(e=>console.warn(e));
+    return;
+  }
   try{await refreshMe()}catch(e){console.error(e);window.__dbErr=(e&&(e.message||e.details||e.code))||String(e);S.dbReady=false;render();return}
   if(S.acct){LS.set('hadacct',1);S.locked=!!acctBio()}
   render();
