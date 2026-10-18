@@ -1,7 +1,7 @@
 // Home Poker: si apre subito (anche con poca rete) e riceve le notifiche.
 // L'app e le librerie restano sul telefono; a ogni apertura si scarica in silenzio
 // la versione nuova, che l'app propone con "Aggiorna".
-const CACHE='hp-v2';
+const CACHE='hp-v3';
 const SHELL=['./','index.html','manifest.webmanifest','icon.png','icon.svg'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL).catch(()=>{})))});
 self.addEventListener('activate',e=>e.waitUntil((async()=>{
@@ -20,11 +20,12 @@ self.addEventListener('fetch',e=>{
   const page=r.mode==='navigate'||/\/(index\.html)?$/.test(u.pathname);
   if(page){
     // nuova versione scelta con "Aggiorna": dalla rete, e diventa quella salvata
-    if(u.searchParams.has('v')){e.respondWith(fetch(r).then(res=>{if(res.ok)caches.open(CACHE).then(c=>c.put('index.html',res.clone()));return res}).catch(()=>caches.match('index.html')));return}
+    if(u.searchParams.has('v')){e.respondWith(fetch(r.url,{cache:'no-store'}).then(res=>{if(res.ok)caches.open(CACHE).then(c=>c.put('index.html',res.clone()));return res}).catch(()=>caches.match('index.html')));return}
     // apertura normale: subito dal telefono, intanto si aggiorna la copia
     e.respondWith(caches.open(CACHE).then(async c=>{
       const hit=await c.match('index.html');
-      const net=fetch(r).then(res=>{if(res.ok)c.put('index.html',res.clone());return res});
+      // sempre la versione vera dal sito, mai una copia vecchia rimasta in memoria
+      const net=fetch(r.url,{cache:'no-store'}).then(res=>{if(res.ok)c.put('index.html',res.clone());return res});
       if(hit){e.waitUntil(net.catch(()=>{}));return hit}
       return net;
     }));
