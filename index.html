@@ -2312,6 +2312,13 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .ch-stkg.emo .ch-stk.emo span{font-size:46px}
 .ch-stkg.emo .ch-stkc .ch-stk{transform:none;margin:0}
 .ch-att.a5 .ch-atti svg,.ch-atti svg{display:block}
+.ch-ta[contenteditable]{display:block;overflow-y:auto;white-space:pre-wrap;overflow-wrap:anywhere;-webkit-user-select:text;user-select:text;cursor:text}
+.ch-ta[contenteditable]:empty::before{content:attr(data-ph);color:rgba(255,255,255,.45);pointer-events:none}
+.ch-ta[contenteditable] img{max-height:60px;vertical-align:middle}
+.ch-ib.muted{background:rgba(0,0,0,.45);box-shadow:inset 0 0 0 1px rgba(255,214,90,.5)}
+.ch-stk.img{width:150px;height:auto;max-height:170px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
+.ch-stk.img img{display:block;width:100%;height:100%;object-fit:contain}
+.ch-stk.img .ch-imgl{border-radius:16px}
 @keyframes chFabIn{from{transform:scale(.3);opacity:0}}
 @media (prefers-reduced-motion:reduce){.ch-in,.ch-in .ch-die,.ch-in .ch-coin,.ch-in .ch-cardw,.ch-fab{animation:none!important}}
 </style>
@@ -8363,7 +8370,20 @@ function chChanged(what){
 }
 /* badge dei messaggi non letti fuori dalla chat, senza ricostruire la pagina */
 function chBadges(){document.querySelectorAll('[data-chbadge]').forEach(el=>{el.textContent=CH.unread>9?'9+':String(CH.unread);el.hidden=!CH.unread})}
-function chPing(){try{if(typeof SND!=='undefined'&&SND.chip)SND.chip(1)}catch(e){}chBadges()}
+function chPing(){try{if(!chMuted()&&typeof SND!=='undefined'&&SND.chip)SND.chip(1)}catch(e){}chBadges()}
+/* aggiorna un pezzo di pagina già disegnato senza ricrearlo: chi sta scrivendo non perde la tastiera */
+function chMorph(a,b){
+  if(a.nodeType!==b.nodeType||a.nodeName!==b.nodeName){a.replaceWith(b.cloneNode(true));return}
+  if(a.nodeType===3||a.nodeType===8){if(a.nodeValue!==b.nodeValue)a.nodeValue=b.nodeValue;return}
+  if(a.nodeType!==1)return;
+  for(const at of [...a.attributes])if(!b.hasAttribute(at.name))a.removeAttribute(at.name);
+  for(const at of b.attributes)if(a.getAttribute(at.name)!==at.value)a.setAttribute(at.name,at.value);
+  if(a.tagName==='INPUT'){const v=b.getAttribute('value')||'';if(document.activeElement!==a&&a.value!==v)a.value=v;return}
+  if(a.tagName==='TEXTAREA'){if(document.activeElement!==a&&a.value!==b.value)a.value=b.value;return}
+  const ac=[...a.childNodes],bc=[...b.childNodes];
+  for(let i=0;i<bc.length;i++){if(i<ac.length)chMorph(ac[i],bc[i]);else a.appendChild(bc[i].cloneNode(true))}
+  for(let i=bc.length;i<ac.length;i++)ac[i].remove();
+}
 
 /* ---------- invio ---------- */
 async function chSend(kind,body){
@@ -8618,7 +8638,7 @@ function vChat(){
   return `<div class="app chat" id="chatroot">
 <header class="ch-hd"><button class="ch-back" data-act="chback" aria-label="${back}">${ico('back',22)}</button>
 <div class="ch-ht"><span class="pk-k">Chat del tavolo</span><b class="ell">${esc(S.table?S.table.name:'')}</b><div class="ch-on" id="chonline"></div></div>
-<button class="ch-ib" data-act="chpoll" aria-label="Nuovo sondaggio">📊</button></header>
+<button class="ch-ib" id="chmute" data-act="chmuteopen" aria-label="Notifiche della chat">🔔</button></header>
 <div class="ch-list" id="chlist" role="log" aria-live="polite" aria-label="Messaggi"></div>
 <div class="ch-typing" id="chtyping" aria-live="polite"></div>
 <button class="ch-new" id="chnew" data-act="chdown" hidden><b>0</b> nuovi ${ico('chev',16)}</button>
@@ -8640,14 +8660,14 @@ const _renderChat=render;
 render=function(){
   if(V&&V.name==='chat'&&$$id('chatroot')&&S.table&&S.me&&!S.locked){
     const sh=(SH&&db&&unlocked())?sheetHtml():'',sel=$('#sheet');
-    if(sel.__h!==sh){sel.innerHTML=sh;sel.__h=sh;if(SH)SH.anim=false}
+    if(sel.__h!==sh){const ty=SH&&SH.type;if(sh&&ty&&sel.__t===ty&&sel.firstElementChild){const t=document.createElement('div');t.innerHTML=sh;if(t.firstElementChild)chMorph(sel.firstElementChild,t.firstElementChild)}else sel.innerHTML=sh;sel.__h=sh;sel.__t=ty;if(SH)SH.anim=false}
     document.body.classList.toggle('noscroll',!!SH);
     chatPaint(false);return;
   }
   const sel=$('#sheet');if(sel)sel.__h=undefined;
   const r=_renderChat.apply(this,arguments);
   if($$id('chatroot')){
-    const ta=$$id('chin');if(ta){try{ta.value=LS.get('chatdraft.'+CH.tid,'')||''}catch(e){}chAutoGrow()}
+    const ta=$$id('chin');if(ta){chEdInit(ta);try{ta.value=LS.get('chatdraft.'+CH.tid,'')||''}catch(e){}chAutoGrow()}
     chVV();chStick=true;chatPaint(true);if(!CH.loaded)chLoad();
     const u=$$id('chunr'),l=$$id('chlist');if(u&&l&&!CH.__unrDone){CH.__unrDone=true;l.scrollTop=Math.max(0,u.offsetTop-l.offsetTop-70)}
   }else chBadges();
@@ -9032,6 +9052,152 @@ H.chback=function(){if(REC.on)chRecStop(true);if(PL.a){try{PL.a.pause()}catch(e)
 const _chPaint2=chatPaint;
 chatPaint=function(){const r=_chPaint2.apply(this,arguments);if(PL.id!=null)chPlayUI();chRecUI();return r};
 
+/* ---------- silenziare la chat (niente notifiche dei messaggi per chi vuole) ---------- */
+CH.mute=null;
+function chMuted(){const m=CH.mute;return !!m&&(!m.until||Date.parse(m.until)>Date.now())}
+function chMuteHead(){
+  const b=$$id('chmute');if(!b)return;const on=chMuted(),ic=on?'🔕':'🔔';
+  if(b.textContent!==ic)b.textContent=ic;b.classList.toggle('muted',on);b.setAttribute('aria-label',on?'Chat silenziata':'Notifiche della chat');
+}
+async function chMuteLoad(){
+  const tid=CH.tid;if(!tid)return;
+  try{const c=LS.get('chmute.'+tid,'');CH.mute=c?JSON.parse(c):null}catch(e){CH.mute=null}
+  chMuteHead();
+  try{const {data,error}=await chSb().from('hpl_chat_mute').select('*').eq('table_id',tid).maybeSingle();if(error||tid!==CH.tid)return;CH.mute=data?{until:data.until}:null;LS.set('chmute.'+tid,CH.mute?JSON.stringify(CH.mute):'');chMuteHead();if(SH&&SH.type==='chmute')render()}catch(e){}
+}
+async function chSetMute(ms){
+  const tid=CH.tid;if(!tid)return;const old=CH.mute;
+  CH.mute=ms===0?null:{until:ms<0?null:new Date(Date.now()+ms).toISOString()};
+  try{LS.set('chmute.'+tid,CH.mute?JSON.stringify(CH.mute):'')}catch(e){}
+  SH=null;render();chMuteHead();
+  try{
+    const q=chSb().from('hpl_chat_mute');
+    const r=ms===0?await q.delete().eq('table_id',tid).eq('acct',chMe()):await q.upsert({table_id:tid,acct:chMe(),until:CH.mute.until});
+    if(r&&r.error)throw r.error;
+    toast(ms===0?'Notifiche della chat riattivate':ms<0?'Chat silenziata: niente notifiche finché non la riattivi':'Chat silenziata per '+(ms>=6048e5?'una settimana':'8 ore'),'ok');
+  }catch(e){CH.mute=old;chMuteHead();toast('Non salvato: '+errMsg(e),'err')}
+}
+function chMuteSheet(){
+  const on=chMuted(),u=on&&CH.mute.until?new Date(CH.mute.until):null;
+  const st=!on?'Ricevi una notifica quando qualcuno scrive.':u?'Silenziata fino a '+u.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})+' alle '+chTime(u):'Silenziata: non ricevi notifiche dei messaggi.';
+  const it=(ms,ic,l,cur)=>`<button class="li" data-act="chmuteset" data-ms="${ms}"><span class="lic">${ic}</span><span class="grow">${l}</span>${cur?ico('check',18):''}</button>`;
+  return `<div class="back" data-act="closesheet"><div class="sheet ${SH.anim?'anim':''}" role="dialog" aria-label="Notifiche della chat"><div class="grab"></div><div class="sheet-body">
+<div class="row sp"><h2>Notifiche della chat</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
+<p class="mut sm" style="margin:-4px 0 12px">${esc(st)} Le notifiche delle serate e dei pagamenti arrivano comunque.</p>
+<div class="list">${it(0,'🔔','Attive',!on)}${it(8*36e5,'🌙','Silenzia per 8 ore',on&&u&&u-Date.now()<864e5)}${it(7*864e5,'📅','Silenzia per una settimana',on&&u&&u-Date.now()>=864e5)}${it(-1,'🔕','Silenzia sempre',on&&!u)}</div>
+</div></div></div>`;
+}
+const _chStart3=chatStart;
+chatStart=async function(){const was=CH.tid;const r=_chStart3.apply(this,arguments);if(CH.tid&&CH.tid!==was)chMuteLoad();return r};
+const _sheetChat3=sheetHtml;
+sheetHtml=function(){if(SH&&SH.type==='chmute')return chMuteSheet();return _sheetChat3()};
+
+/* ---------- casella di scrittura che accetta gli sticker della tastiera del telefono ----------
+   È un campo "modificabile" invece di una textarea: così la tastiera (emoji/sticker di iPhone,
+   Gboard e Samsung) può inserirci immagini, che diventano subito uno sticker in chat. */
+function chEdText(el){
+  let t='';
+  const walk=n=>n.childNodes.forEach(c=>{
+    if(c.nodeType===3)t+=c.nodeValue;
+    else if(c.nodeName==='BR')t+='\n';
+    else if(c.nodeType===1&&c.nodeName!=='IMG'){if(/^(DIV|P)$/.test(c.nodeName)&&t&&!t.endsWith('\n'))t+='\n';walk(c)}
+  });
+  walk(el);return t.replace(/ /g,' ');
+}
+function chEdInit(el){
+  if(!el||el.__ed)return;el.__ed=true;
+  Object.defineProperty(el,'value',{configurable:true,get(){return chEdText(el)},set(v){el.textContent=v||'';if(document.activeElement===el)chEdEnd(el)}});
+}
+function chEdEnd(el){try{const r=document.createRange();r.selectNodeContents(el);r.collapse(false);const s=getSelection();s.removeAllRanges();s.addRange(r)}catch(e){}}
+const _vChat3=vChat;
+vChat=function(){
+  return _vChat3()
+    .replace('<button class="ch-stb" data-act="chstk" aria-label="Sticker">😎</button>','')
+    .replace('<textarea id="chin" class="ch-ta" rows="1" maxlength="2000" placeholder="Scrivi al tavolo…" aria-label="Messaggio" enterkeyhint="send"></textarea>',
+      '<div id="chin" class="ch-ta" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Messaggio" data-ph="Scrivi al tavolo…" enterkeyhint="send" autocapitalize="sentences" spellcheck="true"></div>');
+};
+/* incollare: testo semplice, oppure immagini (sticker o foto) */
+document.addEventListener('paste',e=>{
+  const el=e.target&&e.target.closest&&e.target.closest('#chin');if(!el)return;
+  const dt=e.clipboardData;if(!dt)return;
+  const files=[];
+  [...(dt.files||[])].forEach(f=>{if(/^image\//.test(f.type))files.push(f)});
+  if(!files.length)[...(dt.items||[])].forEach(it=>{if(it.kind==='file'&&/^image\//.test(it.type)){const f=it.getAsFile();if(f)files.push(f)}});
+  if(files.length){e.preventDefault();files.slice(0,5).forEach(chImageIn);return}
+  const txt=dt.getData('text/plain');
+  if(txt){e.preventDefault();document.execCommand('insertText',false,txt)}
+},true);
+document.addEventListener('drop',e=>{
+  const el=e.target&&e.target.closest&&e.target.closest('#chatroot');if(!el)return;
+  const fs=[...((e.dataTransfer&&e.dataTransfer.files)||[])].filter(f=>/^image\//.test(f.type));
+  if(fs.length){e.preventDefault();fs.slice(0,5).forEach(chImageIn)}
+},true);
+/* immagini messe nella casella dalla tastiera (sticker): si tolgono dal testo e si mandano */
+document.addEventListener('input',e=>{
+  const el=e.target&&e.target.id==='chin'?e.target:null;if(!el)return;
+  el.querySelectorAll('img').forEach(img=>{const src=img.currentSrc||img.src;img.remove();if(src)fetch(src).then(r=>r.blob()).then(chImageIn).catch(()=>toast('Sticker non letto','err'))});
+  el.querySelectorAll('[style],[class],font,span,b,i').forEach(n=>{if(n.nodeName==='SPAN'||n.nodeName==='FONT'||n.nodeName==='B'||n.nodeName==='I'){n.replaceWith(...n.childNodes)}else{n.removeAttribute('style');n.removeAttribute('class')}});
+  if(!chEdText(el).trim()&&!el.querySelector('img'))el.innerHTML='';
+},true);
+function chImgLoad(blob){return new Promise((ok,ko)=>{const u=URL.createObjectURL(blob),img=new Image();img.onload=()=>ok({img,u});img.onerror=()=>{URL.revokeObjectURL(u);ko(new Error('Immagine non leggibile'))};img.src=u})}
+/* sticker se ha lo sfondo trasparente (o è animato), altrimenti è una foto */
+async function chImageIn(blob){
+  if(!blob||!CH.tid)return;
+  let L;try{L=await chImgLoad(blob)}catch(e){toast(e.message,'err');return}
+  const {img,u}=L,w=img.naturalWidth,h=img.naturalHeight;
+  let transp=false;
+  try{const c=document.createElement('canvas');c.width=48;c.height=48;const x=c.getContext('2d');x.drawImage(img,0,0,48,48);const d=x.getImageData(0,0,48,48).data;
+    for(let i=3;i<d.length;i+=4)if(d[i]<240){transp=true;break}}catch(e){}
+  const anim=/gif|webp/.test(blob.type)&&blob.size<1.5e6;
+  if(!transp&&!anim){URL.revokeObjectURL(u);chSendPhoto(blob instanceof File?blob:new File([blob],'foto.jpg',{type:blob.type||'image/jpeg'}));return}
+  let out=blob,type=blob.type,ow=w,oh=h;
+  if(!anim||!/^image\/(png|gif|webp)$/.test(type)){
+    const k=Math.min(1,512/Math.max(w,h));ow=Math.round(w*k);oh=Math.round(h*k);
+    const c=document.createElement('canvas');c.width=ow;c.height=oh;c.getContext('2d').drawImage(img,0,0,ow,oh);
+    out=await new Promise(r=>c.toBlob(r,'image/png'));type='image/png';
+  }
+  URL.revokeObjectURL(u);
+  if(!out){toast('Sticker non leggibile','err');return}
+  chSendSticker(out,type,ow,oh);
+}
+async function chSendSticker(blob,type,w,h){
+  const ext=type==='image/gif'?'gif':type==='image/webp'?'webp':'png';
+  const path=CH.tid+'/s'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)+'.'+ext;
+  CH.urls.set(path,{u:URL.createObjectURL(blob),at:Date.now()+36e5});
+  const tmpId=-(++CH.tmp)-1e9,body={path,w,h};
+  CH.msgs.set(tmpId,{id:tmpId,__tmp:true,__up:true,table_id:CH.tid,author_acct:chMe(),author_name:chMyName(),kind:'sticker',body,created_at:new Date().toISOString()});CH.order.push(tmpId);chStick=true;chChanged('msg');
+  try{
+    const {error}=await chSb().storage.from('hpl-chat').upload(path,blob,{contentType:type,cacheControl:'31536000',upsert:false});if(error)throw error;
+    CH.msgs.delete(tmpId);CH.order=CH.order.filter(x=>x!==tmpId);
+    await chSend('sticker',body);
+  }catch(e){const t=CH.msgs.get(tmpId);if(t){t.__fail=true;t.__up=false}chChanged('msg');toast('Sticker non inviato: '+errMsg(e),'err')}
+}
+const _chStk3=chStkHtml;
+chStkHtml=function(b){
+  if(b&&b.path){const u=chUrl(b.path),r=b.w&&b.h?b.w+'/'+b.h:'1/1';
+    return `<div class="ch-stk img" style="aspect-ratio:${r}">${u?`<img src="${esc(u)}" alt="Sticker" loading="lazy" decoding="async">`:'<span class="ch-imgl"></span>'}</div>`}
+  return _chStk3(b);
+};
+const _chSnip3=chSnip;
+chSnip=function(m){if(m&&!m.deleted&&m.kind==='sticker'&&m.body&&m.body.path)return '🖼️ Sticker';return _chSnip3(m)};
+function chStkHint(){
+  const ta=$$id('chin');if(ta)ta.focus();
+  toast(isIOS()?'Apri le emoji della tastiera 😀 e scorri fino ai tuoi sticker: toccane uno e arriva in chat':'Apri le emoji della tastiera 😀 e tocca la sezione sticker: quello che scegli arriva in chat','ok');
+}
+const _attach3=chAttachSheet;
+chAttachSheet=function(){return _attach3().replace(/<button class="ch-att a6" data-act="chstk">[\s\S]*?<\/button>/,`<button class="ch-att a6" data-act="chstkhint"><span class="ch-atti">😀</span><b>Sticker</b><span>dalla tastiera</span></button>`)};
+Object.assign(H,{
+  chmuteopen(){openSheet({type:'chmute'})},
+  chmuteset(d){chSetMute(+d.ms)},
+  chstkhint(){SH=null;render();chStkHint()},
+  chstk(){chStkHint()},
+  chquick(d){const ta=$$id('chin');if(ta){ta.focus();ta.value=d.t;chAutoGrow();chComposer()}},
+  chedit(d){const m=CH.msgs.get(+d.id);SH=null;render();if(!m)return;CH.reply=null;CH.edit=m.id;const ta=$$id('chin');if(ta){ta.focus();ta.value=m.body.t||'';chAutoGrow();chComposer()}},
+});
+const _chPaint3=chatPaint;
+chatPaint=function(){const r=_chPaint3.apply(this,arguments);chMuteHead();return r};
+
+
 /* ---------- dove si entra nella chat ---------- */
 /* pulsante fluttuante nelle sezioni principali */
 function chFab(){return `<button class="ch-fab" data-act="openchat" aria-label="Chat del tavolo${CH.unread?', '+CH.unread+' messaggi nuovi':''}"><span>💬</span><i data-chbadge ${CH.unread?'':'hidden'}>${CH.unread>9?'9+':CH.unread}</i></button>`}
@@ -9049,7 +9215,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792436916112';
+const APP_VERSION='1792437372921';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;

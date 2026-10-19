@@ -43,6 +43,13 @@ Deno.serve(async (req) => {
       let targets = (links ?? []).filter((l) => l.account_id !== dev?.account_id);
       if (Array.isArray(to)) targets = targets.filter((l) => to.includes(l.player_id));
       accounts = [...new Set(targets.map((t) => t.account_id))];
+      // chi ha silenziato la chat del tavolo non riceve le notifiche dei messaggi
+      if (typeof tag === "string" && tag.startsWith("chat-") && accounts.length) {
+        const { data: mutes } = await db.from("hpl_chat_mute").select("acct, until").eq("table_id", table_id).in("acct", accounts);
+        const now = Date.now();
+        const muted = new Set((mutes ?? []).filter((m) => !m.until || Date.parse(m.until) > now).map((m) => m.acct));
+        accounts = accounts.filter((a) => !muted.has(a));
+      }
     }
     if (!accounts.length) return json({ sent: 0, subs: 0, failed: [] });
 
