@@ -2025,34 +2025,6 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .ent-note{margin:0;text-align:center;font-size:13px;color:#A79FB3}.ent-note b{color:#fff}
 @media (max-height:700px){.ent-felt{height:160px}.ent-ava .ava{width:84px!important;height:84px!important}}
 
-/* ===== scherzo: Vittorio clown ===== */
-.ava.clown{position:relative;overflow:visible!important;box-shadow:0 0 0 2.5px #FF2D55,0 0 0 5px #FFD60A,0 0 0 7.5px #30D158,0 0 0 10px #0A84FF,0 0 14px 6px rgba(255,45,85,.45)!important;animation:clownWob 1.6s ease-in-out infinite}
-.ava.clown::before{content:"";position:absolute;left:50%;top:52%;width:30%;height:30%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 35% 30%,#FF8A8A,#E00000 60%,#900);box-shadow:0 2px 4px rgba(0,0,0,.4);z-index:3}
-.ava.clown::after{content:"🤡";position:absolute;right:-14%;top:-18%;font-size:max(12px,42%);line-height:1;z-index:4;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
-@keyframes clownWob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
-.stk .ava.clown{animation:none}
-/* sul suo telefono: il tendone del circo */
-body.clown-me{background:repeating-linear-gradient(90deg,#B3001B 0 46px,#F4EDE0 46px 92px)!important}
-html:has(body.clown-me){background:repeating-linear-gradient(90deg,#B3001B 0 46px,#F4EDE0 46px 92px)!important}
-body.clown-me::after{opacity:0!important}
-body.clown-me #app>*{background:rgba(20,8,24,.72)!important}
-body.clown-me h1::after,body.clown-me .pkb-tx b::after,body.clown-me .pkh-sign h1::after{content:" 🤡";font-style:normal}
-body.clown-me .btn:not(.ghost):not(.dash),body.clown-me .ent-cta,body.clown-me .pk-cta,body.clown-me .sl-cta,body.clown-me .pkt-cta,body.clown-me .sg-play-go{background:linear-gradient(90deg,#FF2D55,#FF9F0A,#FFD60A,#30D158,#0A84FF,#BF5AF2)!important;color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.5)}
-body.clown-me .tab-ind{background:linear-gradient(90deg,#FF2D55,#FFD60A,#30D158,#0A84FF)!important}
-body.clown-me .pk-logo b i::after{content:" CIRCUS"}
-@media (prefers-reduced-motion:reduce){.ava.clown{animation:none}}
-
-.clown-strip{position:relative;z-index:6;display:flex;overflow:hidden;white-space:nowrap;margin:0 -16px 10px;padding:7px 0;background:repeating-linear-gradient(90deg,#FF2D55 0 40px,#FFD60A 40px 80px,#30D158 80px 120px,#0A84FF 120px 160px);color:#fff;font-weight:900;font-size:13px;letter-spacing:.06em;text-shadow:0 1px 2px #000,0 0 6px rgba(0,0,0,.6);box-shadow:0 4px 14px rgba(0,0,0,.4)}
-.clown-strip span{flex:none;padding-right:8px;animation:clownMarq 22s linear infinite}
-@keyframes clownMarq{to{transform:translateX(-100%)}}
-.cas .clown-strip,.lob .clown-strip{margin:0 0 12px}
-.clown-rain{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}
-.clown-rain i{position:absolute;top:-60px;font-style:normal;animation:clownFall 3s cubic-bezier(.3,.6,.6,1) forwards}
-@keyframes clownFall{to{transform:translateY(110vh) rotate(540deg)}}
-body.clown-me .btn,body.clown-me .ent-cta,body.clown-me .pk-cta,body.clown-me .tab{animation:clownJig 2.4s ease-in-out infinite}
-body.clown-me .tab:nth-child(odd){animation-delay:.4s}
-@keyframes clownJig{0%,86%,100%{transform:none}90%{transform:rotate(-3deg) scale(1.03)}95%{transform:rotate(3deg) scale(1.03)}}
-@media (prefers-reduced-motion:reduce){.clown-strip span,body.clown-me .btn,body.clown-me .tab{animation:none}}
 /* =====================================================================
    CHAT DEL TAVOLO: panno verde da casinò, fumetti oro (miei) e neri
    lucidi (degli altri), barra in alto rossa come le insegne
@@ -2420,11 +2392,7 @@ const picOf=n=>{try{if(typeof S==='undefined')return null;const k=String(n||'').
   if(S.players)for(const id in S.players){const p=S.players[id];if(p&&p.pic&&String(p.name||'').trim().toLowerCase()===k){if(mine){try{const c=localStorage.getItem('hpl.mypic');if(c!==JSON.stringify({k,pic:p.pic}))localStorage.setItem('hpl.mypic',JSON.stringify({k,pic:p.pic}))}catch(e){}}return p.pic}}
   if(mine){try{const c=JSON.parse(localStorage.getItem('hpl.mypic')||'null');if(c&&c.k===k&&c.pic)return c.pic}catch(e){}}
   return null}catch(e){return null}};
-/* scherzo a tempo: solo Vittorio, fino a CLOWN_UNTIL, poi tutto torna normale da solo */
-const CLOWN_NAME='vittorio',CLOWN_UNTIL=Date.parse('2026-10-19T11:25:00Z');
-const clownOn=()=>Date.now()<CLOWN_UNTIL;
-const isClown=n=>clownOn()&&String(n||'').trim().toLowerCase()===CLOWN_NAME;
-const ava=(n,s)=>{const pc=picOf(n);return `<span class="ava ${s||''}${pc?' pic':''}${isClown(n)?' clown':''}" style="--h:${hueOf(n)}">${pc?(String(pc).slice(0,11)==='data:image/'?`<img class="aph" src="${pc}" alt="">`:`<i class="ap" aria-hidden="true">${pc}</i>`)+`<span class="sr">${esc(n)}</span>`:`<i>${esc(inits(n))}</i>`}</span>`};
+const ava=(n,s)=>{const pc=picOf(n);return `<span class="ava ${s||''}${pc?' pic':''}" style="--h:${hueOf(n)}">${pc?(String(pc).slice(0,11)==='data:image/'?`<img class="aph" src="${pc}" alt="">`:`<i class="ap" aria-hidden="true">${pc}</i>`)+`<span class="sr">${esc(n)}</span>`:`<i>${esc(inits(n))}</i>`}</span>`};
 const dDay=iso=>new Date(iso).getDate();
 const pKey=(id,name)=>id&&id!=='dealer'?id:'n:'+String(name||'').trim().toLowerCase();
 const pName=(id,name)=>(id&&typeof S!=='undefined'&&S.players&&S.players[id]&&S.players[id].name)||name;
@@ -8194,60 +8162,6 @@ function pkSigns(){
 const _renderSigns=render;
 render=function(){const r=_renderSigns.apply(this,arguments);try{pkSigns()}catch(e){console.warn(e)}return r};
 
-/* ---- modalità clown sul telefono di Vittorio (scade da sola) ---- */
-function clownSync(){
-  const me=(S.acct&&S.acct.name)||(S.me&&S.me.name);
-  const on=isClown(me);
-  document.body.classList.toggle('clown-me',on);
-  if(on&&!clownSync.told){clownSync.told=true;setTimeout(()=>toast('🤡 Benvenuto al circo, Vittorio!','ok'),900)}
-  if(!clownSync.t&&clownOn()){clownSync.t=setTimeout(()=>{try{render()}catch(e){}},Math.max(1000,CLOWN_UNTIL-Date.now()+500))}
-}
-const _renderClown=render;
-render=function(){const r=_renderClown.apply(this,arguments);try{clownSync()}catch(e){}return r};
-
-/* ---- scherzo, livello 2: nome, insegna, trombetta, battute (scade con CLOWN_UNTIL) ---- */
-const CLOWN_JOKES=['Il naso rosso ti dona 🤡','Attenzione: al tavolo c\'è un pagliaccio 🎪','Vittorio, il bluff si fa con le carte, non con la faccia 🤡','Applausi per il clown della serata 👏🤡','Oggi offre il circo: entrata gratuita 🎪','Ricorda: chi ride per ultimo… non sei tu 🤡','Hai le scarpe giuste per il tavolo? Sono lunghe 50 cm 👞🤡','Il tendone è montato, manchi solo tu in pista 🎪'];
-let honkCtx=null,honkAt=0;
-function honk(){
-  const n=performance.now();if(n-honkAt<350)return;honkAt=n;
-  try{honkCtx=honkCtx||new (window.AudioContext||window.webkitAudioContext)();const c=honkCtx,t=c.currentTime;
-    [0,0.22].forEach((d,k)=>{const o=c.createOscillator(),o2=c.createOscillator(),g=c.createGain();
-      o.type='sawtooth';o2.type='square';o.frequency.setValueAtTime(k?330:390,t+d);o.frequency.exponentialRampToValueAtTime(k?240:300,t+d+.18);o2.frequency.setValueAtTime(k?165:195,t+d);
-      g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(.22,t+d+.02);g.gain.exponentialRampToValueAtTime(.001,t+d+.2);
-      o.connect(g);o2.connect(g);g.connect(c.destination);o.start(t+d);o2.start(t+d);o.stop(t+d+.21);o2.stop(t+d+.21)});
-  }catch(e){}
-}
-function clownRain(){
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-  const box=document.createElement('div');box.className='clown-rain';box.setAttribute('aria-hidden','true');
-  for(let i=0;i<26;i++){const e=document.createElement('i');e.textContent=['🤡','🎪','🎈','🤡','👃'][i%5];e.style.left=(Math.random()*100)+'%';e.style.animationDelay=(Math.random()*1.4)+'s';e.style.fontSize=(22+Math.random()*26)+'px';box.appendChild(e)}
-  document.body.appendChild(box);setTimeout(()=>box.remove(),4200);
-}
-function clownText(root){
-  if(!root)return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>/\bVittorio\b/.test(n.nodeValue)&&!(n.parentElement&&n.parentElement.closest('input,textarea,.sr,.clown-strip'))?1:2});
-  const L=[];while(w.nextNode())L.push(w.currentNode);
-  L.forEach(n=>{n.nodeValue=n.nodeValue.replace(/\bVittorio\b(?! 🤡)/g,'Vittorio 🤡')});
-}
-function clownStrip(){
-  const app=$('#app'),first=app&&app.firstElementChild;if(!first||first.querySelector(':scope>.clown-strip'))return;
-  if(!(V&&['mode','home','vlobby'].includes(V.name))&&!document.querySelector('#app .sl'))return;
-  const msg='🎪 OGGI IN PISTA: VITTORIO IL PAGLIACCIO 🤡 · INGRESSO GRATUITO · NON DATEGLI DA MANGIARE 🍌 · ';
-  first.insertAdjacentHTML('afterbegin',`<div class="clown-strip" aria-label="Oggi in pista: Vittorio il pagliaccio"><span>${msg.repeat(3)}</span><span aria-hidden="true">${msg.repeat(3)}</span></div>`);
-}
-const _renderClown2=render;
-render=function(){const r=_renderClown2.apply(this,arguments);
-  if(clownOn()){try{clownText($('#app'));clownText($('#sheet'));clownStrip();
-    const me=(S.acct&&S.acct.name)||(S.me&&S.me.name);
-    if(isClown(me)){if(!render.__rain){render.__rain=1;setTimeout(clownRain,500)}
-      if(!render.__jk){render.__jk=setInterval(()=>{if(!clownOn()){clearInterval(render.__jk);return}if(!document.hidden)toast(CLOWN_JOKES[Math.floor(Math.random()*CLOWN_JOKES.length)],'ok')},40000)}}
-  }catch(e){}}
-  return r};
-document.addEventListener('pointerdown',e=>{
-  if(!clownOn())return;
-  const me=(S.acct&&S.acct.name)||(S.me&&S.me.name);
-  if(isClown(me)){if(e.target.closest('button,a,.tab'))honk();return}
-  if(e.target.closest('.ava.clown'))honk();
-},true);
 /* =====================================================================
    CHAT DEL TAVOLO
    Messaggi, foto, sondaggi, reazioni, risposte, dadi/carte/moneta,
@@ -8850,7 +8764,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792410970527';
+const APP_VERSION='1792411170849';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
