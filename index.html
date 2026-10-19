@@ -2319,6 +2319,36 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .ch-stk.img{width:150px;height:auto;max-height:170px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
 .ch-stk.img img{display:block;width:100%;height:100%;object-fit:contain}
 .ch-stk.img .ch-imgl{border-radius:16px}
+/* risultati in chat */
+.ch-bub.res{padding:0!important;background:none!important;box-shadow:none!important}
+.ch-bub.res .ch-meta{float:none;display:block;text-align:right;margin:4px 4px 0;color:#fff;opacity:.7}
+.ch-res{width:min(300px,80vw);border-radius:18px;overflow:hidden;color:#fff;text-align:left;
+  background:radial-gradient(circle at 85% 0%,rgba(255,214,90,.25),transparent 45%),linear-gradient(180deg,#1F7A4A,#0D4A2B 55%,#07301B);
+  box-shadow:0 10px 24px rgba(0,0,0,.45),inset 0 0 0 2px #C99A2E,inset 0 0 0 5px #5A3A12,inset 0 0 0 6px rgba(255,214,90,.4)}
+.ch-rhd{display:flex;align-items:center;gap:10px;padding:14px 14px 6px}
+.ch-rtro{font-size:30px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
+.ch-rhd .grow{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+.ch-rhd .pk-k{color:#FFE680;font-size:10px}
+.ch-rhd b{font-size:17px;font-weight:800;font-style:italic;text-transform:uppercase}
+.ch-rpills{display:flex;flex-wrap:wrap;gap:6px;padding:2px 14px 8px}
+.ch-rpills i{font-style:normal;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:rgba(0,0,0,.3);box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+.ch-rlist{margin:0 8px;padding:4px 0;border-radius:12px;background:rgba(0,0,0,.28)}
+.ch-rrow{display:flex;align-items:center;gap:9px;padding:6px 10px;font-size:14.5px;font-weight:600}
+.ch-rrow.me{background:rgba(255,214,90,.14);border-radius:8px}
+.ch-rrow .num{font-weight:800}.ch-rrow .up{color:#7CF0A8}.ch-rrow .dn{color:#FF8A8F}
+.ch-rpos{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;background:rgba(255,255,255,.12)}
+.ch-rpos.p1{background:linear-gradient(180deg,#FFE680,#F2B000);color:#2A1600}.ch-rpos.p2{background:linear-gradient(180deg,#F1F3F7,#B9C0CC);color:#1A1D24}.ch-rpos.p3{background:linear-gradient(180deg,#F0B98A,#C2763F);color:#2A1200}
+.ch-rmore{padding:4px 10px 6px 41px;font-size:12.5px;opacity:.8}
+.ch-rft{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 12px 14px;font-size:12.5px;font-weight:700}
+.ch-ropen{color:#FFD25A}.ch-rok{color:#7CF0A8}
+.ch-rgo{flex:none;padding:8px 12px;border-radius:10px;font-size:12.5px;font-weight:800;text-transform:uppercase;color:#2A1600;background:linear-gradient(180deg,#FFE680,#FFC21A 55%,#F09A00);box-shadow:0 4px 10px rgba(255,180,0,.35)}
+.ch-att.a7{--g:radial-gradient(circle at 70% 20%,#7CF0A8,#1F9E5A 45%,#0D4A2B)}
+.ch-rban{display:flex;align-items:center;gap:12px;margin:14px 0 4px;padding:14px;border-radius:18px;color:#fff;
+  background:radial-gradient(circle at 90% 0%,rgba(255,214,90,.35),transparent 50%),linear-gradient(180deg,#1F7A4A,#0D4A2B);box-shadow:0 12px 26px -12px rgba(30,180,100,.6),inset 0 0 0 1px rgba(255,214,90,.5)}
+.ch-rbi{font-size:30px}
+.ch-rban .grow{display:flex;flex-direction:column;min-width:0;line-height:1.3}
+.ch-rban b{font-size:16px;font-weight:800}.ch-rban span{font-size:13px;opacity:.9}
+.ch-rban .btn{flex:none;width:auto;padding:10px 14px;font-size:14px}
 @keyframes chFabIn{from{transform:scale(.3);opacity:0}}
 @media (prefers-reduced-motion:reduce){.ch-in,.ch-in .ch-die,.ch-in .ch-coin,.ch-in .ch-cardw,.ch-fab{animation:none!important}}
 </style>
@@ -9203,6 +9233,72 @@ const _chPaint3=chatPaint;
 chatPaint=function(){const r=_chPaint3.apply(this,arguments);chMuteHead();return r};
 
 
+/* ---------- risultati della serata condivisi in chat ----------
+   Il messaggio porta una copia dei numeri (per chi non ha ancora caricato la serata),
+   ma si disegna con i dati veri del tavolo: quando qualcuno paga, la scheda si aggiorna. */
+function chResSnap(gid){
+  const g=S.games[gid];if(!g)return null;const isT=g.kind==='tournament';
+  const L=plist(g).slice().sort((a,b)=>isT?((a.out||1)-(b.out||1)):((b.netCents||0)-(a.netCents||0)));
+  const D=(g.debts||[]).filter(d=>d.fromPlayerId!=='dealer');
+  return {gid,at:g.scheduledAt,pot:netPot(g),n:L.length,tour:isT,
+    rows:L.slice(0,20).map(p=>({id:p.playerId,n:pName(p.playerId,p.playerName),net:p.netCents||0,pos:isT?(p.out||1):undefined})),
+    td:D.length,open:D.filter(d=>d.remainingAmount>0).length};
+}
+function chResHtml(m){
+  const b=m.body||{},live=S.games&&S.games[b.gid]&&S.games[b.gid].status==='closed'?chResSnap(b.gid):null,r=live||b;
+  const rows=r.rows||[],meId=S.me&&S.me.id,max=rows.length>7?6:rows.length;
+  const day=(t=>t?t[0].toUpperCase()+t.slice(1):'')(r.at?new Date(r.at).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}):'');
+  const mine=rows.find(x=>x.id===meId);
+  const row=(x,i)=>{const pos=r.tour?x.pos:i+1,net=x.net||0;
+    return `<div class="ch-rrow ${x.id===meId?'me':''}"><span class="ch-rpos p${pos<=3?pos:0}">${pos}</span><span class="grow ell">${esc(x.n||'?')}</span><b class="num ${net>0?'up':net<0?'dn':''}">${sgnS(net)}</b></div>`};
+  return `<div class="ch-res"><div class="ch-rhd"><span class="ch-rtro">🏆</span><div class="grow"><span class="pk-k">Risultati${r.tour?' del torneo':' della serata'}</span><b>${esc(day)}</b></div></div>
+<div class="ch-rpills"><i>${r.n||rows.length} giocatori</i><i>Montepremi ${eurS(r.pot||0)}</i></div>
+<div class="ch-rlist">${rows.slice(0,max).map(row).join('')}${rows.length>max?`<div class="ch-rmore">+ altri ${rows.length-max}${mine&&rows.indexOf(mine)>=max?' · tu '+sgnS(mine.net||0):''}</div>`:''}</div>
+<div class="ch-rft">${r.td?(r.open?`<span class="ch-ropen">${r.open} pagament${r.open===1?'o':'i'} da saldare</span>`:'<span class="ch-rok">Tutti i pagamenti fatti ✓</span>'):'<span class="ch-rok">Tutti pari ✓</span>'}<button class="ch-rgo" data-act="chres" data-g="${esc(b.gid||'')}">Resoconto</button></div></div>`;
+}
+const _chBody4=chBodyHtml;
+chBodyHtml=function(m){if(!m.deleted&&m.kind==='result')return chResHtml(m);return _chBody4(m)};
+const _chMsg4=chMsgHtml;
+chMsgHtml=function(m,first,last){let h=_chMsg4(m,first,last);if(m.kind==='result'&&!m.deleted)h=h.replace('class="ch-bub ','class="ch-bub res ');return h};
+const _chSnip4=chSnip;
+chSnip=function(m){if(m&&!m.deleted&&m.kind==='result'){const b=m.body||{};return '🏆 Risultati della serata del '+(b.at?dShort(b.at).slice(0,5):'')}return _chSnip4(m)};
+const chResShared=gid=>CH.order.some(id=>{const m=CH.msgs.get(id);return m&&!m.deleted&&m.kind==='result'&&m.body&&m.body.gid===gid});
+const chLastClosed=()=>Object.entries(S.games||{}).filter(([,g])=>g.status==='closed'&&g.kind!=='netting').sort((a,b)=>String(b[1].scheduledAt).localeCompare(String(a[1].scheduledAt)))[0]||null;
+async function chShareResult(gid){
+  const snap=chResSnap(gid);if(!snap){toast('Serata non trovata','err');return}
+  if(!S.table||!S.acct){toast('Accedi per usare la chat','err');return}
+  if(CH.tid!==S.table.id)await chatStart();
+  openChat();
+  const ok=await chSend('result',snap);
+  if(ok)toast('Risultati condivisi nella chat','ok');
+}
+/* nel resoconto: pulsante in evidenza appena chiusa la partita, e sempre in "Condividi" */
+const _vDetail4=vDetail;
+vDetail=function(){
+  let h=_vDetail4();const g=S.games[V.gid];
+  if(!g||g.status!=='closed'||g.kind==='netting'||!S.acct)return h;
+  const done=chResShared(V.gid);
+  const btn=`<button class="btn ch-rshare" data-act="chressend" data-gid="${V.gid}">💬 ${done?'Condividi di nuovo nella chat':'Condividi nella chat del tavolo'}</button>`;
+  h=h.replace('<button class="btn" data-act="shareimg"',btn+'<button class="btn ghost" data-act="shareimg"');
+  const fresh=g.closedAt&&Date.now()-Date.parse(g.closedAt)<12*36e5;
+  if(fresh&&!done){
+    const ban=`<div class="ch-rban"><span class="ch-rbi">🏆</span><div class="grow"><b>Partita chiusa!</b><span>Fai vedere a tutti com'è andata: i risultati arrivano nella chat del tavolo.</span></div><button class="btn" data-act="chressend" data-gid="${V.gid}">💬 Condividi</button></div>`;
+    const i=h.indexOf('<div class="hero"');h=i>0?h.slice(0,i)+ban+h.slice(i):h;
+  }
+  return h;
+};
+const _attach4=chAttachSheet;
+chAttachSheet=function(){
+  const h=_attach4(),lc=chLastClosed();if(!lc)return h;
+  const tile=`<button class="ch-att a7" data-act="chressend" data-gid="${lc[0]}"><span class="ch-atti">🏆</span><b>Risultati</b><span>serata del ${dShort(lc[1].scheduledAt).slice(0,5)}</span></button>`;
+  return h.replace('</div></div></div></div>',tile+'</div></div></div></div>');
+};
+Object.assign(H,{
+  chressend(d){SH=null;chShareResult(d.gid)},
+  chres(d){if(d.g&&S.games[d.g])go('detail',d.g);else toast('Questa serata non c\'è più','err')},
+});
+
+
 /* ---------- dove si entra nella chat ---------- */
 /* pulsante fluttuante nelle sezioni principali */
 function chFab(){return `<button class="ch-fab" data-act="openchat" aria-label="Chat del tavolo${CH.unread?', '+CH.unread+' messaggi nuovi':''}"><span>💬</span><i data-chbadge ${CH.unread?'':'hidden'}>${CH.unread>9?'9+':CH.unread}</i></button>`}
@@ -9220,7 +9316,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792437809894';
+const APP_VERSION='1792438482567';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
