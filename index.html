@@ -2029,7 +2029,7 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
    CHAT DEL TAVOLO: panno verde da casinò, fumetti oro (miei) e neri
    lucidi (degli altri), barra in alto rossa come le insegne
    ===================================================================== */
-.app.chat{position:fixed;left:0;right:0;top:0;height:var(--chvh,100dvh);max-width:520px;margin:0 auto;min-height:0;padding:0;display:flex;flex-direction:column;overflow:hidden;
+.app.chat{position:fixed;left:0;right:0;top:0;bottom:0;height:auto;max-width:520px;margin:0 auto;min-height:0;padding:0;display:flex;flex-direction:column;overflow:hidden;
   background:radial-gradient(120% 60% at 50% 0%,rgba(40,170,100,.22),transparent 60%),radial-gradient(90% 50% at 50% 100%,rgba(0,0,0,.6),transparent 70%),linear-gradient(180deg,#0E3B26,#082717 55%,#05170E)!important}
 .app.chat::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cg fill='%23FFE680' fill-opacity='.045' font-size='18' font-family='serif'%3E%3Ctext x='8' y='26'%3E%E2%99%A0%3C/text%3E%3Ctext x='56' y='74'%3E%E2%99%A5%3C/text%3E%3C/g%3E%3C/svg%3E")}
 .ch-hd{position:relative;z-index:3;flex:none;display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top,0px)) 10px 10px;
@@ -2042,8 +2042,8 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .ch-ht>b{font-weight:800;font-style:italic;text-transform:uppercase;font-size:19px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35)}
 .ch-on{min-height:18px;margin-top:2px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:rgba(255,255,255,.88);white-space:nowrap;overflow:hidden}
 .ch-on .ch-off{opacity:.75}
-.ch-ondots{display:flex}.ch-ondots .av{width:18px!important;height:18px!important;font-size:9px!important;margin-right:-5px;box-shadow:0 0 0 2px #8E0B1D}
-.ch-ondots+span{margin-left:6px}
+.ch-ondots{display:flex}.ch-ondots .ava{width:22px!important;height:22px!important;font-size:9px!important;margin-right:-6px;box-shadow:0 0 0 2px #8E0B1D}
+.ch-ondots+span{margin-left:8px}
 .ch-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#34E07A;margin-right:5px;box-shadow:0 0 8px #34E07A;vertical-align:1px}
 
 .ch-list{position:relative;z-index:1;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:12px 10px 8px;display:flex;flex-direction:column}
@@ -2059,7 +2059,7 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .ch-row.first{margin-top:10px}
 .ch-row.me{justify-content:flex-end}
 .ch-av{flex:none;width:30px;display:flex;align-items:flex-end}
-.ch-av .av{width:30px!important;height:30px!important;font-size:12px!important}
+.ch-av .ava{width:30px!important;height:30px!important;font-size:11px!important}
 .ch-col{display:flex;flex-direction:column;max-width:80%;min-width:0}
 .ch-row.me .ch-col{align-items:flex-end}
 .ch-nm{font-size:12px;font-weight:800;margin:0 0 3px 12px;color:hsl(var(--h,40) 90% 70%)}
@@ -2104,6 +2104,11 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .ch-up{position:absolute;inset:auto 8px 8px auto;font-size:12px;font-weight:800;color:#fff;padding:4px 9px;border-radius:999px;background:rgba(0,0,0,.6)}
 .ch-bub:has(.ch-img) .ch-t{padding:6px 6px 0}
 .ch-bub:has(.ch-img) .ch-meta{margin-right:6px}
+.ch-bub.ph{padding:0!important;background:none!important;box-shadow:none!important}
+.ch-bub.ph .ch-img{box-shadow:0 6px 18px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.12)}
+.ch-row.me .ch-bub.ph .ch-img{box-shadow:0 6px 18px rgba(0,0,0,.45),0 0 0 2px #FFC21A}
+.ch-bub.ph .ch-meta{position:absolute;right:8px;bottom:8px;float:none;margin:0;padding:4px 8px;border-radius:999px;color:#fff;opacity:1;background:rgba(0,0,0,.55)}
+.ch-bub.ph .ch-tick.seen{color:#7CF0A8}
 
 /* sondaggio */
 .ch-bub:has(.ch-poll){width:min(300px,76vw)}
@@ -2120,7 +2125,7 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .ch-po.on .ch-pck{opacity:1;background:#34E07A;color:#05170E;box-shadow:none}
 .ch-row.me .ch-po.on .ch-pck{background:#B3122A;color:#fff}
 .ch-pt{flex:1;min-width:0;font-weight:700;font-size:14.5px}
-.ch-pav{display:flex}.ch-pav .av{width:18px!important;height:18px!important;font-size:8px!important;margin-left:-5px;box-shadow:0 0 0 2px rgba(0,0,0,.3)}
+.ch-pav{display:flex}.ch-pav .ava{width:18px!important;height:18px!important;font-size:8px!important;margin-left:-5px;box-shadow:0 0 0 2px rgba(0,0,0,.3)}
 .ch-po b{font-size:13px;min-width:34px;text-align:right}
 .ch-po.win{box-shadow:inset 0 0 0 2px #FFC21A}
 .ch-po:disabled{opacity:1}
@@ -8434,7 +8439,7 @@ function chMsgHtml(m,first,last){
   return `<div class="ch-row ${mine?'me':'ot'} ${first?'first':''} ${last?'last':''} k-${m.kind}" data-id="${m.id}">
 ${!mine?`<span class="ch-av">${last?ava(m.author_name||'?','s'):''}</span>`:''}
 <div class="ch-col">${!mine&&first?`<span class="ch-nm" style="--h:${hueOf(m.author_name||'')}">${esc(m.author_name||'?')}</span>`:''}
-<div class="ch-bub ${plain?'plain':''} ${m.deleted?'gone':''}" data-act="chmenu" data-id="${m.id}">${chBodyHtml(m)}
+<div class="ch-bub ${plain?'plain':''} ${m.kind==='photo'&&!m.deleted&&!(b.cap||b.re)?'ph':''} ${m.deleted?'gone':''}" data-act="chmenu" data-id="${m.id}">${chBodyHtml(m)}
 <span class="ch-meta">${m.edited_at&&!m.deleted?'modificato · ':''}${chTime(m.created_at)}${mine&&!m.__tmp?`<i class="ch-tick ${seen?'seen':''}">${seen?'✓✓':'✓'}</i>`:''}</span></div>
 ${chReactsHtml(m)}${st}${seen?`<button class="ch-seen" data-act="chseen" data-id="${m.id}">Visto da ${seen}</button>`:''}</div></div>`;
 }
@@ -8562,7 +8567,12 @@ afterData=async function(){const r=await _afterDataChat.apply(this,arguments);if
 const _resetChat=resetTableState;
 resetTableState=function(){chatStop();return _resetChat.apply(this,arguments)};
 /* con la tastiera aperta la chat occupa solo la parte visibile dello schermo */
-function chVV(){const r=$$id('chatroot');if(!r)return;const vv=window.visualViewport;if(vv){r.style.setProperty('--chvh',vv.height+'px');r.style.top=vv.offsetTop+'px'}}
+function chVV(){const r=$$id('chatroot');if(!r)return;const vv=window.visualViewport;
+  /* solo con la tastiera aperta: la chat si accorcia alla parte visibile; altrimenti occupa tutto lo schermo */
+  if(vv&&vv.height<window.innerHeight-80){r.style.height=vv.height+'px';r.style.bottom='auto';r.style.top=vv.offsetTop+'px'}else{r.style.height='';r.style.bottom='';r.style.top=''}}
+window.addEventListener('resize',()=>chVV());
+document.addEventListener('focusout',e=>{if(e.target&&e.target.id==='chin')[60,300,700].forEach(t=>setTimeout(chVV,t))});
+document.addEventListener('focusin',e=>{if(e.target&&e.target.id==='chin')[300,700].forEach(t=>setTimeout(chVV,t))});
 if(window.visualViewport){visualViewport.addEventListener('resize',()=>{const near=chNearBottom();chVV();if(near){const l=$$id('chlist');if(l)l.scrollTop=l.scrollHeight}});visualViewport.addEventListener('scroll',chVV)}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&CH.tid){chLoad();if(V&&V.name==='chat')chMarkRead()}});
 
@@ -8731,7 +8741,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792411289216';
+const APP_VERSION='1792412195000';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
