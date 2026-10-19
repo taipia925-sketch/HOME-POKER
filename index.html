@@ -4325,15 +4325,32 @@ async function swReady(){if(!('serviceWorker' in navigator)||!/^https:/.test(loc
 async function pushState(){try{const r=await swReady();if(!r)return false;const s=await r.pushManager.getSubscription();return !!s&&Notification.permission==='granted'}catch(e){return false}}
 async function pushOn(){
   if(!pushSupported()){toast(isIOS()&&!isStandalone()?'Prima aggiungi l\'app alla schermata Home (Condividi → Aggiungi alla schermata Home), poi riprova da lì':'Questo telefono o browser non supporta le notifiche','err');return}
-  const perm=await Notification.requestPermission();
-  if(perm!=='granted'){toast('Notifiche non permesse: puoi attivarle dalle impostazioni del telefono','err');return}
+  const android=/Android/i.test(navigator.userAgent);
+  let perm;try{perm=await Notification.requestPermission()}catch(e){perm=Notification.permission}
+  if(perm!=='granted'){pushFail(perm==='denied'
+    ?(android?'Il telefono ha bloccato le notifiche per Home Poker. Sbloccale: tieni premuta l\'icona dell\'app → Info app → Notifiche → Consenti (oppure in Chrome: ⋮ → Impostazioni → Impostazioni sito → Notifiche), poi riaccendi qui.'
+      :'Il telefono ha bloccato le notifiche per Home Poker: sbloccale nelle Impostazioni (Notifiche → Home Poker), poi riaccendi qui.')
+    :'Non hai toccato "Consenti": riaccendi e scegli Consenti.');return}
+  let step='servizio';
   try{
-    const r=await swReady();const key=unb64(VAPID_PUBLIC);
-    const sub=(await r.pushManager.getSubscription())||(await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:key}));
-    const j=sub.toJSON();await BASE.rpc('hpl_save_push',{p_endpoint:j.endpoint,p_p256dh:j.keys.p256dh,p_auth:j.keys.auth});
-    S.pushOn=true;render();toast('Notifiche attive','ok');
-  }catch(e){toast('Non riesco ad attivare le notifiche: '+errMsg(e),'err')}
+    const r=await swReady();if(!r)throw new Error('servizio non pronto');const key=unb64(VAPID_PUBLIC);
+    step='iscrizione';
+    let sub=await r.pushManager.getSubscription();
+    // un'iscrizione vecchia con un'altra chiave non funziona più: si rifà
+    try{const k=sub&&sub.options&&sub.options.applicationServerKey;if(k&&btoa(String.fromCharCode(...new Uint8Array(k))).replace(/=+$/,'')!==btoa(String.fromCharCode(...key)).replace(/=+$/,'')){await sub.unsubscribe();sub=null}}catch(x){}
+    if(!sub)sub=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:key});
+    step='salvataggio';
+    const j=sub.toJSON();const res=await BASE.rpc('hpl_save_push',{p_endpoint:j.endpoint,p_p256dh:j.keys.p256dh,p_auth:j.keys.auth});
+    if(res&&res.error)throw res.error;
+    LS.del('pusherr');S.pushOn=true;render();toast('Notifiche attive: tocca "Prova le notifiche" per controllare','ok');
+  }catch(e){
+    const m=String(e&&(e.name+' '+e.message)||e);
+    pushFail(step==='iscrizione'&&android&&/Abort|push service|Registration failed/i.test(m)
+      ?'Il telefono non riesce a collegarsi al servizio notifiche di Google. Apri l\'app da Chrome (non da un altro browser), controlla che Google Play Services sia aggiornato e riprova.'
+      :'Non riesco ad attivare le notifiche ('+step+': '+m.slice(0,80)+')');
+  }
 }
+function pushFail(msg){try{LS.set('pusherr',msg)}catch(e){}toast(msg,'err');render()}
 async function pushOff(){
   try{const r=await swReady();const s=r&&await r.pushManager.getSubscription();if(s){try{await BASE.rpc('hpl_delete_push',{p_endpoint:s.endpoint})}catch(e){}await s.unsubscribe()}}catch(e){}
   S.pushOn=false;render();toast('Notifiche disattivate','ok');
@@ -4546,7 +4563,7 @@ sheetHtml=function(){
   }
   let h=_sheetF();
   if((s.type==='me'||s.type==='acct')&&h){
-    const pushLi=`<button class="li" data-act="pushtoggle"><span class="lic">${ico('bell',17)}</span><span class="grow">Notifiche${!pushSupported()&&isIOS()&&!isStandalone()?'<span class="mut xs" style="display:block">Aggiungi prima l\'app alla schermata Home</span>':''}</span><span class="sw ${S.pushOn?'on':''}"><i></i></span></button>`;
+    const pushLi=`<button class="li" data-act="pushtoggle"><span class="lic">${ico('bell',17)}</span><span class="grow">Notifiche${!pushSupported()&&isIOS()&&!isStandalone()?'<span class="mut xs" style="display:block">Aggiungi prima l\'app alla schermata Home</span>':''}${!S.pushOn&&LS.get('pusherr','')?`<span class="xs" style="display:block;color:#FF8A8F;white-space:normal">${esc(LS.get('pusherr',''))}</span>`:''}</span><span class="sw ${S.pushOn?'on':''}"><i></i></span></button>`;
     const nameLi=`<button class="li" data-act="rename"><span class="lic">${ico('user',17)}</span><span class="grow">Cambia nome utente</span>${ico('chevr',16)}</button>`;
     h=h.replace(/(<button class="li" data-act="chpin"\s*>)/,nameLi+'$1');
     h=h.replace(/(<div class="list">)(?![\s\S]*<div class="list">)/,'$1'+pushLi+(S.pushOn?`<button class="li" data-act="pushtest"><span class="lic">🔔</span><span class="grow">Prova le notifiche<span class="mut xs" style="display:block">Manda una notifica a questo telefono</span></span>${ico('chevr',16)}</button>`:''));
@@ -8759,7 +8776,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792423493251';
+const APP_VERSION='1792423628428';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
