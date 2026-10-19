@@ -2249,6 +2249,69 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .v2-chead{gap:8px}.v2-chead b{flex:1;min-width:0}.ch-full{flex:none;display:flex;align-items:center;gap:2px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800;color:#2A1600;background:linear-gradient(180deg,#FFE680,#FFC21A)}
 .ch-fab i{position:absolute;top:-4px;right:-4px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;font-style:normal;font-size:12px;font-weight:800;display:grid;place-items:center;color:#fff;background:#E01E37;box-shadow:0 0 0 2px #fff}
 .ch-fab i[hidden]{display:none}
+/* vocali */
+.ch-bub.aud{padding:8px 10px 6px}
+.ch-aud{position:relative;display:flex;align-items:center;gap:8px;width:min(250px,64vw)}
+.ch-ap{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#2A1600;background:linear-gradient(180deg,#FFE680,#FFC21A 55%,#F09A00);box-shadow:0 3px 10px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.7)}
+.ch-row.me .ch-ap{color:#fff;background:linear-gradient(180deg,#E01E37,#8E0B1D);box-shadow:0 3px 10px rgba(120,0,20,.35),inset 0 1px 0 rgba(255,255,255,.3)}
+.ch-ap:active{transform:scale(.92)}
+.ch-aud.playing .ch-ap{animation:chPulse 1.4s ease-in-out infinite}
+@keyframes chPulse{50%{box-shadow:0 0 0 6px rgba(255,194,26,.25),0 3px 10px rgba(0,0,0,.35)}}
+.ch-wave{flex:1;min-width:0;height:30px;display:flex;align-items:center;gap:2px;padding:0;overflow:hidden}
+.ch-wave i{flex:1;min-width:2px;max-width:4px;border-radius:2px;background:currentColor;opacity:.35;transition:opacity .15s}
+.ch-wave i.on{opacity:1;color:#FFD25A}
+.ch-row.me .ch-wave i.on{color:#8E0B1D}
+.ch-ainf{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.ch-at2{font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+.ch-sp{font-size:10.5px;font-weight:800;padding:1px 6px;border-radius:999px;color:inherit;background:rgba(0,0,0,.22)}
+.ch-row.me .ch-sp{background:rgba(110,50,0,.16)}
+.ch-bub.aud .ch-meta{margin-top:2px}
+.ch-aud .ch-up{right:auto;left:46px;bottom:-4px}
+/* registrazione */
+.ch-rec{display:none}
+.ch-comp.rec .ch-inrow{display:none}
+.ch-comp.rec .ch-rec{display:flex;align-items:center;gap:10px;min-height:44px;animation:chIn .2s}
+.ch-recx{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#FF8A8F;background:rgba(255,255,255,.08)}
+.ch-recdot{flex:none;width:12px;height:12px;border-radius:50%;background:#FF2D45;box-shadow:0 0 10px #FF2D45;animation:chBlink 1s infinite}
+@keyframes chBlink{50%{opacity:.25}}
+#chrect{flex:none;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;color:#fff;min-width:40px}
+.ch-recw{flex:1;min-width:0;height:30px;display:flex;align-items:center;justify-content:flex-end;gap:2px;overflow:hidden}
+.ch-recw i{flex:none;width:3px;border-radius:2px;background:#FFD25A}
+.ch-send.mic{color:#fff;background:linear-gradient(180deg,#E01E37,#8E0B1D);box-shadow:0 4px 12px rgba(224,30,55,.4)}
+.ch-stb{flex:none;width:40px;height:44px;display:grid;place-items:center;font-size:24px;border-radius:12px}
+.ch-stb:active{transform:scale(.9)}
+/* sticker */
+.ch-bub.stk{padding:0}
+.ch-stk{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:124px;height:124px;text-align:center;filter:drop-shadow(0 8px 14px rgba(0,0,0,.45))}
+.ch-in .ch-stk{animation:chStk .5s cubic-bezier(.2,.9,.25,1.35)}
+@keyframes chStk{from{transform:scale(.3) rotate(-12deg);opacity:0}}
+.ch-stke{font-size:40px;line-height:1}
+.ch-stk b{font-weight:900;font-style:italic;text-transform:uppercase;line-height:1.02;letter-spacing:-.01em}
+.ch-stk.chip{border-radius:50%;--c:#C8182F;background:radial-gradient(circle,var(--c) 0 52%,#fff 52% 56%,var(--c) 56%);box-shadow:inset 0 0 0 7px var(--c)}
+.ch-stk.chip::before{content:"";position:absolute;inset:5px;border-radius:50%;border:7px dashed rgba(255,255,255,.9)}
+.ch-stk.chip b{font-size:17px;color:#fff;max-width:80px;text-shadow:0 2px 0 rgba(0,0,0,.35);position:relative}
+.ch-stk.chip .ch-stke{position:relative;font-size:34px}
+.ch-stk.chip.g{--c:#1F9E5A}.ch-stk.chip.b{--c:#2B5CFF}.ch-stk.chip.k{--c:#24202A}.ch-stk.chip.p{--c:#7B2CBF}
+.ch-stk.neon{width:136px;height:auto;min-height:96px;padding:12px 10px;border-radius:18px;--c:#FF3DA8;background:#14081C;box-shadow:0 0 0 3px var(--c),0 0 18px var(--c),inset 0 0 14px color-mix(in srgb,var(--c) 45%,transparent);transform:rotate(-3deg)}
+.ch-stk.neon b{font-size:21px;color:#fff;text-shadow:0 0 6px var(--c),0 0 14px var(--c)}
+.ch-stk.neon.r{--c:#FF2D45}.ch-stk.neon.g{--c:#34E07A}.ch-stk.neon.y{--c:#FFD25A}
+.ch-stk.tk{width:142px;height:auto;min-height:90px;padding:12px 14px;border-radius:10px;--c:#FFC21A;--d:#2A1600;color:var(--d);transform:rotate(4deg);
+  background:radial-gradient(circle at 0 50%,transparent 9px,var(--c) 10px) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,transparent 9px,var(--c) 10px) right/51% 100% no-repeat}
+.ch-stk.tk b{font-size:19px;color:var(--d);border-top:2px dashed rgba(0,0,0,.25);padding-top:4px;margin-top:2px}
+.ch-stk.tk.g{--c:#34E07A;--d:#05351A}.ch-stk.tk.o{--c:#FF9F0A;--d:#2A1200}
+.ch-stk.emo{width:auto;height:auto;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4))}
+.ch-stk.emo span{font-size:96px;line-height:1.05}
+.ch-bub.stk{position:relative;display:block;padding:0 0 6px!important}
+.ch-bub.stk .ch-meta{position:absolute!important;right:0;bottom:0;float:none!important;display:block!important;margin:0!important;padding:2px 7px!important;border-radius:999px;background:rgba(0,0,0,.55)!important;color:#fff!important;opacity:1!important;text-align:right}
+.ch-stkg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 16px}
+.ch-stkg.emo{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ch-stkc{display:grid;place-items:center;min-width:0;height:112px;padding:4px;overflow:hidden;border-radius:16px;background:rgba(255,255,255,.04);transition:transform .15s}
+.ch-stkg.emo .ch-stkc{height:76px}
+.ch-stkc:active{transform:scale(.92)}
+.ch-stkc .ch-stk{zoom:.72}
+.ch-stkg.emo .ch-stk.emo span{font-size:46px}
+.ch-stkg.emo .ch-stkc .ch-stk{transform:none;margin:0}
+.ch-att.a5 .ch-atti svg,.ch-atti svg{display:block}
 @keyframes chFabIn{from{transform:scale(.3);opacity:0}}
 @media (prefers-reduced-motion:reduce){.ch-in,.ch-in .ch-die,.ch-in .ch-coin,.ch-in .ch-cardw,.ch-fab{animation:none!important}}
 </style>
@@ -8759,6 +8822,216 @@ vtChatPanel=function(){
 };
 Object.assign(H,{vtfull(){F.vt.chatOpen=false;vtChatPanel();openChat()}});
 
+/* ---------- vocali e sticker ---------- */
+const chDur=s=>{s=Math.max(0,Math.round(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const CH_STK=[
+  ['allin','🔥','ALL IN','chip r'],['gg','🤝','GG','chip g'],['bluff','🤨','BLUFF?','neon p'],['ship','💰','SHIP IT','tk y'],
+  ['river','😭','RIVER…','chip b'],['fold','🏳️','FOLD','chip k'],['tilt','🤯','TILT','neon r'],['nh','👏','BELLA MANO','tk g'],
+  ['paga','💸','CHI PAGA?','tk y'],['fish','🐟','PESCE','chip b'],['culo','🍀','CHE CULO','neon g'],['rebuy','🔁','REBUY!','chip p'],
+  ['birre','🍺','BIRRE?','tk o'],['arrivo','🏃','ARRIVO!','neon y'],['stasera','🃏','STASERA?','chip r'],['nuts','🥜','NUTS','tk o'],
+  ['check','✋','CHECK','chip k'],['clown','🤡','PAGLIACCIO','neon p'],['re','👑','RE DEL TAVOLO','tk y'],['bad','💀','BAD BEAT','chip k'],
+];
+const CH_STKE=['😂','🤣','🤡','🔥','💸','🃏','🍺','😎','😭','🤬','👑','🫡','🙏','💀','🥳','😴'];
+const chStkOf=id=>CH_STK.find(x=>x[0]===id);
+function chStkHtml(b){
+  if(b&&b.e)return `<div class="ch-stk emo"><span>${esc(b.e)}</span></div>`;
+  const s=chStkOf(b&&b.id)||CH_STK[0];
+  return `<div class="ch-stk ${s[3]}"><span class="ch-stke">${s[1]}</span><b>${esc(s[2])}</b></div>`;
+}
+const _chSnip0=chSnip;
+chSnip=function(m){
+  if(m&&!m.deleted&&m.kind==='audio')return '🎤 Messaggio vocale ('+chDur((m.body||{}).dur)+')';
+  if(m&&!m.deleted&&m.kind==='sticker'){const b=m.body||{};return b.e?b.e+' Sticker':'🃏 Sticker: '+((chStkOf(b.id)||[])[2]||'')}
+  return _chSnip0(m);
+};
+const CH_PLAY='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5l12 7-12 7z" fill="currentColor"/></svg>';
+const CH_PAUSE='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>';
+function chAudioHtml(m){
+  const b=m.body||{},w=Array.isArray(b.wave)&&b.wave.length?b.wave:Array(40).fill(3);
+  chUrl(b.path);
+  return `<div class="ch-aud" data-id="${m.id}" data-d="${+b.dur||0}"><button class="ch-ap" data-act="chplay" data-id="${m.id}" aria-label="Ascolta">${CH_PLAY}</button>
+<button class="ch-wave" aria-label="Sposta l'ascolto">${w.map(v=>`<i style="height:${4+Math.round(Math.min(9,+v||0)*2.4)}px"></i>`).join('')}</button>
+<span class="ch-ainf"><b class="ch-at2">${chDur(b.dur)}</b><button class="ch-sp" data-act="chspeed" aria-label="Velocità">${PL.rate}×</button></span>${m.__up?'<span class="ch-up">Invio…</span>':''}</div>`;
+}
+const _chBody0=chBodyHtml;
+chBodyHtml=function(m){
+  if(!m.deleted&&m.kind==='audio')return chAudioHtml(m);
+  if(!m.deleted&&m.kind==='sticker')return chStkHtml(m.body);
+  return _chBody0(m);
+};
+/* lo sticker sta senza fumetto, come una foto ritagliata */
+const _chMsg0=chMsgHtml;
+chMsgHtml=function(m,first,last){
+  let h=_chMsg0(m,first,last);
+  if(m.kind==='sticker'&&!m.deleted)h=h.replace('class="ch-bub ','class="ch-bub plain stk ');
+  if(m.kind==='audio'&&!m.deleted)h=h.replace('class="ch-bub ','class="ch-bub aud ');
+  return h;
+};
+
+/* lettore: un solo vocale alla volta, con velocità 1× / 1,5× / 2× */
+const PL={a:null,id:null,rate:1};
+function chPlay(id){
+  const m=CH.msgs.get(id);if(!m||!m.body)return;
+  if(PL.id===id&&PL.a){if(PL.a.paused)PL.a.play().catch(()=>{});else PL.a.pause();chPlayUI();return}
+  if(PL.a){try{PL.a.pause()}catch(e){}}
+  const u=chUrl(m.body.path);
+  if(!u){toast('Sto caricando l\'audio, riprova tra un attimo','ok');return}
+  const a=new Audio(u);a.preload='auto';a.playbackRate=PL.rate;PL.a=a;PL.id=id;
+  a.ontimeupdate=chPlayUI;a.onplay=chPlayUI;a.onpause=chPlayUI;
+  a.onended=()=>{const was=PL.id;PL.id=null;PL.a=null;chPlayUI();
+    // finito un vocale parte il successivo dello stesso giro, come su WhatsApp
+    const i=CH.order.indexOf(was),nx=i>=0?CH.msgs.get(CH.order[i+1]):null;if(nx&&nx.kind==='audio'&&!nx.deleted)chPlay(nx.id)};
+  a.onerror=()=>{if(PL.a!==a)return;PL.id=null;PL.a=null;chPlayUI();toast('Questo audio non si riesce ad ascoltare su questo telefono','err')};
+  a.play().catch(()=>{});chPlayUI();
+}
+function chPlayUI(){
+  document.querySelectorAll('#chlist .ch-aud').forEach(el=>{
+    const id=+el.dataset.id,on=PL.id===id&&PL.a,pl=!!(on&&!PL.a.paused);
+    el.classList.toggle('playing',pl);
+    const btn=el.querySelector('.ch-ap');const ic=pl?CH_PAUSE:CH_PLAY;if(btn&&btn.__ic!==ic){btn.innerHTML=ic;btn.__ic=ic}
+    const d=on&&PL.a.duration&&isFinite(PL.a.duration)?PL.a.duration:+el.dataset.d||1;
+    const p=on?Math.min(1,PL.a.currentTime/d):0;
+    const bars=el.querySelectorAll('.ch-wave i'),n=Math.round(p*bars.length);bars.forEach((b,i)=>b.classList.toggle('on',i<n));
+    const t=el.querySelector('.ch-at2');if(t)t.textContent=chDur(on&&PL.a.currentTime>0?PL.a.currentTime:+el.dataset.d);
+    const sp=el.querySelector('.ch-sp');if(sp)sp.textContent=String(PL.rate).replace('.',',')+'×';
+  });
+}
+document.addEventListener('click',e=>{
+  const w=e.target.closest&&e.target.closest('#chlist .ch-wave');if(!w)return;
+  const el=w.closest('.ch-aud'),id=+el.dataset.id,r=w.getBoundingClientRect(),p=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width));
+  if(PL.id!==id)chPlay(id);
+  const a=PL.a;if(!a)return;const go=()=>{const d=isFinite(a.duration)&&a.duration?a.duration:+el.dataset.d;a.currentTime=p*d;chPlayUI()};
+  if(a.readyState>=1)go();else a.addEventListener('loadedmetadata',go,{once:true});
+});
+
+/* registrazione */
+const REC={on:false};
+async function chRecStart(){
+  if(REC.on||!CH.tid)return;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){toast('Questo telefono non permette di registrare audio dall\'app','err');return}
+  let st;
+  try{st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}
+  catch(e){toast(e&&e.name==='NotAllowedError'?'Microfono non permesso: consentilo nelle impostazioni del telefono per Home Poker':'Microfono non disponibile','err');return}
+  const types=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/aac'];
+  const mime=types.find(t=>{try{return MediaRecorder.isTypeSupported(t)}catch(e){return false}})||'';
+  let mr;try{mr=new MediaRecorder(st,mime?{mimeType:mime,audioBitsPerSecond:48000}:undefined)}catch(e){mr=new MediaRecorder(st)}
+  Object.assign(REC,{on:true,st,mr,chunks:[],t0:Date.now(),wave:[],cancel:false,an:null,ac:null});
+  mr.ondataavailable=e=>{if(e.data&&e.data.size)REC.chunks.push(e.data)};
+  mr.onstop=chRecDone;
+  try{const AC=window.AudioContext||window.webkitAudioContext;REC.ac=new AC();const src=REC.ac.createMediaStreamSource(st);REC.an=REC.ac.createAnalyser();REC.an.fftSize=512;src.connect(REC.an);REC.buf=new Uint8Array(REC.an.fftSize)}catch(e){}
+  if(PL.a){try{PL.a.pause()}catch(e){}}
+  mr.start(250);REC.iv=setInterval(chRecTick,100);
+  try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}
+  chRecUI();
+}
+function chRecTick(){
+  if(!REC.on)return;const s=(Date.now()-REC.t0)/1000;let lv=.12+Math.random()*.1;
+  if(REC.an){try{REC.an.getByteTimeDomainData(REC.buf);let mx=0;for(let i=0;i<REC.buf.length;i++){const d=Math.abs(REC.buf[i]-128);if(d>mx)mx=d}lv=Math.min(1,mx/70)}catch(e){}}
+  REC.wave.push(lv);
+  const t=$$id('chrect');if(t)t.textContent=chDur(s);
+  const w=$$id('chrecw');if(w)w.innerHTML=REC.wave.slice(-34).map(v=>`<i style="height:${Math.round(4+v*24)}px"></i>`).join('');
+  if(s>=180){toast('Massimo 3 minuti: lo mando così','ok');chRecStop(false)}
+}
+function chRecStop(cancel){
+  if(!REC.on)return;REC.cancel=!!cancel;clearInterval(REC.iv);
+  try{if(REC.mr.state!=='inactive')REC.mr.stop();else chRecDone()}catch(e){chRecDone()}
+}
+function chRecDone(){
+  if(!REC.on)return;const r=Object.assign({},REC);REC.on=false;
+  try{r.st.getTracks().forEach(t=>t.stop())}catch(e){}try{r.ac&&r.ac.close()}catch(e){}
+  chRecUI();
+  const dur=(Date.now()-r.t0)/1000;if(r.cancel)return;
+  if(dur<1){toast('Troppo corto: tieni registrato almeno un secondo','err');return}
+  const type=String(r.mr.mimeType||(r.chunks[0]&&r.chunks[0].type)||'audio/webm').split(';')[0]||'audio/webm';
+  const blob=new Blob(r.chunks,{type});
+  const W=r.wave.length?r.wave:[.2],N=40,wave=[];
+  for(let i=0;i<N;i++){const a=Math.floor(i*W.length/N),b=Math.max(a+1,Math.floor((i+1)*W.length/N));let mx=0;for(let k=a;k<b&&k<W.length;k++)mx=Math.max(mx,W[k]);wave.push(Math.round(mx*9))}
+  chSendAudio(blob,type,Math.round(dur),wave);
+}
+async function chSendAudio(blob,type,dur,wave){
+  if(!CH.tid)return;
+  const ext=/mp4|aac|m4a/.test(type)?'m4a':/ogg/.test(type)?'ogg':/mpeg/.test(type)?'mp3':'webm';
+  const ct=ext==='m4a'?'audio/mp4':type;
+  const path=CH.tid+'/'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)+'.'+ext;
+  CH.urls.set(path,{u:URL.createObjectURL(blob),at:Date.now()+36e5});
+  const tmpId=-(++CH.tmp)-1e9,body={path,dur,wave,mime:ct};
+  CH.msgs.set(tmpId,{id:tmpId,__tmp:true,__up:true,table_id:CH.tid,author_acct:chMe(),author_name:chMyName(),kind:'audio',body,created_at:new Date().toISOString()});CH.order.push(tmpId);chStick=true;chChanged('msg');
+  try{
+    const {error}=await chSb().storage.from('hpl-chat').upload(path,blob,{contentType:ct,cacheControl:'31536000',upsert:false});if(error)throw error;
+    CH.msgs.delete(tmpId);CH.order=CH.order.filter(x=>x!==tmpId);
+    await chSend('audio',body);
+  }catch(e){const t=CH.msgs.get(tmpId);if(t){t.__fail=true;t.__up=false}chChanged('msg');toast('Vocale non inviato: '+errMsg(e),'err')}
+}
+function chRecUI(){
+  const c=document.querySelector('#chatroot .ch-comp');if(!c)return;
+  c.classList.toggle('rec',!!REC.on);
+  const box=$$id('chrec');if(!box)return;
+  box.innerHTML=REC.on?`<button class="ch-recx" data-act="chrecx" aria-label="Annulla">${ico('trash',20)}</button><span class="ch-recdot"></span><b id="chrect">0:00</b><span class="ch-recw" id="chrecw"></span><button class="ch-send on" data-act="chrecok" aria-label="Invia il vocale">${ico('send',20)}</button>`:'';
+}
+const CH_MIC='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 3a3 3 0 00-3 3v6a3 3 0 006 0V6a3 3 0 00-3-3zM6 11a6 6 0 0012 0M12 17v4M9 21h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const _chComp0=chComposer;
+chComposer=function(){
+  _chComp0();
+  const ta=$$id('chin'),send=$$id('chsend');if(!ta||!send)return;
+  const has=!!ta.value.trim()||!!CH.edit,ic=has?ico('send',20):CH_MIC;
+  send.classList.toggle('on',has);send.classList.toggle('mic',!has);send.setAttribute('aria-label',has?'Invia':'Registra un vocale');
+  if(send.__ic!==ic){send.innerHTML=ic;send.__ic=ic}
+};
+const _vChat0=vChat;
+vChat=function(){
+  return _vChat0().replace('<button class="ch-send" id="chsend"',`<button class="ch-stb" data-act="chstk" aria-label="Sticker">😎</button><button class="ch-send" id="chsend"`)
+    .replace('<div class="ch-comp"><div id="chreply"></div>','<div class="ch-comp"><div id="chreply"></div><div class="ch-rec" id="chrec"></div>')
+    .replace('aria-label="Allega foto, sondaggio, dadi…"','aria-label="Allega foto, vocale, sondaggio…"');
+};
+chAttachSheet=function(){
+  const ev=chNextEvent();
+  const t=(act,ic,l,s,c)=>`<button class="ch-att ${c||''}" data-act="${act}"><span class="ch-atti">${ic}</span><b>${l}</b><span>${s}</span></button>`;
+  return `<div class="back" data-act="closesheet"><div class="sheet ${SH.anim?'anim':''}" role="dialog" aria-label="Allega"><div class="grab"></div><div class="sheet-body">
+<div class="row sp"><h2>Aggiungi alla chat</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
+<div class="ch-atts">
+${t('chphoto',ico('image',24),'Foto','dalla galleria','a1')}
+${t('chcam',ico('camera',24),'Scatta','con la fotocamera','a2')}
+${t('chrecgo',CH_MIC,'Vocale','registra un audio','a5')}
+${t('chstk','😎','Sticker','a tema poker','a6')}
+${t('chpoll','📊','Sondaggio','fai votare il tavolo','a3')}
+${ev?t('chevshare','📅','Serata','condividi la prossima','a4'):''}
+</div></div></div></div>`;
+};
+function chStkSheet(){
+  let rec=[];try{rec=JSON.parse(LS.get('stkrecent','[]'))||[]}catch(e){}
+  rec=rec.filter(k=>k.e?CH_STKE.includes(k.e):chStkOf(k.id)).slice(0,8);
+  const cell=k=>`<button class="ch-stkc" data-act="chstksend" ${k.e?`data-e="${esc(k.e)}"`:`data-s="${k.id}"`} aria-label="${esc(k.e||chStkOf(k.id)[2])}">${chStkHtml(k)}</button>`;
+  return `<div class="back" data-act="closesheet"><div class="sheet tall ch-stksh ${SH.anim?'anim':''}" role="dialog" aria-label="Sticker"><div class="grab"></div><div class="sheet-body">
+<div class="row sp"><h2>Sticker</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
+${rec.length?`<div class="lbl">Usati di recente</div><div class="ch-stkg">${rec.map(cell).join('')}</div>`:''}
+<div class="lbl">Dal tavolo da poker</div><div class="ch-stkg">${CH_STK.map(s=>cell({id:s[0]})).join('')}</div>
+<div class="lbl">Faccine giganti</div><div class="ch-stkg emo">${CH_STKE.map(e=>cell({e})).join('')}</div>
+</div></div></div>`;
+}
+const _sheetChat2=sheetHtml;
+sheetHtml=function(){if(SH&&SH.type==='chstk')return chStkSheet();return _sheetChat2()};
+Object.assign(H,{
+  chsend(){const ta=$$id('chin');if(ta&&(ta.value.trim()||CH.edit)){chSendText();ta.focus()}else chRecStart()},
+  chrecgo(){SH=null;render();chRecStart()},
+  chrecx(){chRecStop(true)},
+  chrecok(){chRecStop(false)},
+  chplay(d){chPlay(+d.id)},
+  chspeed(){PL.rate=PL.rate===1?1.5:PL.rate===1.5?2:1;if(PL.a)PL.a.playbackRate=PL.rate;chPlayUI()},
+  chstk(){openSheet({type:'chstk'})},
+  chstksend(d){const b=d.e?{e:d.e}:{id:d.s};SH=null;render();
+    try{let rec=JSON.parse(LS.get('stkrecent','[]'))||[];rec=[b].concat(rec.filter(k=>!(k.e===b.e&&k.id===b.id))).slice(0,8);LS.set('stkrecent',JSON.stringify(rec))}catch(e){}
+    chSend('sticker',b)},
+});
+/* se si esce dalla chat mentre si registra, la registrazione si butta */
+const _goChat=go;
+go=function(){if(REC.on)chRecStop(true);if(PL.a&&arguments[0]!=='chat'){try{PL.a.pause()}catch(e){}}return _goChat.apply(this,arguments)};
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&REC.on)chRecStop(false)});
+
+const _chBack2=H.chback;
+H.chback=function(){if(REC.on)chRecStop(true);if(PL.a){try{PL.a.pause()}catch(e){}}return _chBack2.apply(this,arguments)};
+const _chPaint2=chatPaint;
+chatPaint=function(){const r=_chPaint2.apply(this,arguments);if(PL.id!=null)chPlayUI();chRecUI();return r};
+
 /* ---------- dove si entra nella chat ---------- */
 /* pulsante fluttuante nelle sezioni principali */
 function chFab(){return `<button class="ch-fab" data-act="openchat" aria-label="Chat del tavolo${CH.unread?', '+CH.unread+' messaggi nuovi':''}"><span>💬</span><i data-chbadge ${CH.unread?'':'hidden'}>${CH.unread>9?'9+':CH.unread}</i></button>`}
@@ -8776,7 +9049,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792423628428';
+const APP_VERSION='1792436916112';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
