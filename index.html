@@ -8896,7 +8896,8 @@ function chPlay(id){
   if(PL.a){try{PL.a.pause()}catch(e){}}
   const u=chUrl(m.body.path);
   if(!u){toast('Sto caricando l\'audio, riprova tra un attimo','ok');return}
-  const a=new Audio(u);a.preload='auto';a.playbackRate=PL.rate;PL.a=a;PL.id=id;
+  chAudioSession('playback');
+  const a=new Audio(u);a.preload='auto';a.volume=1;a.playbackRate=PL.rate;try{a.preservesPitch=true}catch(e){}PL.a=a;PL.id=id;
   a.ontimeupdate=chPlayUI;a.onplay=chPlayUI;a.onpause=chPlayUI;
   a.onended=()=>{const was=PL.id;PL.id=null;PL.a=null;chPlayUI();
     // finito un vocale parte il successivo dello stesso giro, come su WhatsApp
@@ -8930,11 +8931,13 @@ async function chRecStart(){
   if(REC.on||!CH.tid)return;
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){toast('Questo telefono non permette di registrare audio dall\'app','err');return}
   let st;
-  try{st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}
+  /* niente filtro "da telefonata" (cancellazione dell'eco): su iPhone e Android abbassa molto la qualità.
+     Il volume si regola da solo, così anche chi parla piano si sente bene */
+  try{chAudioSession('play-and-record');st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:true,channelCount:1,sampleRate:{ideal:48000}}})}
   catch(e){toast(e&&e.name==='NotAllowedError'?'Microfono non permesso: consentilo nelle impostazioni del telefono per Home Poker':'Microfono non disponibile','err');return}
   const types=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/aac'];
   const mime=types.find(t=>{try{return MediaRecorder.isTypeSupported(t)}catch(e){return false}})||'';
-  let mr;try{mr=new MediaRecorder(st,mime?{mimeType:mime,audioBitsPerSecond:48000}:undefined)}catch(e){mr=new MediaRecorder(st)}
+  let mr;try{mr=new MediaRecorder(st,mime?{mimeType:mime,audioBitsPerSecond:128000}:{audioBitsPerSecond:128000})}catch(e){mr=new MediaRecorder(st)}
   Object.assign(REC,{on:true,st,mr,chunks:[],t0:Date.now(),wave:[],cancel:false,an:null,ac:null});
   mr.ondataavailable=e=>{if(e.data&&e.data.size)REC.chunks.push(e.data)};
   mr.onstop=chRecDone;
@@ -8944,6 +8947,9 @@ async function chRecStart(){
   try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}
   chRecUI();
 }
+/* su iPhone, dopo aver usato il microfono l'audio esce dalla capsula per le chiamate (bassissimo):
+   si rimette l'uscita normale dall'altoparlante */
+function chAudioSession(t){try{if(navigator.audioSession)navigator.audioSession.type=t}catch(e){}}
 function chRecTick(){
   if(!REC.on)return;const s=(Date.now()-REC.t0)/1000;let lv=.12+Math.random()*.1;
   if(REC.an){try{REC.an.getByteTimeDomainData(REC.buf);let mx=0;for(let i=0;i<REC.buf.length;i++){const d=Math.abs(REC.buf[i]-128);if(d>mx)mx=d}lv=Math.min(1,mx/70)}catch(e){}}
@@ -8959,6 +8965,7 @@ function chRecStop(cancel){
 function chRecDone(){
   if(!REC.on)return;const r=Object.assign({},REC);REC.on=false;
   try{r.st.getTracks().forEach(t=>t.stop())}catch(e){}try{r.ac&&r.ac.close()}catch(e){}
+  chAudioSession('playback');
   chRecUI();
   const dur=(Date.now()-r.t0)/1000;if(r.cancel)return;
   if(dur<1){toast('Troppo corto: tieni registrato almeno un secondo','err');return}
@@ -9215,7 +9222,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792437372921';
+const APP_VERSION='1792437655389';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
