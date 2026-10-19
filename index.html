@@ -2041,6 +2041,18 @@ body.clown-me .btn:not(.ghost):not(.dash),body.clown-me .ent-cta,body.clown-me .
 body.clown-me .tab-ind{background:linear-gradient(90deg,#FF2D55,#FFD60A,#30D158,#0A84FF)!important}
 body.clown-me .pk-logo b i::after{content:" CIRCUS"}
 @media (prefers-reduced-motion:reduce){.ava.clown{animation:none}}
+
+.clown-strip{position:relative;z-index:6;display:flex;overflow:hidden;white-space:nowrap;margin:0 -16px 10px;padding:7px 0;background:repeating-linear-gradient(90deg,#FF2D55 0 40px,#FFD60A 40px 80px,#30D158 80px 120px,#0A84FF 120px 160px);color:#fff;font-weight:900;font-size:13px;letter-spacing:.06em;text-shadow:0 1px 2px #000,0 0 6px rgba(0,0,0,.6);box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.clown-strip span{flex:none;padding-right:8px;animation:clownMarq 22s linear infinite}
+@keyframes clownMarq{to{transform:translateX(-100%)}}
+.cas .clown-strip,.lob .clown-strip{margin:0 0 12px}
+.clown-rain{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}
+.clown-rain i{position:absolute;top:-60px;font-style:normal;animation:clownFall 3s cubic-bezier(.3,.6,.6,1) forwards}
+@keyframes clownFall{to{transform:translateY(110vh) rotate(540deg)}}
+body.clown-me .btn,body.clown-me .ent-cta,body.clown-me .pk-cta,body.clown-me .tab{animation:clownJig 2.4s ease-in-out infinite}
+body.clown-me .tab:nth-child(odd){animation-delay:.4s}
+@keyframes clownJig{0%,86%,100%{transform:none}90%{transform:rotate(-3deg) scale(1.03)}95%{transform:rotate(3deg) scale(1.03)}}
+@media (prefers-reduced-motion:reduce){.clown-strip span,body.clown-me .btn,body.clown-me .tab{animation:none}}
 </style>
 
 <div id="app"></div>
@@ -7954,8 +7966,52 @@ function clownSync(){
 }
 const _renderClown=render;
 render=function(){const r=_renderClown.apply(this,arguments);try{clownSync()}catch(e){}return r};
+
+/* ---- scherzo, livello 2: nome, insegna, trombetta, battute (scade con CLOWN_UNTIL) ---- */
+const CLOWN_JOKES=['Il naso rosso ti dona 🤡','Attenzione: al tavolo c\'è un pagliaccio 🎪','Vittorio, il bluff si fa con le carte, non con la faccia 🤡','Applausi per il clown della serata 👏🤡','Oggi offre il circo: entrata gratuita 🎪','Ricorda: chi ride per ultimo… non sei tu 🤡','Hai le scarpe giuste per il tavolo? Sono lunghe 50 cm 👞🤡','Il tendone è montato, manchi solo tu in pista 🎪'];
+let honkCtx=null,honkAt=0;
+function honk(){
+  const n=performance.now();if(n-honkAt<350)return;honkAt=n;
+  try{honkCtx=honkCtx||new (window.AudioContext||window.webkitAudioContext)();const c=honkCtx,t=c.currentTime;
+    [0,0.22].forEach((d,k)=>{const o=c.createOscillator(),o2=c.createOscillator(),g=c.createGain();
+      o.type='sawtooth';o2.type='square';o.frequency.setValueAtTime(k?330:390,t+d);o.frequency.exponentialRampToValueAtTime(k?240:300,t+d+.18);o2.frequency.setValueAtTime(k?165:195,t+d);
+      g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(.22,t+d+.02);g.gain.exponentialRampToValueAtTime(.001,t+d+.2);
+      o.connect(g);o2.connect(g);g.connect(c.destination);o.start(t+d);o2.start(t+d);o.stop(t+d+.21);o2.stop(t+d+.21)});
+  }catch(e){}
+}
+function clownRain(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const box=document.createElement('div');box.className='clown-rain';box.setAttribute('aria-hidden','true');
+  for(let i=0;i<26;i++){const e=document.createElement('i');e.textContent=['🤡','🎪','🎈','🤡','👃'][i%5];e.style.left=(Math.random()*100)+'%';e.style.animationDelay=(Math.random()*1.4)+'s';e.style.fontSize=(22+Math.random()*26)+'px';box.appendChild(e)}
+  document.body.appendChild(box);setTimeout(()=>box.remove(),4200);
+}
+function clownText(root){
+  if(!root)return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>/\bVittorio\b/.test(n.nodeValue)&&!(n.parentElement&&n.parentElement.closest('input,textarea,.sr,.clown-strip'))?1:2});
+  const L=[];while(w.nextNode())L.push(w.currentNode);
+  L.forEach(n=>{n.nodeValue=n.nodeValue.replace(/\bVittorio\b(?! 🤡)/g,'Vittorio 🤡')});
+}
+function clownStrip(){
+  const app=$('#app'),first=app&&app.firstElementChild;if(!first||first.querySelector(':scope>.clown-strip'))return;
+  if(!(V&&['mode','home','vlobby'].includes(V.name))&&!document.querySelector('#app .sl'))return;
+  const msg='🎪 OGGI IN PISTA: VITTORIO IL PAGLIACCIO 🤡 · INGRESSO GRATUITO · NON DATEGLI DA MANGIARE 🍌 · ';
+  first.insertAdjacentHTML('afterbegin',`<div class="clown-strip" aria-label="Oggi in pista: Vittorio il pagliaccio"><span>${msg.repeat(3)}</span><span aria-hidden="true">${msg.repeat(3)}</span></div>`);
+}
+const _renderClown2=render;
+render=function(){const r=_renderClown2.apply(this,arguments);
+  if(clownOn()){try{clownText($('#app'));clownText($('#sheet'));clownStrip();
+    const me=(S.acct&&S.acct.name)||(S.me&&S.me.name);
+    if(isClown(me)){if(!render.__rain){render.__rain=1;setTimeout(clownRain,500)}
+      if(!render.__jk){render.__jk=setInterval(()=>{if(!clownOn()){clearInterval(render.__jk);return}if(!document.hidden)toast(CLOWN_JOKES[Math.floor(Math.random()*CLOWN_JOKES.length)],'ok')},40000)}}
+  }catch(e){}}
+  return r};
+document.addEventListener('pointerdown',e=>{
+  if(!clownOn())return;
+  const me=(S.acct&&S.acct.name)||(S.me&&S.me.name);
+  if(isClown(me)){if(e.target.closest('button,a,.tab'))honk();return}
+  if(e.target.closest('.ava.clown'))honk();
+},true);
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792405141073';
+const APP_VERSION='1792405234519';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
