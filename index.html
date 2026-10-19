@@ -4519,6 +4519,7 @@ Object.assign(H,{
   },
   pushinvite(d){const g=S.games[d.gid];if(!g)return;pushSend({to:'all',title:`♠️ Poker ${new Date(g.scheduledAt).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})} alle ${tHM(g.scheduledAt)}`,body:`Ci sono ancora posti: tocca per prenotarti.`,url:deepUrl('book',d.gid),tag:'invito-'+d.gid});toast('Promemoria inviato al tavolo','ok')},
   pushtoggle(){S.pushOn?pushOff():pushOn()},
+  pushtest(){pushTest()},
   rename(){F.rn={name:S.acct?S.acct.name:'',pin:''};openSheet({type:'rename'})},
   renameok(){renameOk()}
 });
@@ -4548,7 +4549,7 @@ sheetHtml=function(){
     const pushLi=`<button class="li" data-act="pushtoggle"><span class="lic">${ico('bell',17)}</span><span class="grow">Notifiche${!pushSupported()&&isIOS()&&!isStandalone()?'<span class="mut xs" style="display:block">Aggiungi prima l\'app alla schermata Home</span>':''}</span><span class="sw ${S.pushOn?'on':''}"><i></i></span></button>`;
     const nameLi=`<button class="li" data-act="rename"><span class="lic">${ico('user',17)}</span><span class="grow">Cambia nome utente</span>${ico('chevr',16)}</button>`;
     h=h.replace(/(<button class="li" data-act="chpin"\s*>)/,nameLi+'$1');
-    h=h.replace(/(<div class="list">)(?![\s\S]*<div class="list">)/,'$1'+pushLi);
+    h=h.replace(/(<div class="list">)(?![\s\S]*<div class="list">)/,'$1'+pushLi+(S.pushOn?`<button class="li" data-act="pushtest"><span class="lic">🔔</span><span class="grow">Prova le notifiche<span class="mut xs" style="display:block">Manda una notifica a questo telefono</span></span>${ico('chevr',16)}</button>`:''));
   }
   return h;
 };
@@ -4578,7 +4579,24 @@ window.addEventListener('hashchange',()=>{const d=deepLink();if(!d||!S.acct||S.l
   if(S.table&&S.table.id===d.t){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(d.v==='vt'){H.govt({rid:d.g})}else if(d.v==='net'){F.pinp='';go('netting',null,{pid:d.g})}else if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g)}
   else{S.deepTried=false;backToTables()}});
 navigator.serviceWorker&&navigator.serviceWorker.addEventListener&&navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.url){location.hash=new URL(e.data.url,location.href).hash}});
-setTimeout(async()=>{S.pushOn=await pushState()},1500);
+/* all'avvio: se le notifiche sono attive, il server riceve sempre l'indirizzo aggiornato del telefono
+   (su Android cambia ogni tanto e quello vecchio smette di funzionare) */
+async function pushResync(){
+  S.pushOn=await pushState();
+  if(!S.pushOn||!S.acct||pushResync.done)return;pushResync.done=true;
+  try{const r=await swReady();const s=await r.pushManager.getSubscription();if(!s)return;const j=s.toJSON();await BASE.rpc('hpl_save_push',{p_endpoint:j.endpoint,p_p256dh:j.keys.p256dh,p_auth:j.keys.auth})}catch(e){console.warn('push resync',e)}
+}
+setTimeout(pushResync,1500);setTimeout(pushResync,8000);
+async function pushTest(){
+  if(!S.table){toast('Apri prima un tavolo','err');return}
+  toast('Invio una notifica di prova…','ok');
+  try{
+    const r=await BASE.fn('hpl-push',{table_id:S.table.id,test:true,title:'🔔 Home Poker',body:'Prova riuscita: le notifiche arrivano su questo telefono',url:'./',tag:'test'});
+    if(!r||!r.subs)toast('Questo account non ha telefoni con le notifiche attive: spegni e riaccendi "Notifiche"','err');
+    else if(r.failed&&r.failed.length)toast('Non consegnata a '+r.failed.length+' telefon'+(r.failed.length===1?'o':'i')+' ('+(r.failed[0].code||'errore')+'): spegni e riaccendi "Notifiche"','err');
+    else toast('Inviata: deve arrivare tra pochi secondi. Se non arriva, guarda le impostazioni del telefono','ok');
+  }catch(e){toast('Prova non riuscita: '+errMsg(e),'err')}
+}
 
 /* =====================================================================
    Motore Texas Hold'em (no-limit) — usato dal server (Edge Function) e,
@@ -8741,7 +8759,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792412195000';
+const APP_VERSION='1792423493251';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
