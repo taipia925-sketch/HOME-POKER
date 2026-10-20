@@ -8229,7 +8229,9 @@ const chSb=()=>BASE&&BASE.sb;
 const CH_REACT=['♥️','😂','🔥','👍','😮','🤡','🃏'];
 const chReadKey=()=>'chatread.'+CH.tid;
 function chMyRead(){return Math.max(CH.reads.get(chMe())||0,+(LS.get(chReadKey(),0))||0)}
-function chNameOf(acct){if(acct===chMe())return chMyName();return CH.names.get(acct)||(CH.online.get(acct)||{}).name||'Qualcuno'}
+/* il nome di chi non ha mai scritto né è collegato si prende dalla rubrica del tavolo (giocatore collegato a quell'account) */
+function chNameOf(acct){if(acct===chMe())return chMyName();return CH.names.get(acct)||(CH.online.get(acct)||{}).name||chPlayerName(acct)||'Un giocatore'}
+function chPlayerName(acct){const p=Object.values(S.players||{}).find(x=>x&&x.acct===acct);return p?p.name:''}
 
 /* ---------- avvio / stop (per tavolo) ---------- */
 async function chatStart(){
@@ -9219,7 +9221,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792522359092';
+const APP_VERSION='1792523374362';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
