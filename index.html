@@ -3425,8 +3425,8 @@ async function bioEnroll(){
   const token=[...crypto.getRandomValues(new Uint8Array(24))].map(x=>x.toString(16).padStart(2,'0')).join('');
   return {cred:b64(cred.rawId),token};
 }
-async function bioAssert(cred){
-  await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:unb64(cred)}],userVerification:'required',timeout:60000}});
+async function bioAssert(cred,signal){
+  await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:unb64(cred)}],userVerification:'required',timeout:60000},signal});
   return true;
 }
 const bioHash=(id,token)=>sha('hplbio:'+id+':'+token);
@@ -4045,7 +4045,7 @@ async function fullLogout(){
 Object.assign(H,{
   acmode(d){F.ac.mode=d.m;F.ac.err='';F.ac.pin='';F.ac.pin2='';render()},
   ulpin(){F.ul.show=true;render()},
-  async unlockbio(){const b=acctBio();if(!b){F.ul.show=true;render();return}try{await bioAssert(b.cred);S.locked=false;F.ul={pin:'',err:'',show:false};render()}catch(e){F.ul.show=true;F.ul.err='Face ID non riuscito: usa il PIN.';render()}},
+  async unlockbio(){const b=acctBio();if(!b){F.ul.show=true;render();return}bioAutoStop();try{await bioAssert(b.cred);S.locked=false;F.ul={pin:'',err:'',show:false};render()}catch(e){F.ul.show=true;F.ul.err='Face ID non riuscito: usa il PIN.';render()}},
   fulllogout(){SH=null;fullLogout()},
   logout(){SH=null;if(acctBio()){resetTableState();S.locked=true;render()}else fullLogout()},
   tables(){SH=null;backToTables()},
@@ -8168,6 +8168,18 @@ ${u.show?`<label class="field"><span>Oppure il tuo PIN</span><input class="in en
 ${u.err?`<div class="ent-err">${esc(u.err)}</div>`:''}<button class="ent-alt" type="submit">Entra con il PIN</button>`:`<button type="button" class="ent-alt" data-act="ulpin">${ico('key',18)} Usa il PIN</button>`}
 <button type="button" class="ent-out" data-act="fulllogout">Non sei ${esc(n)}? Esci</button></form></main></div>`;
 };
+/* appena si apre la schermata di blocco chiede subito il Face ID, senza dover toccare il pulsante:
+   una volta per blocco (e di nuovo quando si torna nell'app); se non parte o lo annulli resta il pulsante */
+let bioAutoDone=false,bioAutoAc=null;
+function bioAutoStop(){if(bioAutoAc){try{bioAutoAc.abort()}catch(e){}bioAutoAc=null}}
+function bioAuto(){
+  if(!S.locked||bioAutoDone||bioAutoAc||document.hidden||F.ul.show||!window.PublicKeyCredential)return;
+  const b=acctBio();if(!b)return;
+  bioAutoDone=true;const ac=bioAutoAc=typeof AbortController==='function'?new AbortController():{abort(){},signal:undefined};
+  bioAssert(b.cred,ac.signal).then(()=>{if(bioAutoAc===ac&&S.locked){S.locked=false;F.ul={pin:'',err:'',show:false};render()}}).catch(()=>{}).finally(()=>{if(bioAutoAc===ac)bioAutoAc=null});
+}
+{const _rBio=render;render=function(){const r=_rBio.apply(this,arguments);if(S.locked)setTimeout(bioAuto,250);else{bioAutoDone=false;bioAutoStop()}return r}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&S.locked&&!bioAutoAc){bioAutoDone=false;setTimeout(bioAuto,250)}});
 vAccount=function(){
   const a=F.ac;if(a.mode===null)a.mode='login';
   const reg=a.mode==='reg';
@@ -9221,7 +9233,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792523374362';
+const APP_VERSION='1792529517817';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
