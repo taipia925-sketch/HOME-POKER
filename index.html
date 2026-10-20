@@ -2352,6 +2352,20 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .ch-rban .btn{flex:none;width:auto;padding:10px 14px;font-size:14px}
 @keyframes chFabIn{from{transform:scale(.3);opacity:0}}
 @media (prefers-reduced-motion:reduce){.ch-in,.ch-in .ch-die,.ch-in .ch-coin,.ch-in .ch-cardw,.ch-fab{animation:none!important}}
+/* ===== accessibilità: contrasti e zone da toccare (WCAG 2.1 AA) ===== */
+.num.red,.red.num{color:#FF8A8F!important}
+.pk-pill.up{background:#0E7A3E}
+.pkt-stats small{color:rgba(255,255,255,.86)}
+.b3 b.num{background:rgba(0,0,0,.55);padding:1px 6px;border-radius:999px}
+.ch-row.me .ch-tick.seen{color:#7A0716}
+.pkh-home,[data-act=rebuy],[data-act=cashout],[data-act=vtjoin]{min-height:44px}
+.t3-ib,.ch-back,.ch-ib,.t3-step{width:44px!important;height:44px!important}
+[data-act=settle].link,button.link[data-act=settle]{min-height:44px;padding:0 10px}
+.ch-seen{padding:10px 6px;margin:-7px 0 -7px}
+.ch-bub:focus-visible{outline:3px solid #FFD25A;outline-offset:2px}
+.pkt-stats small{color:rgba(255,255,255,.95)}
+.ch-row.me .ch-bub:not(.ph):not(.stk):not(.res) .ch-meta{opacity:.85}
+.s3.fold .s3-av,.s3.fold .s3-plate{opacity:.62}
 </style>
 
 <div id="app"></div>
@@ -8627,7 +8641,7 @@ function chMsgHtml(m,first,last){
   return `<div class="ch-row ${mine?'me':'ot'} ${first?'first':''} ${last?'last':''} k-${m.kind}" data-id="${m.id}">
 ${!mine?`<span class="ch-av">${last?ava(m.author_name||'?','s'):''}</span>`:''}
 <div class="ch-col">${!mine&&first?`<span class="ch-nm" style="--h:${hueOf(m.author_name||'')}">${esc(m.author_name||'?')}</span>`:''}
-<div class="ch-bub ${plain?'plain':''} ${m.kind==='photo'&&!m.deleted&&!(b.cap||b.re)?'ph':''} ${m.deleted?'gone':''}" data-act="chmenu" data-id="${m.id}">${chBodyHtml(m)}
+<div tabindex="0" role="button" aria-haspopup="dialog" aria-label="Messaggio di ${esc(mine?'te':m.author_name||'')}, ${chTime(m.created_at)}: ${esc(chSnip(m))}. Invio per rispondere o reagire" class="ch-bub ${plain?'plain':''} ${m.kind==='photo'&&!m.deleted&&!(b.cap||b.re)?'ph':''} ${m.deleted?'gone':''}" data-act="chmenu" data-id="${m.id}">${chBodyHtml(m)}
 <span class="ch-meta">${m.edited_at&&!m.deleted?'modificato · ':''}${chTime(m.created_at)}${mine&&!m.__tmp?`<i class="ch-tick ${seen?'seen':''}">${seen?'✓✓':'✓'}</i>`:''}</span></div>
 ${chReactsHtml(m)}${st}${seen?`<button class="ch-seen" data-act="chseen" data-id="${m.id}">Visto da ${seen}</button>`:''}</div></div>`;
 }
@@ -8780,6 +8794,7 @@ document.addEventListener('click',e=>{
     if(chLastTapId===id&&now-chLastTap<320){chToggleReact(id,'♥️');chLastTap=0;e.stopPropagation();e.preventDefault();return}
     chLastTap=now;chLastTapId=id;e.stopPropagation();e.preventDefault();return}
 },true);
+document.addEventListener('keydown',e=>{const b=e.target&&e.target.classList&&e.target.classList.contains('ch-bub')?e.target:null;if(b&&(e.key==='Enter'||e.key===' ')){e.preventDefault();chOpenMenu(+b.dataset.id)}});
 document.addEventListener('contextmenu',e=>{const b=e.target.closest&&e.target.closest('#chlist .ch-bub');if(b){e.preventDefault();chOpenMenu(+b.dataset.id)}});
 document.addEventListener('input',e=>{
   if(e.target&&e.target.id==='chin'){chAutoGrow();chComposer();if(e.target.value.trim())chTyping();try{LS.set('chatdraft.'+CH.tid,e.target.value)}catch(x){}}
@@ -9361,7 +9376,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792502729711';
+const APP_VERSION='1792503219923';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
