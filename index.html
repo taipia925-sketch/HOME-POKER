@@ -1576,7 +1576,7 @@ body::after{opacity:1;mix-blend-mode:normal;background-image:
 .vt3{--pr:#D7262F;--pr2:#A9141D;background:radial-gradient(80% 30% at 50% -4%,rgba(220,40,60,.30),transparent 70%),radial-gradient(70% 40% at 100% 70%,rgba(90,60,255,.10),transparent 70%),radial-gradient(90% 55% at 50% 42%,#2E2530,#1A1419 70%,#110C11)}
 .vt3::before{display:none}
 .t3-top{min-height:52px;padding:6px 8px 0}
-.t3-ib{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 2px 6px rgba(0,0,0,.4)}
+.t3-ib{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 2px 6px rgba(0,0,0,.4)}
 .t3-ib.on{background:linear-gradient(180deg,#E8434B,var(--pr2));color:#fff}
 .t3-tt b{font-family:var(--sans);font-size:15.5px;font-weight:800}
 .t3-tt span{color:#A9ABB0}
@@ -1678,7 +1678,7 @@ body::after{opacity:1;mix-blend-mode:normal;background-image:
 .t3-szp button.on{background:linear-gradient(180deg,#F04A52,var(--pr));box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55)}
 .t3-szr{display:flex;align-items:center;gap:7px}
 .t3-szv{flex:none;min-width:78px;height:38px;display:grid;place-items:center;padding:0 10px;border-radius:6px;background:#0F1012;box-shadow:inset 0 0 0 1px #55575C;font-weight:800;font-size:15px;color:#fff}
-.vt3 .t3-step{width:38px;height:38px;border-radius:6px;background:linear-gradient(180deg,#4A4B4F,#2E2F33);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);font-size:20px;color:#fff}
+.vt3 .t3-step{width:44px;height:44px;border-radius:6px;background:linear-gradient(180deg,#4A4B4F,#2E2F33);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);font-size:20px;color:#fff}
 .vt3 #vt-range::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,#E8434B var(--f),#55575C var(--f))}
 .vt3 #vt-range::-moz-range-track{height:6px;border-radius:3px;background:linear-gradient(90deg,#E8434B var(--f),#55575C var(--f))}
 .vt3 #vt-range::-webkit-slider-thumb{width:26px;height:26px;margin-top:-10px;border-radius:6px;background:linear-gradient(180deg,#FFFFFF,#C9CBD0);box-shadow:0 2px 6px rgba(0,0,0,.6)}
@@ -2045,7 +2045,7 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .ch-hd{position:relative;z-index:3;flex:none;display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top,0px)) 10px 10px;
   background:radial-gradient(circle at 85% 0%,rgba(255,120,120,.45),transparent 55%),linear-gradient(180deg,#B3122A,#6E0716);box-shadow:0 8px 24px -8px rgba(0,0,0,.7),inset 0 -1px 0 rgba(255,214,90,.5)}
 .ch-hd::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:repeating-linear-gradient(90deg,#FFD25A 0 6px,transparent 6px 12px);opacity:.55}
-.ch-back,.ch-ib{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:#fff;background:rgba(0,0,0,.25);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);font-size:20px}
+.ch-back,.ch-ib{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;color:#fff;background:rgba(0,0,0,.25);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);font-size:20px}
 .ch-back:active,.ch-ib:active{transform:scale(.94)}
 .ch-ht{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.15}
 .ch-ht .pk-k{font-size:10px;color:#FFD9A0}
@@ -2364,11 +2364,9 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 /* ===== accessibilità: contrasti e zone da toccare (WCAG 2.1 AA) ===== */
 .num.red,.red.num{color:#FF8A8F!important}
 .pk-pill.up{background:#0E7A3E}
-.pkt-stats small{color:rgba(255,255,255,.86)}
 .b3 b.num{background:rgba(0,0,0,.55);padding:1px 6px;border-radius:999px}
 .ch-row.me .ch-tick.seen{color:#7A0716}
 .pkh-home,[data-act=rebuy],[data-act=cashout],[data-act=vtjoin]{min-height:44px}
-.t3-ib,.ch-back,.ch-ib,.t3-step{width:44px!important;height:44px!important}
 [data-act=settle].link,button.link[data-act=settle]{min-height:44px;padding:0 10px}
 .ch-seen{padding:10px 6px;margin:-7px 0 -7px}
 .ch-bub:focus-visible{outline:3px solid #FFD25A;outline-offset:2px}
@@ -5128,7 +5126,7 @@ function vtSubscribe(){
   try{S.vt.ch=BASE.sb.channel('vt-'+tid).on('postgres_changes',{event:'*',schema:'public',table:'hpl_vt',filter:'table_id=eq.'+tid},pl=>{if(pl.new&&pl.new.state&&S.table&&S.table.id===tid)vtApply(pl.new.state)}).subscribe()}catch(e){}
   vtLoad();
 }
-function vtUnsubscribe(){if(S.vt.ch){try{BASE.sb.removeChannel(S.vt.ch)}catch(e){}S.vt.ch=null}}
+function vtUnsubscribe(){if(S.vt.ch){try{BASE.sb.removeChannel(S.vt.ch)}catch(e){}S.vt.ch=null}S.vt.rtOk=false}
 function vtReset(){vtUnsubscribe();Object.assign(S.vt,{st:null,cards:null,cardsHand:null,missing:false,err:null,myTurnSeen:null,loadedFor:null});F.vt={raise:null,cfg:null}}
 
 /* battito: timer a schermo, turni scaduti, mano successiva, aggiornamento di riserva */
@@ -5138,7 +5136,7 @@ setInterval(()=>{
   if(!(inVt||(V&&V.name==='mode'&&S.table))){if(S.vt.ch&&!(V&&(V.name==='vt'||V.name==='mode')))vtUnsubscribe();return}
   if(!S.vt.ch)vtSubscribe();
   const now=Date.now();
-  if(now-VT_LASTPOLL>(inVt?3000:8000)){VT_LASTPOLL=now;vtLoad()}
+  if(now-VT_LASTPOLL>(S.vt.rtOk&&S.vt.ch?15000:(inVt?3000:8000))){VT_LASTPOLL=now;vtLoad()}
   if(!inVt){if(S.vt.awake&&V.name!=='live'){S.vt.awake=false;keepAwake(false)}return}
   if(!S.vt.awake&&vtSeat()>=0){S.vt.awake=true;keepAwake(true)}
   const st=S.vt.st,h=st&&st.hand,sn=vtNow();
@@ -5764,7 +5762,7 @@ const _vtApplyR=vtApply;
 vtApply=function(st){
   if(!st||!st.room||!st.room.id)return;const rid=st.room.id;
   const cur=S.vt.rooms[rid];if(!cur||(st.v||0)>=(cur.v||0))S.vt.rooms[rid]=st;
-  if(rid!==S.vt.rid){if(V.name==='vlobby'||V.name==='mode')render();return}
+  if(rid!==S.vt.rid){if(!S.vt.batch&&(V.name==='vlobby'||V.name==='mode'))render();return}
   if(S.vt.optPending&&S.vt.st&&(st.v||0)>(S.vt.st.v||0))S.vt.optPending=false;
   _vtApplyR(st);
 };
@@ -5784,7 +5782,7 @@ vtLoad=async function(){
       return}
     if(!S.table||S.table.id!==tid)return;
     S.vt.missing=false;S.vt.roomsLoaded=true;
-    const seen={};(data||[]).forEach(r=>{seen[r.room_id]=1;vtApply(r.state)});
+    const seen={};S.vt.batch=true;try{(data||[]).forEach(r=>{seen[r.room_id]=1;vtApply(r.state)})}finally{S.vt.batch=false}
     Object.keys(S.vt.rooms).forEach(k=>{if(!seen[k])vtRoomGone(k)});
     if(S.vt.wantRid){const w=S.vt.wantRid;S.vt.wantRid=null;if(S.vt.rooms[w])vtOpenRoom(w);else toast('Quel tavolo virtuale non esiste più','err')}
     if(V.name==='vlobby'||V.name==='mode')render();
@@ -5796,12 +5794,12 @@ vtSubscribe=function(){
     if(!S.table||S.table.id!==tid)return;
     if(pl.eventType==='DELETE'){const r=pl.old&&pl.old.room_id;if(r)vtRoomGone(r)}
     else if(pl.new&&pl.new.state)vtApply(pl.new.state);
-  }).subscribe()}catch(e){}
+  }).subscribe(st=>{S.vt.rtOk=st==='SUBSCRIBED'})}catch(e){}
   vtLoad();
 };
 const _vtUnsubR=vtUnsubscribe;
 vtUnsubscribe=function(){if(V&&V.name==='vlobby')return;_vtUnsubR()};
-setInterval(()=>{if(V&&V.name==='vlobby'&&S.table){if(!S.vt.ch)vtSubscribe();if(Date.now()-(S.vt.lpoll||0)>4000){S.vt.lpoll=Date.now();vtLoad()}}},500);
+setInterval(()=>{if(V&&V.name==='vlobby'&&S.table){if(!S.vt.ch)vtSubscribe();if(Date.now()-(S.vt.lpoll||0)>(S.vt.rtOk&&S.vt.ch?15000:4000)){S.vt.lpoll=Date.now();vtLoad()}}},500);
 const _vtCallR=vtCall;
 vtCall=async function(action,extra,quiet){
   if(action!=='create'&&!S.vt.rid)return null;
@@ -5811,7 +5809,6 @@ vtCall=async function(action,extra,quiet){
   return r;
 };
 // gli errori "tavolo sparito" arrivano come error: li intercettiamo dalla risposta grezza
-const _fnR=()=>BASE&&BASE.fn;
 setTimeout(function wrapFn(){if(!BASE){setTimeout(wrapFn,300);return}if(BASE.__vr)return;BASE.__vr=1;const f=BASE.fn;BASE.fn=async function(n,b){const r=await f.call(BASE,n,b);if(n==='hpl-holdem'&&r&&r.gone&&b&&b.room_id)setTimeout(()=>vtRoomGone(b.room_id),0);return r}},300);
 const _vtResetR=vtReset;
 vtReset=function(){_vtResetR();Object.assign(S.vt,{rooms:{},rid:null,roomsLoaded:false,gone:null,wantRid:null,optPending:false})};
@@ -6135,7 +6132,6 @@ vtPaint=function(){
   if(st)vtOutToast(st);
 };
 /* battito: serve un giro anche per chiusura e pause scadute */
-const _vtLiveR=vtLive;
 setInterval(()=>{
   if(!(V&&V.name==='vt'&&S.table&&S.vt.st))return;
   const st=S.vt.st,sn=vtNow();let need=false;
@@ -7324,7 +7320,7 @@ ${F.vt.emo?`<div class="v2-emos t3-emos">${EMO.map(e=>`<button data-act="vtreact
 
   /* --- animazioni: confronto con quello che si vedeva prima --- */
   try{t3Animate(prev,D,st,me)}catch(e){console.warn(e)}
-  T3.prev=D;S.vt.painted=st0?JSON.parse(JSON.stringify(st0)):null;
+  T3.prev=D;S.vt.painted=st0||null;
   vtPreFire(st0,vtSeat());
   vtChatPanel();if(st0&&!(h&&h.stage==='done'&&!showRes))vtOutToast(st0);vtMusicSync();
 };
@@ -8602,7 +8598,7 @@ function chShareEvent(){
 }
 
 /* ---------- disegno ---------- */
-const chTime=t=>{const d=new Date(t);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+const chTime=tHM;
 function chDay(t){const d=new Date(t),n=new Date(),y=new Date(Date.now()-864e5);const same=(a,b)=>a.toDateString()===b.toDateString();
   if(same(d,n))return 'Oggi';if(same(d,y))return 'Ieri';const s=d.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'});return s[0].toUpperCase()+s.slice(1)}
 const chEmojiOnly=t=>{const s=String(t||'').trim();if(!s||s.length>16)return false;try{return /^(\p{Extended_Pictographic}|\p{Emoji_Component}|‍|️|\s)+$/u.test(s)&&!/^[\d#*\s]+$/.test(s)}catch(e){return false}};
@@ -8736,7 +8732,7 @@ function vChat(){
 <div class="ch-typing" id="chtyping" aria-live="polite"></div>
 <button class="ch-new" id="chnew" data-act="chdown" hidden><b>0</b> nuovi ${ico('chev',16)}</button>
 <div class="ch-comp"><div id="chreply"></div>
-<div class="ch-inrow"><button class="ch-plus" data-act="chattach" aria-label="Allega foto, sondaggio, dadi…">${ico('plus',24)}</button>
+<div class="ch-inrow"><button class="ch-plus" data-act="chattach" aria-label="Allega foto, sondaggio…">${ico('plus',24)}</button>
 <textarea id="chin" class="ch-ta" rows="1" maxlength="2000" placeholder="Scrivi al tavolo…" aria-label="Messaggio" enterkeyhint="send"></textarea>
 <button class="ch-send" id="chsend" data-act="chsend" aria-label="Invia">${ico('send',20)}</button></div></div>
 </div>`;
@@ -8992,15 +8988,15 @@ function chPlay(id){
   if(!u){toast('Sto caricando l\'audio, riprova tra un attimo','ok');return}
   chAudioSession('playback');
   const a=new Audio(u);a.preload='auto';a.volume=1;a.playbackRate=PL.rate;try{a.preservesPitch=true}catch(e){}PL.a=a;PL.id=id;
-  a.ontimeupdate=chPlayUI;a.onplay=chPlayUI;a.onpause=chPlayUI;
+  a.ontimeupdate=()=>chPlayUI(true);a.onplay=chPlayUI;a.onpause=chPlayUI;
   a.onended=()=>{const was=PL.id;PL.id=null;PL.a=null;chPlayUI();
     // finito un vocale parte il successivo dello stesso giro, come su WhatsApp
     const i=CH.order.indexOf(was),nx=i>=0?CH.msgs.get(CH.order[i+1]):null;if(nx&&nx.kind==='audio'&&!nx.deleted)chPlay(nx.id)};
   a.onerror=()=>{if(PL.a!==a)return;PL.id=null;PL.a=null;chPlayUI();toast('Questo audio non si riesce ad ascoltare su questo telefono','err')};
   a.play().catch(()=>{});chPlayUI();
 }
-function chPlayUI(){
-  document.querySelectorAll('#chlist .ch-aud').forEach(el=>{
+function chPlayUI(onlyPlaying){
+  (onlyPlaying&&PL.id!=null?document.querySelectorAll(`#chlist .ch-aud[data-id="${PL.id}"]`):document.querySelectorAll('#chlist .ch-aud')).forEach(el=>{
     const id=+el.dataset.id,on=PL.id===id&&PL.a,pl=!!(on&&!PL.a.paused);
     el.classList.toggle('playing',pl);
     const btn=el.querySelector('.ch-ap');const ic=pl?CH_PAUSE:CH_PLAY;if(btn&&btn.__ic!==ic){btn.innerHTML=ic;btn.__ic=ic}
@@ -9101,8 +9097,7 @@ chComposer=function(){
 const _vChat0=vChat;
 vChat=function(){
   return _vChat0().replace('<button class="ch-send" id="chsend"',`<button class="ch-stb" data-act="chstk" aria-label="Sticker">😎</button><button class="ch-send" id="chsend"`)
-    .replace('<div class="ch-comp"><div id="chreply"></div>','<div class="ch-comp"><div id="chreply"></div><div class="ch-rec" id="chrec"></div>')
-    .replace('aria-label="Allega foto, sondaggio, dadi…"','aria-label="Allega foto, vocale, sondaggio…"');
+    .replace('<div class="ch-comp"><div id="chreply"></div>','<div class="ch-comp"><div id="chreply"></div><div class="ch-rec" id="chrec"></div>');
 };
 chAttachSheet=function(){
   const ev=chNextEvent();
@@ -9385,12 +9380,12 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792503706202';
+const APP_VERSION='1792504482039';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
   try{
-    const r=await fetch(location.pathname+'?vcheck='+Date.now(),{cache:'no-store'});if(!r.ok)return;
+    const r=await fetch(location.pathname+'?vcheck=1',{cache:'no-cache'});if(!r.ok)return;
     const m=(await r.text()).match(/const APP_VERSION='(\d+)'/);
     if(!m||m[1]===APP_VERSION)return;
     updShown=true;const nv=m[1];

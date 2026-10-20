@@ -24,8 +24,8 @@ self.addEventListener('fetch',e=>{
     // apertura normale: subito dal telefono, intanto si aggiorna la copia
     e.respondWith(caches.open(CACHE).then(async c=>{
       const hit=await c.match('index.html');
-      // sempre la versione vera dal sito, mai una copia vecchia rimasta in memoria
-      const net=fetch(r.url,{cache:'no-store'}).then(res=>{if(res.ok)c.put('index.html',res.clone());return res});
+      // sempre la versione vera dal sito (si chiede se è cambiata: se no risponde 304 senza riscaricarla)
+      const net=fetch(r.url,{cache:'no-cache'}).then(res=>{if(res.ok)c.put('index.html',res.clone());return res});
       if(hit){e.waitUntil(net.catch(()=>{}));return hit}
       return net;
     }));
