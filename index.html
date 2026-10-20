@@ -4413,7 +4413,7 @@ function upcomingCards(){
   return upcoming().map(g=>`<button class="card tap gcard upc" data-act="book" data-gid="${g.id}"><span class="dtile"><b>${dDay(g.scheduledAt)}</b><span>${dMon(g.scheduledAt)}</span></span><div class="grow" style="min-width:0"><div style="font-weight:700">Poker ${new Date(g.scheduledAt).toLocaleDateString('it-IT',{weekday:'long'})} alle ${tHM(g.scheduledAt)}</div><div class="mut sm ell">${esc(g.location||('da '+g.hostName))}${g.note?' · '+esc(g.note):''}</div></div><span class="badge live">Prenota</span></button>`).join('');
 }
 const deepUrl=(v,gid)=>'./#go='+v+'&t='+encodeURIComponent(S.table.id)+'&g='+encodeURIComponent(gid);
-function deepLink(){const m=/^#go=(\w+)&t=([^&]+)&g=([^&]+)/.exec(location.hash||'');return m?{v:m[1],t:decodeURIComponent(m[2]),g:decodeURIComponent(m[3])}:null}
+function deepLink(){const m=/^#go=(\w+)&t=([^&]+)&g=([^&]+)/.exec(location.hash||'');return m?{v:m[1],t:decodeURIComponent(m[2]),g:decodeURIComponent(m[3]),r:/&r=1/.test(location.hash)}:null}
 
 /* ---------- 2. Notifiche push ---------- */
 const VAPID_PUBLIC='BCnn5zA-GaX6MJhOF6mrLIkm7CfuFImZr_3YHaKPhZY644jdaiWsEEUo33pTsqBMuico3HhB5qhg0Swy1g_GMXQ';
@@ -4687,12 +4687,13 @@ vTables=function(){
 const _afterDataF=afterData;
 afterData=async function(){
   await _afterDataF();
-  if(S.deep&&S.me&&S.table&&S.table.id===S.deep.t&&S.loaded.games){
+  if(S.deep&&S.deep.v!=='chat'&&S.me&&S.table&&S.table.id===S.deep.t&&S.loaded.games){
     const d=S.deep;S.deep=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
     if(d.v==='vt'){H.govt({rid:d.g})}else if(d.v==='net'){F.pinp='';go('netting',null,{pid:d.g})}else if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g);
   }
 };
 window.addEventListener('hashchange',()=>{const d=deepLink();if(!d||!S.acct||S.locked)return;
+  if(d.v==='chat'&&S.table&&S.table.id===d.t)return; // la chat la apre il suo gestore
   if(S.table&&S.table.id===d.t){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(d.v==='vt'){H.govt({rid:d.g})}else if(d.v==='net'){F.pinp='';go('netting',null,{pid:d.g})}else if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g)}
   else{S.deepTried=false;backToTables()}});
 navigator.serviceWorker&&navigator.serviceWorker.addEventListener&&navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.url){location.hash=new URL(e.data.url,location.href).hash}});
@@ -8318,8 +8319,8 @@ async function chatStart(){
       .on('postgres_changes',{event:'*',schema:'public',table:'hpl_chat_vote',filter:f},p=>chOnVote(p))
       .on('postgres_changes',{event:'*',schema:'public',table:'hpl_chat_read',filter:f},p=>{const r=p.new;if(r&&r.acct){CH.reads.set(r.acct,+r.last_id);chChanged('reads')}})
       .on('broadcast',{event:'typing'},m=>{const d=m.payload||{};if(!d.acct||d.acct===chMe())return;CH.names.set(d.acct,d.name);if(d.stop)CH.typing.delete(d.acct);else CH.typing.set(d.acct,{name:d.name,until:Date.now()+4500});chChanged('typing')})
-      .on('presence',{event:'sync'},()=>{try{const st=CH.ch.presenceState();CH.online=new Map();Object.values(st).forEach(arr=>(arr||[]).forEach(x=>{if(x&&x.acct)CH.online.set(x.acct,{name:x.name});if(x&&x.acct&&x.name)CH.names.set(x.acct,x.name)}));chChanged('online')}catch(e){}})
-      .subscribe(st=>{if(st==='SUBSCRIBED'){try{CH.ch.track({acct:chMe(),name:chMyName(),at:Date.now()})}catch(e){}}});
+      .on('presence',{event:'sync'},()=>{try{const st=CH.ch.presenceState();CH.online=new Map();Object.values(st).forEach(arr=>(arr||[]).forEach(x=>{if(x&&x.acct){const o=CH.online.get(x.acct);CH.online.set(x.acct,{name:x.name,chat:!!x.chat||!!(o&&o.chat)})}if(x&&x.acct&&x.name)CH.names.set(x.acct,x.name)}));chChanged('online')}catch(e){}})
+      .subscribe(st=>{if(st==='SUBSCRIBED'){CH.trackedChat=undefined;chTrack()}});
   }catch(e){console.warn('chat rt',e)}
   await chLoad();
 }
@@ -8425,7 +8426,7 @@ async function chSend(kind,body){
     const {data,error}=await chSb().from('hpl_chat').insert({table_id:CH.tid,kind,body,author_name:chMyName()}).select().single();
     if(error)throw error;
     CH.msgs.delete(tmpId);CH.order=CH.order.filter(x=>x!==tmpId);chPut(data,true);chMarkRead();chChanged('msg');
-    chNotify(kind,body);
+    chNotify(kind,body,data.id);
     return data;
   }catch(e){
     tmp.__fail=true;chChanged('msg');toast('Messaggio non inviato: '+errMsg(e),'err');return false;
@@ -8435,10 +8436,20 @@ function chSnip(m){
   if(!m)return '';if(m.deleted)return 'Messaggio eliminato';const b=m.body||{};
   return m.kind==='text'?String(b.t||'').slice(0,90):m.kind==='photo'?'📷 Foto'+(b.cap?': '+b.cap:''):m.kind==='poll'?'📊 '+(b.q||'Sondaggio'):m.kind==='dice'?'🎲 Dadi: '+(b.v||[]).join(' + '):m.kind==='card'?'🃏 Ha pescato una carta':m.kind==='coin'?'🪙 '+(b.v==='T'?'Testa':'Croce'):m.kind==='event'?'📅 '+(b.title||'Serata'):'';
 }
-function chNotify(kind,body){
-  const now=Date.now();if(now-CH.lastPush<20000)return;CH.lastPush=now;
-  try{pushSend({title:'💬 '+firstName(chMyName())+' · '+(S.table?S.table.name:'Chat'),body:chSnip({kind,body}),url:deepUrl('chat','x'),tag:'chat-'+CH.tid})}catch(e){}
+function chNotify(kind,body,mid){
+  const now=Date.now();if(now-CH.lastPush<8000)return;CH.lastPush=now;
+  // chi ha la chat aperta sullo schermo vede già il messaggio: a lui la notifica non arriva
+  const skip=[...CH.online.entries()].filter(([a,x])=>a!==chMe()&&x&&x.chat).map(([a])=>a);
+  try{pushSend({title:'💬 '+firstName(chMyName())+' · '+(S.table?S.table.name:'Chat'),body:chSnip({kind,body}),url:deepUrl('chat','x'),tag:'chat-'+CH.tid,skip,mid})}catch(e){}
 }
+/* dice agli altri se ho la chat davanti agli occhi (pagina della chat o chat della partita aperta) */
+function chInView(){return !document.hidden&&!!V&&(V.name==='chat'||(!!F.vt&&!!F.vt.chatOpen&&(V.name==='vt'||V.name==='vlobby')))}
+function chTrack(){
+  if(!CH.ch)return;const c=chInView();if(c===CH.trackedChat)return;CH.trackedChat=c;
+  try{CH.ch.track({acct:chMe(),name:chMyName(),at:Date.now(),chat:c})}catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{try{chTrack()}catch(e){}});
+window.addEventListener('pagehide',()=>{try{CH.trackedChat=undefined;if(CH.ch)CH.ch.track({acct:chMe(),name:chMyName(),at:Date.now(),chat:false})}catch(e){}});
 async function chSendText(){
   const ta=$$id('chin');if(!ta)return;const t=ta.value.replace(/\s+$/,'').slice(0,2000);if(!t.trim())return;
   if(CH.edit){const id=CH.edit;CH.edit=null;ta.value='';chAutoGrow();chComposer();
@@ -9299,6 +9310,11 @@ Object.assign(H,{
 });
 
 
+const _renderTrack=render;
+render=function(){const r=_renderTrack.apply(this,arguments);try{chTrack();if(CH.focusIn&&V&&V.name==='chat'){const ta=$$id('chin');if(ta){CH.focusIn=false;ta.focus()}}}catch(e){}return r};
+const _vtChatTrack=H.vtchat;
+H.vtchat=function(){const r=_vtChatTrack.apply(this,arguments);try{chTrack()}catch(e){}return r};
+
 /* ---------- dove si entra nella chat ---------- */
 /* pulsante fluttuante nelle sezioni principali */
 function chFab(){return `<button class="ch-fab" data-act="openchat" aria-label="Chat del tavolo${CH.unread?', '+CH.unread+' messaggi nuovi':''}"><span>💬</span><i data-chbadge ${CH.unread?'':'hidden'}>${CH.unread>9?'9+':CH.unread}</i></button>`}
@@ -9309,14 +9325,14 @@ render=function(){
   return r;
 };
 /* collegamenti dalle notifiche: #go=chat&t=…&g=x */
-window.addEventListener('hashchange',()=>{const d=deepLink();if(d&&d.v==='chat'&&S.table&&S.table.id===d.t){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}openChat()}});
+window.addEventListener('hashchange',()=>{const d=deepLink();if(d&&d.v==='chat'&&S.table&&S.table.id===d.t){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}CH.focusIn=!!d.r;openChat()}});
 const _afterDataDeep=afterData;
 afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
-  if(S.deep&&S.deep.v==='chat'&&S.me&&S.table&&S.table.id===S.deep.t&&S.loaded.games){S.deep=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}openChat()}
+  if(S.deep&&S.deep.v==='chat'&&S.me&&S.table&&S.table.id===S.deep.t&&S.loaded.games){CH.focusIn=!!S.deep.r;S.deep=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}openChat()}
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792438482567';
+const APP_VERSION='1792485958090';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
