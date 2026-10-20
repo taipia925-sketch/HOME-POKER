@@ -2518,7 +2518,7 @@ const armed={};
 function arm(k){if(armed[k]){clearTimeout(armed[k]);delete armed[k];return true}armed[k]=setTimeout(()=>{delete armed[k];render()},3000);render();return false}
 function setPath(path,val){const k=path.split('.');let o=F;for(let i=0;i<k.length-1;i++){if(o[k[i]]==null||typeof o[k[i]]!=='object')o[k[i]]={};o=o[k[i]]}o[k[k.length-1]]=val}
 function toast(msg,kind){const el=document.createElement('div');el.className='t '+(kind||'ok');el.innerHTML=(kind==='err'?ico('close',16):ico('check',16))+'<span></span>';el.lastChild.textContent=msg;$('#toast').appendChild(el);setTimeout(()=>el.remove(),2900)}
-const errMsg=e=>e&&e.code==='invalid_argument'?'Il tuo account non può modificare questi dati. Chiedi di essere invitato come collaboratore.':(e&&e.message)||'Operazione non riuscita';
+const errMsg=e=>e&&e.code==='invalid_argument'?'Il tuo account non può modificare questi dati. Chiedi di essere invitato come collaboratore.':(e&&e.message)||'Non è andata a buon fine.'+' Controlla la connessione e riprova.';
 const unlocked=()=>!!S.table;
 const isAdmin=gid=>!!S.admin[gid]||!!(S.me&&S.games[gid]&&S.games[gid].hostId&&S.games[gid].hostId===S.me.id);
 const resSorted=()=>S.res.slice().sort((a,b)=>String(a.reservedAt).localeCompare(String(b.reservedAt))||a.id.localeCompare(b.id));
@@ -2758,7 +2758,7 @@ async function authDebt(did){
   if(perm.needPin){
     const p=S.me&&S.players[S.me.id];
     if(await bioFresh(p)){F.bioOk=0}
-    else if(!p||!p.pinHash||(await pinHash(S.me.id,F.pinp))!==p.pinHash){toast('PIN errato, riprova.','err');return false}
+    else if(!p||!p.pinHash||(await pinHash(S.me.id,F.pinp))!==p.pinHash){toast('PIN sbagliato, riprova','err');return false}
   }
   F.pinp='';return true;
 }
@@ -3087,7 +3087,7 @@ ${so?`<div class="stack" style="gap:12px;margin-top:12px">
 ${g.maxSeats?`<div class="meter"><i class="m-o" style="flex:${Math.min(R.length,g.maxSeats)} 1 0"></i><i style="flex:${Math.max(g.maxSeats-R.length,0)} 1 0"></i></div>`:''}
 <a class="btn wa" href="${waHref(inviteText(gid))}" target="_blank" rel="noopener">Invita su WhatsApp</a>
 <div class="stack" style="gap:0">${resList(g,A)}</div>
-${A?`<button class="link" style="align-self:center;color:#FF6A60" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Elimina partita'}</button>`:''}</div>`:''}</div>
+${A?`<button class="link" style="align-self:center;color:#FF6A60" data-act="delgame">${armed.delgame?'Elimina partita · tocca ancora per confermare':'Elimina partita'}</button>`:''}</div>`:''}</div>
 ${histBlock(g,'live')}</div></div>
 <div class="bar"><div class="bar-in">${A?`<button class="btn" data-act="startclose" ${closable(g)&&canWrite?'':'disabled'}>Chiudi e conta le fiches</button>
 ${closable(g)?'':'<div class="mut xs" style="padding-top:6px">Servono almeno 2 giocatori per chiudere la partita.</div>'}`:'<div class="mut sm" style="text-align:center;padding:6px 0">Sola lettura: serve il PIN Admin per modificare.</div>'}</div></div>`;
@@ -3226,7 +3226,7 @@ ${(g.dealerChips||0)>0?`<div class="mut sm num" style="margin:8px 4px 0">Mance d
 ${closed?`${histBlock(g,'detail')}<div class="sec">Condividi</div><div class="stack" style="margin-top:10px">
 <a class="btn wa" href="${waHref(waText(gid))}" target="_blank" rel="noopener">Manda il resoconto su WhatsApp</a>
 <button class="btn ghost" data-act="copytxt" data-gid="${gid}">Copia il resoconto</button></div>`:''}
-${A?`<div style="text-align:center;margin-top:18px"><button class="link" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Elimina partita'}</button></div>`:''}</div>`;
+${A?`<div style="text-align:center;margin-top:18px"><button class="link" data-act="delgame">${armed.delgame?'Elimina partita · tocca ancora per confermare':'Elimina partita'}</button></div>`:''}</div>`;
 }
 function debtCard(d,perm){
   const A=perm.can;const done=d.remainingAmount===0;
@@ -3547,7 +3547,7 @@ const H={
   bioask(){F.bpin='';openSheet({type:'bio'})},
   async bioon(){
     const p=S.players[S.me.id];
-    if((await pinHash(S.me.id,F.bpin))!==p.pinHash){toast('PIN errato','err');return}
+    if((await pinHash(S.me.id,F.bpin))!==p.pinHash){toast('PIN sbagliato, riprova','err');return}
     let r;try{r=await bioEnroll()}catch(e){toast('Face ID non disponibile su questo telefono o browser','err');return}
     const hh=await bioHash(S.me.id,r.token);
     const doc=Object.assign({},p,{bio:(p.bio||[]).concat([{h:hh,at:new Date().toISOString()}]).slice(-5)});
@@ -3596,7 +3596,7 @@ const H={
   async delmeok(){
     const p=S.me&&S.players[S.me.id];if(!p)return;
     if(myOpenStuff()){render();return}
-    if((await pinHash(S.me.id,F.dpin))!==p.pinHash){toast('PIN errato','err');return}
+    if((await pinHash(S.me.id,F.dpin))!==p.pinHash){toast('PIN sbagliato, riprova','err');return}
     try{await db.doc('players/'+S.me.id).delete();delete S.players[S.me.id]}catch(e){toast(errMsg(e),'err');return}
     const b=LS.get('bio',null);if(b&&b.id===S.me.id)LS.del('bio');
     F.dpin='';SH=null;S.me=null;LS.del('me');F.auth={mode:null,name:'',pin:'',pin2:'',err:''};V={name:'home'};render();toast('Profilo eliminato','ok');
@@ -3961,7 +3961,7 @@ authDebt=async function(did){
     if(bioFreshUi()){F.bioOk=0}
     else if(b&&!F.usePin&&!PIN_RE.test(F.pinp)){
       try{await bioAssert(b.cred)}catch(e){F.usePin=true;render();toast('Face ID non riuscito'+(e&&e.name&&e.name!=='Error'?' ('+e.name+')':'')+': scrivi il PIN','err');return false}
-    }else{const ok=await checkMyPin(F.pinp);if(ok===null)return false;if(!ok){toast('PIN errato, riprova.','err');return false}}
+    }else{const ok=await checkMyPin(F.pinp);if(ok===null)return false;if(!ok){toast('PIN sbagliato, riprova','err');return false}}
   }
   F.pinp='';return true;
 };
@@ -4070,7 +4070,7 @@ Object.assign(H,{
   relink(){SH=null;F.clm={pin:'',name:'',err:'',busy:false,other:false,pick:null};go('claim')},
   bioask(){F.bpin='';openSheet({type:'bio'})},
   async bioon(){
-    const ok=await checkMyPin(F.bpin);if(ok===null)return;if(!ok){toast('PIN errato','err');return}
+    const ok=await checkMyPin(F.bpin);if(ok===null)return;if(!ok){toast('PIN sbagliato, riprova','err');return}
     let cred;
     try{const c=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'Home Poker'},user:{id:new TextEncoder().encode(S.acct.id),name:S.acct.name,displayName:S.acct.name},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'preferred'},timeout:60000,attestation:'none'}});cred=b64(c.rawId)}
     catch(e){toast('Face ID non disponibile su questo telefono o browser','err');return}
@@ -4084,7 +4084,7 @@ Object.assign(H,{
   },
   async delmeok(){
     if(!S.me||openStuffFor(S.me.id,S.me.name).length){render();return}
-    const ok=await checkMyPin(F.dpin);if(ok===null)return;if(!ok){toast('PIN errato','err');return}
+    const ok=await checkMyPin(F.dpin);if(ok===null)return;if(!ok){toast('PIN sbagliato, riprova','err');return}
     const tn=S.table.name;
     try{await BASE.rpc('hpl_leave_table',{p_tid:S.table.id})}catch(e){toast(errMsg(e),'err');return}
     F.dpin='';SH=null;await backToTables();toast('Sei uscito da '+tn,'ok');
@@ -4092,7 +4092,7 @@ Object.assign(H,{
   delacct(){F.dpin='';openSheet({type:'delacct'})},
   async delacctok(){
     let r;try{r=await BASE.rpc('hpl_delete_account',{p_pin:F.dpin})}catch(e){toast(errMsg(e),'err');return}
-    if(r==='bad_pin'){toast('PIN errato','err');return}
+    if(r==='bad_pin'){toast('PIN sbagliato, riprova','err');return}
     if(r!=='ok'){render();return}
     F.dpin='';SH=null;LS.del('bio');LS.del('hadacct');LS.del('acctsnap');try{Object.keys(localStorage).filter(k=>k.indexOf('hpl.snap.')===0||k==='hpl.mypic').forEach(k=>localStorage.removeItem(k))}catch(e){}S.acct=null;resetTableState();render();toast('Account eliminato','ok');
   },
@@ -4181,7 +4181,7 @@ function vNetting(){
   let act='',bar='';
   if(inq){
     act=`<div class="sec">${esc(on)} ti chiede di compensare</div><div class="card stack" style="gap:12px"><p class="mut sm" style="margin:0">Ha già confermato con il suo PIN. Se sei d'accordo, conferma con il tuo.</p>${pinField({needPin:true})}</div>
-<div style="text-align:center;margin-top:12px"><button class="link" style="color:#FF6A60" data-act="netno" data-pid="${esc(o)}">${armed.netno?'Confermi? Tocca di nuovo':'Rifiuta'}</button></div>`;
+<div style="text-align:center;margin-top:12px"><button class="link" style="color:#FF6A60" data-act="netno" data-pid="${esc(o)}">${armed.netno?'Rifiuta · tocca ancora per confermare':'Rifiuta'}</button></div>`;
     bar=`<button class="btn" data-act="netok" ${pinOk?'':'disabled'}>${F.netBusy?'Un attimo…':'Accetta: '+amt}</button>`;
   }else if(out){
     act=`<div class="box o" style="margin-top:14px">Richiesta inviata a ${esc(on)} il ${dDay(r.at)} ${dMon(r.at)} alle ${tHM(r.at)}. La compensazione si fa quando la accetta dal suo telefono con il suo PIN.</div>
@@ -4206,7 +4206,7 @@ async function authMe(){
   const b=bioMine();
   if(b&&!F.usePin&&!PIN_RE.test(F.pinp)){try{await bioAssert(b.cred);return true}catch(e){F.usePin=true;render();toast('Face ID non riuscito: scrivi il tuo PIN','err');return false}}
   const ok=await checkMyPin(F.pinp);if(ok===null)return false;
-  if(!ok){F.pinp='';render();toast('PIN errato, riprova.','err');return false}
+  if(!ok){F.pinp='';render();toast('PIN sbagliato, riprova','err');return false}
   return true;
 }
 const netMsg=(iO,tO)=>iO===tO?'siete pari':iO>tO?`resti a dare ${eur(iO-tO)}`:`resti a ricevere ${eur(tO-iO)}`;
@@ -4276,7 +4276,7 @@ ${D.length?`<div class="sec">Saldo finale <small>${nDone} di ${D.length} pagat${
 <div class="card stack" style="gap:0;padding:8px 16px 10px">${D.slice().sort((a,b)=>(a.remainingAmount===0)-(b.remainingAmount===0)||(meIsFrom(b)||isCreditor(b))-(meIsFrom(a)||isCreditor(a))).map(d=>debtRow(gid,d)).join('')}</div>`:`<div class="box g" style="margin-top:12px;text-align:center"><b>Pari</b> · nessuno deve più niente</div>`}
 <details class="card" style="margin-top:12px"><summary class="mut sm" style="cursor:pointer">Debiti compensati (${R.length})</summary><div class="stack" style="gap:6px;margin-top:10px">${R.map(r=>`<div class="row sp sm"><span>${esc(r.from)} → ${esc(r.to)} <span class="mut xs">· ${dDay(r.at)} ${dMon(r.at)}</span></span><b class="num">${eur(r.amt)}</b></div>`).join('')}</div></details>
 ${histBlock(g,'detail')}
-${canUndoNet(g)?`<div style="text-align:center;margin-top:14px"><button class="link" data-act="netundo" data-gid="${gid}">${armed.netundo?'Confermi? Tocca di nuovo':'Annulla la compensazione'}</button></div>`:''}</div>`;
+${canUndoNet(g)?`<div style="text-align:center;margin-top:14px"><button class="link" data-act="netundo" data-gid="${gid}">${armed.netundo?'Annulla la compensazione · tocca ancora per confermare':'Annulla la compensazione'}</button></div>`:''}</div>`;
 }
 
 /* ---------- 5. Resoconto come immagine ---------- */
@@ -4384,7 +4384,7 @@ ${A?'':pinBox(gid,'Per eliminare giocatori o gestire il timer serve il PIN Admin
 ${A?`<button class="btn dash" style="margin-top:8px" data-act="addpl">${ico('plus',18)} Aggiungi giocatori</button>`:''}
 ${out.length?`<div class="sec">Eliminati</div><div class="list">${out.slice().sort((a,b)=>a.out-b.out).map(p=>`<div class="li"><span class="medal ${p.out<=3?'m'+p.out:''}">${p.out}</span><span class="grow"><b>${esc(p.playerName)}</b>${p.out<=pr.length?` <span class="green num sm">${eurS(pr[p.out-1])}</span>`:''}</span>${A&&rebuy?`<button class="btn-s" style="min-height:38px" data-act="reenter" data-pid="${p.playerId}">Rientra</button>`:''}</div>`).join('')}</div>`:''}
 ${histBlock(g,'live')}
-${A?`<div style="text-align:center;margin-top:14px"><button class="link" style="color:#FF6A60" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Elimina torneo'}</button></div>`:''}</div>
+${A?`<div style="text-align:center;margin-top:14px"><button class="link" style="color:#FF6A60" data-act="delgame">${armed.delgame?'Elimina torneo · tocca ancora per confermare':'Elimina torneo'}</button></div>`:''}</div>
 ${A?`<div class="bar"><div class="bar-in"><button class="btn" data-act="tclose" ${inn.length===1&&L.length>1?'':'disabled'}>${inn.length===1&&L.length>1?`Chiudi il torneo · vince ${esc(inn[0].playerName)}`:`Restano ${inn.length} giocatori`}</button></div></div>`:''}`;
 }
 function vTourClose(){
@@ -4494,9 +4494,9 @@ async function renameOk(){
   if(n.length<2){toast('Il nome deve avere almeno 2 caratteri','err');return}
   let r;try{r=await BASE.rpc('hpl_rename',{p_name:n,p_pin:F.rn.pin})}catch(e){toast(errMsg(e),'err');return}
   if(r==='exists'){toast('Questo nome utente è già usato da un altro account','err');return}
-  if(r==='bad_pin'){toast('PIN errato','err');return}
+  if(r==='bad_pin'){toast('PIN sbagliato, riprova','err');return}
   if(r==='invalid'){toast('Nome non valido','err');return}
-  if(r!=='ok'){toast('Non è andata, riprova','err');return}
+  if(r!=='ok'){toast('Non è andata a buon fine: controlla la connessione e riprova','err');return}
   await refreshMe();if(S.me){S.me.name=n;if(S.players[S.me.id])S.players[S.me.id].name=n}
   F.rn={name:'',pin:''};SH=null;render();toast('Ora ti chiami '+n,'ok');
 }
@@ -4552,7 +4552,7 @@ vBook=function(){
     const host=S.me&&(g.hostId===S.me.id||isManager());
     h=h.replace('<h1>Poker night</h1>',`<h1>Poker ${new Date(g.scheduledAt).toLocaleDateString('it-IT',{weekday:'long'})}</h1>`);
     if(g.note)h=h.replace('<p class="mut" style="margin:6px 0 0">Prenota il tuo posto al tavolo</p>',`<p class="mut" style="margin:6px 0 0">${esc(g.note)}</p>`);
-    h=h.replace('<button class="btn ghost" data-act="live" data-gid="'+V.gid+'">Apri la cassa</button>',(S.me?`<button class="btn" data-act="startplan" data-gid="${V.gid}">${ico('chip',18)} Inizia la partita con i prenotati</button>`:'')+(host?`<button class="btn ghost" data-act="pushinvite" data-gid="${V.gid}">${ico('share',18)} Ricorda l'invito con una notifica</button><button class="link" style="align-self:center;color:#FF6A60" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Annulla la serata'}</button>`:''));
+    h=h.replace('<button class="btn ghost" data-act="live" data-gid="'+V.gid+'">Apri la cassa</button>',(S.me?`<button class="btn" data-act="startplan" data-gid="${V.gid}">${ico('chip',18)} Inizia la partita con i prenotati</button>`:'')+(host?`<button class="btn ghost" data-act="pushinvite" data-gid="${V.gid}">${ico('share',18)} Ricorda l'invito con una notifica</button><button class="link" style="align-self:center;color:#FF6A60" data-act="delgame">${armed.delgame?'Annulla la serata · tocca ancora per confermare':'Annulla la serata'}</button>`:''));
   }
   return h;
 };
@@ -5079,7 +5079,7 @@ const vtSeat=()=>{const st=S.vt.st;return st?st.seats.findIndex(s=>s&&s.acct===m
 const vtLive=()=>{const h=S.vt.st&&S.vt.st.hand;return !!(h&&h.stage!=='done')};
 const pcard=(c,cls)=>c?`<span class="pc ${'hd'.includes(c[1])?'r':''} ${cls||''}"><b>${c[0]==='T'?'10':c[0]}</b><i>${SUITCH[c[1]]}</i></span>`:`<span class="pc back ${cls||''}"></span>`;
 const VT_ERR={not_seated:'Solo chi è seduto al tavolo può farlo',not_your_turn:'Non è il tuo turno',cannot_check:'Non puoi passare: c\'è una puntata da chiamare',min_raise:'Rilancio troppo basso',too_small:'Importo troppo basso',bad_amount:'Importo non valido',seat_taken:'Posto già occupato',full:'Il tavolo è pieno (9 posti)',already_seated:'Sei già seduto',has_chips:'Hai ancora fiches',in_hand:'Aspetta la fine della mano',hand_running:'Aspetta la fine della mano',bad_config:'Controlla i valori',not_member:'Non sei in questo tavolo',no_player:'Il tuo profilo non è collegato a questo tavolo',no_account:'Accedi di nuovo con il tuo account',busy:'Troppe mosse insieme: riprova',no_hand:'Nessuna mano in corso',not_seated:'Non sei seduto'};
-function vtErrMsg(e){const m=String(e&&(e.message||e)||'');if(/not found|404|Failed to send|FunctionsFetchError|FunctionsHttpError|non-2xx/i.test(m))return 'Il mazziere non risponde: manca la funzione hpl-holdem in Supabase';if(/hpl_vt_load|hpl_vt/.test(m))return 'Manca virtuale.sql in Supabase';return VT_ERR[m]||m||'Qualcosa non va, riprova'}
+function vtErrMsg(e){const m=String(e&&(e.message||e)||'');if(/not found|404|Failed to send|FunctionsFetchError|FunctionsHttpError|non-2xx/i.test(m))return 'Il mazziere non risponde: manca la funzione hpl-holdem in Supabase';if(/hpl_vt_load|hpl_vt/.test(m))return 'Manca virtuale.sql in Supabase';return VT_ERR[m]||m||'Il tavolo non ha risposto: controlla la connessione e riprova'}
 
 function vtApply(st){
   if(!st)return;const cur=S.vt.st;
@@ -5261,7 +5261,7 @@ ${rows.length?`<div class="lbl in">Al tavolo</div><div class="list">${rows.map(r
 <div class="list"><button class="li" data-act="vtinvite"><span class="lic">${ico('user',17)}</span><span class="grow">Invita giocatori<span class="mut xs" style="display:block">Gli arriva una notifica</span></span>${ico('chevr',16)}</button></div>
 ${s?`<div class="list">${s.stack===0&&!live?`<button class="li" data-act="vtrebuy"><span class="lic">${ico('coins',17)}</span><span class="grow">Ricarica ${fchip(st.cfg.stack)} fiches</span></button>`:''}
 ${st.running?`<button class="li" data-act="vtstop"><span class="lic">${ico('lock',17)}</span><span class="grow">Pausa dopo questa mano<span class="mut xs" style="display:block">Per tutti: non parte la mano successiva</span></span></button>`:HE.eligible(st).length>=2?`<button class="li" data-act="vtstart"><span class="lic">${ico('chip',17)}</span><span class="grow">Riprendi la partita</span></button>`:''}
-<button class="li" data-act="vtleave"><span class="lic">${ico('out',17)}</span><span class="grow" style="color:#FF6A60">${armed.vtleave?'Confermi? Tocca di nuovo':'Alzati dal tavolo'}<span class="mut xs" style="display:block">${live&&st.hand.p[me]&&!st.hand.p[me].folded?'Lasci la mano in corso. ':''}Le tue fiches tornano al banco</span></span></button></div>`:''}
+<button class="li" data-act="vtleave"><span class="lic">${ico('out',17)}</span><span class="grow" style="color:#FF6A60">${armed.vtleave?'Alzati dal tavolo · tocca ancora per confermare':'Alzati dal tavolo'}<span class="mut xs" style="display:block">${live&&st.hand.p[me]&&!st.hand.p[me].folded?'Lasci la mano in corso. ':''}Le tue fiches tornano al banco</span></span></button></div>`:''}
 <div class="lbl in">Regole del tavolo</div>
 ${live?`<div class="mut sm">Si possono cambiare tra una mano e l'altra.</div>`:''}
 <div class="two"><label class="field"><span>Piccolo buio</span><input class="in num" id="vc-sb" inputmode="numeric" data-digits="1" data-bind="vt.cfg.sb" value="${c.sb}" ${live?'disabled':''}></label><label class="field"><span>Grande buio</span><input class="in num" id="vc-bb" inputmode="numeric" data-digits="1" data-bind="vt.cfg.bb" value="${c.bb}" ${live?'disabled':''}></label></div>
@@ -5701,7 +5701,7 @@ ${rows.length?`<div class="list">${rows.map(r=>`<div class="li">${ava(r.x.name,'
 ${s&&s.stack===0&&!live&&!sngR?`<button class="li" data-act="vtrebuy"><span class="lic">${ico('coins',17)}</span><span class="grow">Ricarica ${fchip(st.cfg.stack)} fiches</span></button>`:''}
 ${s&&st.running?`<button class="li" data-act="vtstop"><span class="lic">${ico('lock',17)}</span><span class="grow">Pausa dopo questa mano<span class="mut xs" style="display:block">Per tutti: non parte la mano successiva</span></span></button>`:''}
 ${s&&!st.running&&(sngR||HE.eligible(st).length>=2)&&!(st.cfg.mode==='sng'&&!sngR)?`<button class="li" data-act="vtstart"><span class="lic">${ico('chip',17)}</span><span class="grow">Riprendi la partita</span></button>`:''}
-${s?`<button class="li" data-act="vtleave"><span class="lic">${ico('out',17)}</span><span class="grow" style="color:#FF6A60">${armed.vtleave?'Confermi? Tocca di nuovo':'Alzati dal tavolo'}<span class="mut xs" style="display:block">${sngR?'Esci dal torneo. ':live&&st.hand.p[me]&&!st.hand.p[me].folded?'Lasci la mano in corso. ':''}Le tue fiches tornano al banco</span></span></button>`:''}
+${s?`<button class="li" data-act="vtleave"><span class="lic">${ico('out',17)}</span><span class="grow" style="color:#FF6A60">${armed.vtleave?'Alzati dal tavolo · tocca ancora per confermare':'Alzati dal tavolo'}<span class="mut xs" style="display:block">${sngR?'Esci dal torneo. ':live&&st.hand.p[me]&&!st.hand.p[me].folded?'Lasci la mano in corso. ':''}Le tue fiches tornano al banco</span></span></button>`:''}
 </div>
 <div class="lbl in">Regole del tavolo</div>
 ${locked?`<div class="mut sm">${sngR?'Il torneo è in corso: le regole si cambiano alla fine.':'Si possono cambiare tra una mano e l\'altra.'}</div>`:''}
@@ -6542,7 +6542,7 @@ Object.assign(H,{
 /* =====================================================================
    Il gestore del tavolo può chiudere qualsiasi partita virtuale
    ===================================================================== */
-Object.assign(VT_ERR,{not_manager:'Solo un gestore del tavolo può chiudere le partite'});
+Object.assign(VT_ERR,{not_manager:'Solo un gestore del tavolo può chiudere le partite',bad_action:'Mossa non valida: aggiorna il tavolo e riprova',not_in_hand:'Non eri in questa mano',no_cards:'Le carte di questa mano non sono più disponibili',not_signed_in:'Accesso scaduto: chiudi e riapri l\'app',busy:'Il tavolo è molto occupato: riprova tra un attimo',not_member:'Non fai più parte di questo tavolo',no_player:'Collega prima il tuo profilo a questo tavolo'});
 async function vtKill(rid){
   if(!rid)return;
   const r=await BASE.fn('hpl-holdem',{table_id:S.table.id,action:'kill',room_id:rid}).catch(e=>({error:vtErrMsg(e)}));
@@ -6556,7 +6556,7 @@ vtMenuSheet=function(){
   const st=S.vt.st;let h=_menuKill();
   if(st&&st.room&&isManager()){
     h=h.replace('<div class="lbl in">Regole del tavolo</div>',
-      `<div class="list"><button class="li" data-act="vtkill" data-rid="${esc(st.room.id)}"><span class="lic">${ico('trash',17)}</span><span class="grow" style="color:#FF6A60">${armed['vtkill'+st.room.id]?'Confermi? Tocca di nuovo':'Chiudi questa partita per tutti'}<span class="mut xs" style="display:block">Puoi farlo perché sei gestore del tavolo</span></span></button></div><div class="lbl in">Regole del tavolo</div>`);
+      `<div class="list"><button class="li" data-act="vtkill" data-rid="${esc(st.room.id)}"><span class="lic">${ico('trash',17)}</span><span class="grow" style="color:#FF6A60">${armed['vtkill'+st.room.id]?'Chiudi questa partita per tutti · tocca ancora per confermare':'Chiudi questa partita per tutti'}<span class="mut xs" style="display:block">Puoi farlo perché sei gestore del tavolo</span></span></button></div><div class="lbl in">Regole del tavolo</div>`);
   }
   return h;
 };
@@ -6915,7 +6915,7 @@ vLobby=function(){
 function vRoomSheet(){
   const st=S.vt.rooms[SH.rid];if(!st)return '';
   const ms=HE.maxSeats(st),[stt,cls]=roomStatus(st),[jl]=vtJoinLabel(st),sat=st.seats.map((x,i)=>x?{x,i}:null).filter(Boolean),acct=myAcct();
-  const kill=isManager()?`<button class="vm-danger" data-act="vtkill" data-rid="${esc(st.room.id)}">${ico('trash',18)}<span class="grow">${armed['vtkill'+st.room.id]?'Confermi? Tocca di nuovo':'Chiudi il tavolo per tutti'}<small>Puoi farlo perché sei gestore</small></span></button>`:'';
+  const kill=isManager()?`<button class="vm-danger" data-act="vtkill" data-rid="${esc(st.room.id)}">${ico('trash',18)}<span class="grow">${armed['vtkill'+st.room.id]?'Chiudi il tavolo per tutti · tocca ancora per confermare':'Chiudi il tavolo per tutti'}<small>Puoi farlo perché sei gestore</small></span></button>`:'';
   return `<div class="back" data-act="closesheet"><div class="sheet ${SH.anim?'anim':''}" role="dialog" aria-label="${esc(st.room.name)}"><div class="grab"></div><div class="sheet-body">
 <div class="row sp"><h2>${esc(st.room.name)}</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
 <div class="vroom-prev">${gameBadge(st.cfg.game)}<span class="vl-st ${cls}"><i></i>${esc(stt)}</span></div>
@@ -7005,8 +7005,8 @@ ${rows.length?`<div class="lbl in">${st.cfg.mode==='sng'?'Fiches in gioco':'Chi 
 ${locked&&s?`<p class="mut xs" style="margin:-6px 0 0">${sngR?'Il torneo è in corso: le regole si cambiano alla fine.':'Si possono cambiare tra una mano e l\'altra.'}</p>`:''}
 ${vtRulesHtml(st.cfg,ms)}
 <div class="list"><button class="li" data-act="vtsound"><span class="lic">${ico(S.vt.sound!==false?'vol':'mute',17)}</span><span class="grow">Suoni</span><span class="sw ${S.vt.sound!==false?'on':''}"><i></i></span></button><button class="li" data-act="vtmusic"><span class="lic">${ico('music',17)}</span><span class="grow">Musica di sottofondo</span><span class="sw ${S.vt.music!==false?'on':''}"><i></i></span></button></div>
-${s?`<button class="vm-danger" data-act="vtleave">${ico('out',18)}<span class="grow">${armed.vtleave?'Confermi? Tocca di nuovo':'Alzati dal tavolo'}<small>${sngR?'Esci dal torneo. ':live&&st.hand.p[me]&&!st.hand.p[me].folded?'Lasci la mano in corso. ':''}Le tue fiches tornano al banco</small></span></button>`:''}
-${isManager()&&st.room?`<button class="vm-danger" data-act="vtkill" data-rid="${esc(st.room.id)}">${ico('trash',18)}<span class="grow">${armed['vtkill'+st.room.id]?'Confermi? Tocca di nuovo':'Chiudi il tavolo per tutti'}<small>Puoi farlo perché sei gestore</small></span></button>`:''}
+${s?`<button class="vm-danger" data-act="vtleave">${ico('out',18)}<span class="grow">${armed.vtleave?'Alzati dal tavolo · tocca ancora per confermare':'Alzati dal tavolo'}<small>${sngR?'Esci dal torneo. ':live&&st.hand.p[me]&&!st.hand.p[me].folded?'Lasci la mano in corso. ':''}Le tue fiches tornano al banco</small></span></button>`:''}
+${isManager()&&st.room?`<button class="vm-danger" data-act="vtkill" data-rid="${esc(st.room.id)}">${ico('trash',18)}<span class="grow">${armed['vtkill'+st.room.id]?'Chiudi il tavolo per tutti · tocca ancora per confermare':'Chiudi il tavolo per tutti'}<small>Puoi farlo perché sei gestore</small></span></button>`:''}
 <p class="mut xs" style="margin:0;text-align:center">Fiches finte, nessun soldo vero. Le carte le distribuisce il server e ognuno vede solo le sue.</p>
 </div></div></div>`;
 };
@@ -7433,7 +7433,7 @@ ${n?`<div class="list pb-list">${R.map((r,i)=>`<div class="li">${'<b class="pb-n
 <div class="pb-acts">${start}
 <a class="btn wa" href="${waHref(inviteText(gid))}" target="_blank" rel="noopener">Invita su WhatsApp</a>
 ${host?`<button class="btn ghost" data-act="pushinvite" data-gid="${gid}">${ico('bell',18)} Ricorda l'invito al tavolo</button>`:''}</div>
-${host?`<button class="link" style="align-self:center;color:#FF6A60;margin:6px auto 0;display:flex" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Annulla la serata'}</button>`:''}
+${host?`<button class="link" style="align-self:center;color:#FF6A60;margin:6px auto 0;display:flex" data-act="delgame">${armed.delgame?'Annulla la serata · tocca ancora per confermare':'Annulla la serata'}</button>`:''}
 </div>`;
 }
 const _vBookP=vBook;
@@ -8497,7 +8497,7 @@ async function chSendText(){
   const ta=$$id('chin');if(!ta)return;const t=ta.value.replace(/\s+$/,'').slice(0,2000);if(!t.trim())return;
   if(CH.edit){const id=CH.edit;CH.edit=null;ta.value='';chAutoGrow();chComposer();
     const m=CH.msgs.get(id);if(!m)return;const old=m.body;m.body=Object.assign({},m.body,{t});m.edited_at=new Date().toISOString();chChanged('msg');
-    const {error}=await chSb().from('hpl_chat').update({body:m.body}).eq('id',id).select().single();if(error){m.body=old;chChanged('msg');toast('Modifica non salvata','err')}return}
+    const {error}=await chSb().from('hpl_chat').update({body:m.body}).eq('id',id).select().single();if(error){m.body=old;chChanged('msg');toast('Modifica non salvata: controlla la connessione e riprova','err')}return}
   const body={t};if(CH.reply){const r=CH.msgs.get(CH.reply);if(r)body.re={id:r.id,n:r.author_name,s:chSnip(r).slice(0,80)}}
   CH.reply=null;ta.value='';chAutoGrow();chComposer();chTyping(true);
   try{LS.del('chatdraft.'+CH.tid)}catch(e){}
@@ -8515,7 +8515,7 @@ async function chToggleReact(id,emoji){
   try{
     const sb=chSb();const r=has?await sb.from('hpl_chat_react').delete().eq('msg_id',id).eq('acct',me).eq('emoji',emoji):await sb.from('hpl_chat_react').insert(row);
     if(r.error)throw r.error;
-  }catch(e){if(has)chAddReact(row);else chDelReact(row);chChanged('react');toast('Reazione non salvata','err')}
+  }catch(e){if(has)chAddReact(row);else chDelReact(row);chChanged('react');toast('Reazione non salvata: controlla la connessione e riprova','err')}
 }
 async function chVote(id,opt){
   const m=CH.msgs.get(id);if(!m||m.kind!=='poll'||m.body.closed)return;
@@ -8526,17 +8526,17 @@ async function chVote(id,opt){
     if(!multi&&mine.length){mine.forEach(o=>chDelVote({msg_id:id,acct:me,opt:o}));await sb.from('hpl_chat_vote').delete().eq('msg_id',id).eq('acct',me)}
     chAddVote({msg_id:id,acct:me,opt});chChanged('vote');
     const r=await sb.from('hpl_chat_vote').insert({msg_id:id,table_id:CH.tid,acct:me,opt});if(r.error)throw r.error;
-  }catch(e){toast('Voto non salvato','err');chLoad()}
+  }catch(e){toast('Voto non salvato: controlla la connessione e riprova','err');chLoad()}
 }
 async function chUpdateBody(id,patch){
   const m=CH.msgs.get(id);if(!m)return;const old=m.body;m.body=Object.assign({},m.body,patch);chChanged('msg');
   const {error}=await chSb().from('hpl_chat').update({body:m.body}).eq('id',id).select().single();
-  if(error){m.body=old;chChanged('msg');toast('Non salvato','err')}
+  if(error){m.body=old;chChanged('msg');toast('Non salvato: controlla la connessione e riprova','err')}
 }
 async function chDelete(id){
   const m=CH.msgs.get(id);if(!m)return;const old=Object.assign({},m);m.deleted=true;m.body={};chChanged('msg');
   const {error}=await chSb().from('hpl_chat').update({deleted:true}).eq('id',id).select().single();
-  if(error){Object.assign(m,old);chChanged('msg');toast('Non eliminato','err')}
+  if(error){Object.assign(m,old);chChanged('msg');toast('Messaggio non eliminato: controlla la connessione e riprova','err')}
 }
 
 /* ---------- foto ---------- */
@@ -8818,7 +8818,7 @@ function chMenuSheet(){
 <div class="ch-mprev"><b>${esc(m.author_name||'')}</b><span>${esc(chSnip(m))}</span></div>
 <div class="ch-mrx">${CH_REACT.map(e=>`<button class="${rx&&rx.get(e)&&rx.get(e).has(me)?'on':''}" data-act="chrx" data-id="${m.id}" data-e="${e}" aria-label="Reagisci ${e}">${e}</button>`).join('')}</div>
 <div class="list">${it('chreply','↩','Rispondi')}${m.kind==='text'?it('chcopy',ico('copy',17),'Copia il testo'):''}${canEdit?it('chedit',ico('edit',17),'Modifica'):''}
-${rx&&rx.size?it('chrxinfo','♥️','Chi ha reagito'):''}${mine?it('chseen',ico('eye',17),'Chi l\'ha visto'):''}${mine?it('chdel',ico('trash',17),armed['chdel'+m.id]?'Confermi? Tocca di nuovo':'Elimina per tutti','red'):''}</div>
+${rx&&rx.size?it('chrxinfo','♥️','Chi ha reagito'):''}${mine?it('chseen',ico('eye',17),'Chi l\'ha visto'):''}${mine?it('chdel',ico('trash',17),armed['chdel'+m.id]?'Elimina per tutti · tocca ancora per confermare':'Elimina per tutti','red'):''}</div>
 </div></div></div>`;
 }
 function chAttachSheet(){
@@ -8894,7 +8894,7 @@ Object.assign(H,{
   chreply(d){SH=null;render();CH.edit=null;CH.reply=+d.id;chComposer();const ta=$$id('chin');if(ta)ta.focus()},
   chedit(d){const m=CH.msgs.get(+d.id);SH=null;render();if(!m)return;CH.reply=null;CH.edit=m.id;const ta=$$id('chin');if(ta){ta.value=m.body.t||'';chAutoGrow();chComposer();ta.focus()}},
   chcancel(){CH.reply=null;if(CH.edit){CH.edit=null;const ta=$$id('chin');if(ta){ta.value='';chAutoGrow()}}chComposer()},
-  async chcopy(d){const m=CH.msgs.get(+d.id);SH=null;render();try{await navigator.clipboard.writeText(m.body.t||'');toast('Testo copiato','ok')}catch(e){toast('Copia non riuscita','err')}},
+  async chcopy(d){const m=CH.msgs.get(+d.id);SH=null;render();try{await navigator.clipboard.writeText(m.body.t||'');toast('Testo copiato','ok')}catch(e){toast('Copia non riuscita: tieni premuto il testo e copialo a mano','err')}},
   chdel(d){const k='chdel'+d.id;if(!armed[k]){arm(k);render();return}SH=null;render();chDelete(+d.id)},
   chseen(d){openSheet({type:'chseen',id:+d.id})},
   chrxinfo(d){SH={type:'chrxinfo',id:+d.id,anim:false};render()},
@@ -8902,7 +8902,7 @@ Object.assign(H,{
   chjump(d){const n=document.querySelector(`#chlist .ch-row[data-id="${d.id}"]`);if(n){n.scrollIntoView({block:'center',behavior:'smooth'});n.classList.add('ch-flash');setTimeout(()=>n.classList.remove('ch-flash'),1200)}else toast('Messaggio troppo vecchio: scorri in alto','ok')},
   chdown(){const l=$$id('chlist');if(l)l.scrollTo({top:l.scrollHeight,behavior:'smooth'});CH.newBelow=0;chMarkRead()},
   chmore(){chLoad(true)},
-  chretry(d){const m=CH.msgs.get(+d.id);if(!m)return;CH.msgs.delete(m.id);CH.order=CH.order.filter(x=>x!==m.id);chChanged('msg');if(m.kind==='photo'){toast('Riscegli la foto','err');return}chSend(m.kind,m.body)},
+  chretry(d){const m=CH.msgs.get(+d.id);if(!m)return;CH.msgs.delete(m.id);CH.order=CH.order.filter(x=>x!==m.id);chChanged('msg');if(m.kind==='photo'){toast('Foto non inviata: sceglila di nuovo','err');return}chSend(m.kind,m.body)},
   openchat(){openChat()}
 });
 
@@ -9225,7 +9225,7 @@ document.addEventListener('drop',e=>{
 /* immagini messe nella casella dalla tastiera (sticker): si tolgono dal testo e si mandano */
 document.addEventListener('input',e=>{
   const el=e.target&&e.target.id==='chin'?e.target:null;if(!el)return;
-  el.querySelectorAll('img').forEach(img=>{const src=img.currentSrc||img.src;img.remove();if(src)fetch(src).then(r=>r.blob()).then(chImageIn).catch(()=>toast('Sticker non letto','err'))});
+  el.querySelectorAll('img').forEach(img=>{const src=img.currentSrc||img.src;img.remove();if(src)fetch(src).then(r=>r.blob()).then(chImageIn).catch(()=>toast('Questo sticker non si riesce a leggere: provane un altro','err'))});
   el.querySelectorAll('[style],[class],font,span,b,i').forEach(n=>{if(n.nodeName==='SPAN'||n.nodeName==='FONT'||n.nodeName==='B'||n.nodeName==='I'){n.replaceWith(...n.childNodes)}else{n.removeAttribute('style');n.removeAttribute('class')}});
   if(!chEdText(el).trim()&&!el.querySelector('img'))el.innerHTML='';
 },true);
@@ -9247,7 +9247,7 @@ async function chImageIn(blob){
     out=await new Promise(r=>c.toBlob(r,'image/png'));type='image/png';
   }
   URL.revokeObjectURL(u);
-  if(!out){toast('Sticker non leggibile','err');return}
+  if(!out){toast('Questo sticker non si riesce a leggere: provane un altro','err');return}
   chSendSticker(out,type,ow,oh);
 }
 async function chSendSticker(blob,type,w,h){
@@ -9376,7 +9376,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792503219923';
+const APP_VERSION='1792503433498';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
