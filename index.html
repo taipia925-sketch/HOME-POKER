@@ -8476,8 +8476,6 @@ async function chFetchUrls(){
 }
 
 /* ---------- giochi da tavolo in chat ---------- */
-const chRand=n=>{try{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%n}catch(e){return Math.floor(Math.random()*n)}};
-function chDice(){chSend('dice',{v:[1+chRand(6),1+chRand(6)]})}
 function chNextEvent(){
   const now=Date.now();return Object.entries(S.games||{}).filter(([,g])=>g.status==='scheduled'&&Date.parse(g.scheduledAt)>now-3*36e5).sort((a,b)=>Date.parse(a[1].scheduledAt)-Date.parse(b[1].scheduledAt))[0]||null;
 }
@@ -8567,7 +8565,7 @@ function chatPaint(full,what){
   else if(!CH.loaded&&!CH.order.length)body=null;
   if(body!==undefined&&body!==null){list.innerHTML=body;list.__keys=null}
   else if(!CH.loaded&&!CH.order.length){if(!list.querySelector('.ch-sk'))list.innerHTML='<div class="ch-sk"></div><div class="ch-sk r"></div><div class="ch-sk"></div>';list.__keys=null}
-  else if(!CH.order.length){list.innerHTML=`<div class="ch-empty"><div class="ch-empty-art">${cardHTML('Ah','b')}${cardHTML('As','b')}</div><b>Il tavolo è silenzioso</b><span>Scrivi il primo messaggio, manda una foto o lancia un sondaggio per la prossima serata.</span><div class="ch-sugg"><button data-act="chquick" data-t="Chi c'è stasera? 🃏">Chi c'è stasera? 🃏</button><button data-act="chpoll">📊 Sondaggio</button><button data-act="chdice">🎲 Dadi</button></div></div>`;list.__keys=null}
+  else if(!CH.order.length){list.innerHTML=`<div class="ch-empty"><div class="ch-empty-art">${cardHTML('Ah','b')}${cardHTML('As','b')}</div><b>Il tavolo è silenzioso</b><span>Scrivi il primo messaggio, manda una foto o lancia un sondaggio per la prossima serata.</span><div class="ch-sugg"><button data-act="chquick" data-t="Chi c'è stasera? 🃏">Chi c'è stasera? 🃏</button><button data-act="chpoll">📊 Sondaggio</button></div></div>`;list.__keys=null}
   else{
     const items=chItems(),keep=new Map();
     [...list.children].forEach(n=>{if(n.dataset&&n.dataset.k)keep.set(n.dataset.k,n);else if(!n.classList.contains('ch-more'))n.remove()});
@@ -8757,7 +8755,7 @@ Object.assign(H,{
   chattach(){openSheet({type:'chattach'})},
   chphoto(){SH=null;render();chPickPhoto(false)},
   chcam(){SH=null;render();chPickPhoto(true)},
-  chdice(){SH=null;render();chDice()},chevshare(){SH=null;render();chShareEvent()},
+  chevshare(){SH=null;render();chShareEvent()},
   chev(d){if(d.g&&S.games[d.g])go('book',d.g);else toast('Questa serata non c\'è più','err')},
   chquick(d){const ta=$$id('chin');if(ta){ta.value=d.t;chAutoGrow();chComposer();ta.focus()}},
   chpoll(){F.chp={q:'',o:['',''],multi:false};openSheet({type:'chpoll'})},
@@ -9233,7 +9231,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792529517817';
+const APP_VERSION='1792530922037';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
