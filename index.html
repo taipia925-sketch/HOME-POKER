@@ -3711,11 +3711,15 @@ async function makeBase(){
     return {doc,collection,close(){clearInterval(iv);document.removeEventListener('visibilitychange',vis);try{sb.removeChannel(ch)}catch(e){}}};
   }
   /* il mazziere dei tavoli virtuali gira vicino al database (Irlanda): ogni mossa fa meno strada */
-  let fnRegion=true;
+  let fnRegionOff=0;
   async function fn(name,body){
-    const reg=name==='hpl-holdem'&&fnRegion;
+    const reg=name==='hpl-holdem'&&Date.now()>fnRegionOff;
     let {data,error}=await sb.functions.invoke(name,reg?{body,region:'eu-west-1'}:{body});
-    if(error&&reg&&/Fetch|Failed to send/i.test(String(error.name)+' '+String(error.message))){fnRegion=false;({data,error}=await sb.functions.invoke(name,{body}))}
+    if(error&&reg&&/Fetch|Failed to send/i.test(String(error.name)+' '+String(error.message))){
+      // per un minuto si va senza regione; si ripete subito solo ciò che non cambia la partita (una mossa non va mai mandata due volte)
+      fnRegionOff=Date.now()+60000;
+      if(body&&['state','list','tick'].includes(body.action))({data,error}=await sb.functions.invoke(name,{body}));
+    }
     if(error)throw error;return data}
   return {getDoc,rpc,scope,fn,sb};
 }
@@ -4858,7 +4862,7 @@ function start(st,priv,now){
   st.running=true;tick(st,priv,now);return true;
 }
 const rebuyMax=st=>{const m=st.cfg.maxRebuys;return m==null?2:m};
-const rebuysLeft=(st,acct)=>{const m=rebuyMax(st);return m>=99?99:Math.max(0,m-(((st.busted||{})[acct])||0))};
+const rebuysLeft=(st,acct)=>{const m=rebuyMax(st);return m>=99?99:Math.max(0,m-Math.max(0,(((st.busted||{})[acct])||0)-1))};
 const maxSeats=st=>Math.min(NS,Math.max(2,(st.room&&st.room.maxSeats)||NS));
 const eligible=st=>st.seats.map((s,i)=>s&&s.stack>0&&!s.out&&(sngOn(st)||!s.away)?i:-1).filter(i=>i>=0);
 
@@ -5012,7 +5016,7 @@ function roomCheck(st,now){
   }else if(alive.length>1&&st.lonelyAt){st.lonelyAt=null;return true}
   if(!sat.length||(started&&alive.length<=1)){
     st.closed=true;st.closedAt=now;st.running=false;
-    st.final=sat.concat(st.sng&&st.sng.out?[]:[]).map(s=>({name:s.name,acct:s.acct,stack:s.stack,out:!!s.out,net:s.stack-st.cfg.stack*(1+(s.rebuys||0))})).sort((a,b)=>b.stack-a.stack);
+    st.final=sat.map(s=>({name:s.name,acct:s.acct,stack:s.stack,out:!!s.out,net:s.stack-st.cfg.stack*(1+(s.rebuys||0))})).sort((a,b)=>b.stack-a.stack);
     return true;
   }
   return false;
@@ -5060,7 +5064,7 @@ const myAcct=()=>S.acct&&S.acct.id;
 const vtSeat=()=>{const st=S.vt.st;return st?st.seats.findIndex(s=>s&&s.acct===myAcct()):-1};
 const vtLive=()=>{const h=S.vt.st&&S.vt.st.hand;return !!(h&&h.stage!=='done')};
 const pcard=(c,cls)=>c?`<span class="pc ${'hd'.includes(c[1])?'r':''} ${cls||''}"><b>${c[0]==='T'?'10':c[0]}</b><i>${SUITCH[c[1]]}</i></span>`:`<span class="pc back ${cls||''}"></span>`;
-const VT_ERR={not_your_turn:'Non è il tuo turno',cannot_check:'Non puoi passare: c\'è una puntata da chiamare',min_raise:'Rilancio troppo basso',too_small:'Importo troppo basso',bad_amount:'Importo non valido',seat_taken:'Posto già occupato',full:'Il tavolo è pieno (9 posti)',already_seated:'Sei già seduto',has_chips:'Hai ancora fiches',in_hand:'Aspetta la fine della mano',hand_running:'Aspetta la fine della mano',bad_config:'Controlla i valori',not_member:'Non sei in questo tavolo',no_player:'Il tuo profilo non è collegato a questo tavolo',no_account:'Accedi di nuovo con il tuo account',busy:'Troppe mosse insieme: riprova',no_hand:'Nessuna mano in corso',not_seated:'Non sei seduto'};
+const VT_ERR={not_seated:'Solo chi è seduto al tavolo può farlo',not_your_turn:'Non è il tuo turno',cannot_check:'Non puoi passare: c\'è una puntata da chiamare',min_raise:'Rilancio troppo basso',too_small:'Importo troppo basso',bad_amount:'Importo non valido',seat_taken:'Posto già occupato',full:'Il tavolo è pieno (9 posti)',already_seated:'Sei già seduto',has_chips:'Hai ancora fiches',in_hand:'Aspetta la fine della mano',hand_running:'Aspetta la fine della mano',bad_config:'Controlla i valori',not_member:'Non sei in questo tavolo',no_player:'Il tuo profilo non è collegato a questo tavolo',no_account:'Accedi di nuovo con il tuo account',busy:'Troppe mosse insieme: riprova',no_hand:'Nessuna mano in corso',not_seated:'Non sei seduto'};
 function vtErrMsg(e){const m=String(e&&(e.message||e)||'');if(/not found|404|Failed to send|FunctionsFetchError|FunctionsHttpError|non-2xx/i.test(m))return 'Il mazziere non risponde: manca la funzione hpl-holdem in Supabase';if(/hpl_vt_load|hpl_vt/.test(m))return 'Manca virtuale.sql in Supabase';return VT_ERR[m]||m||'Qualcosa non va, riprova'}
 
 function vtApply(st){
@@ -5123,9 +5127,10 @@ setInterval(()=>{
   if(st.running&&(!h||h.stage==='done')&&sn>((h&&h.endedAt)||0)+HE.NEXT_DELAY+300&&HE.eligible(st).length>=2)need=true;
   /* a far andare avanti la partita è uno solo (il primo seduto che non è in pausa): gli altri aspettano
      un po' e intervengono solo se lui non lo fa, così i telefoni non si pestano i piedi */
-  if(!need){S.vt.needSince=0}
+  const needKey=need?[h&&h.no,h&&h.stage,h&&h.toAct,h&&h.deadline,h&&h.endedAt].join(':'):'';
+  if(!need){S.vt.needSince=0;S.vt.needKey=''}
   else if(vtSeat()>=0){
-    if(!S.vt.needSince)S.vt.needSince=now;
+    if(!S.vt.needSince||S.vt.needKey!==needKey){S.vt.needSince=now;S.vt.needKey=needKey}
     const order=st.seats.map((x,k)=>x&&!x.away?k:-1).filter(k=>k>=0);let rank=order.indexOf(vtSeat());if(rank<0)rank=order.length;
     if(now-S.vt.needSince>=rank*1600&&now-S.vt.lastTick>1500){S.vt.lastTick=now;vtCall('tick',{},true)}
   }
@@ -9356,7 +9361,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792501021030';
+const APP_VERSION='1792502729711';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;

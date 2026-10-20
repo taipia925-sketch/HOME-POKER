@@ -57,7 +57,8 @@ export async function sendTo(db: any, table_id: string, accounts: string[], m: M
   const base = {
     title: String(m.title ?? "Home Poker").slice(0, 90),
     body: String(m.body ?? "").slice(0, 220),
-    url: typeof m.url === "string" ? m.url : "./",
+    // solo collegamenti dentro l'app: una notifica non può portare a un sito esterno
+    url: typeof m.url === "string" && /^\.\/(#[^\s]*)?$/.test(m.url) ? m.url : "./",
     tag,
   };
   const ru = Deno.env.get("SUPABASE_URL") + "/functions/v1/hpl-chat-reply";

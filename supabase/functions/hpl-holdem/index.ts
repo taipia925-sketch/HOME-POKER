@@ -4,6 +4,7 @@
 // restano qui sul server: ogni giocatore riceve solo le sue.
 // NB: il motore HE qui sotto è la stessa copia che sta in index.html: se cambi uno, aggiorna l'altro.
 import { createClient } from "npm:@supabase/supabase-js@2.58.0";
+import { createRemoteJWKSet, jwtVerify } from "npm:jose@5.9.6";
 
 const HE=(()=>{
 const RANKS='23456789TJQKA',SUITS='shdc',NS=9,NEXT_DELAY=4000,HIST=25;
@@ -130,7 +131,7 @@ function start(st,priv,now){
   st.running=true;tick(st,priv,now);return true;
 }
 const rebuyMax=st=>{const m=st.cfg.maxRebuys;return m==null?2:m};
-const rebuysLeft=(st,acct)=>{const m=rebuyMax(st);return m>=99?99:Math.max(0,m-(((st.busted||{})[acct])||0))};
+const rebuysLeft=(st,acct)=>{const m=rebuyMax(st);return m>=99?99:Math.max(0,m-Math.max(0,(((st.busted||{})[acct])||0)-1))};
 const maxSeats=st=>Math.min(NS,Math.max(2,(st.room&&st.room.maxSeats)||NS));
 const eligible=st=>st.seats.map((s,i)=>s&&s.stack>0&&!s.out&&(sngOn(st)||!s.away)?i:-1).filter(i=>i>=0);
 
@@ -284,7 +285,7 @@ function roomCheck(st,now){
   }else if(alive.length>1&&st.lonelyAt){st.lonelyAt=null;return true}
   if(!sat.length||(started&&alive.length<=1)){
     st.closed=true;st.closedAt=now;st.running=false;
-    st.final=sat.concat(st.sng&&st.sng.out?[]:[]).map(s=>({name:s.name,acct:s.acct,stack:s.stack,out:!!s.out,net:s.stack-st.cfg.stack*(1+(s.rebuys||0))})).sort((a,b)=>b.stack-a.stack);
+    st.final=sat.map(s=>({name:s.name,acct:s.acct,stack:s.stack,out:!!s.out,net:s.stack-st.cfg.stack*(1+(s.rebuys||0))})).sort((a,b)=>b.stack-a.stack);
     return true;
   }
   return false;
@@ -328,17 +329,19 @@ const cors = {
 const json = (o) => new Response(JSON.stringify(o), { headers: { ...cors, "Content-Type": "application/json" } });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const db = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"), { auth: { persistSession: false } });
-function jwtSub(jwt) {
+/* chi chiama: la firma dell'accesso si controlla qui, con le chiavi pubbliche di Supabase (tenute in memoria),
+   senza un giro di rete a ogni mossa; se la chiave non torna si chiede direttamente a Supabase */
+const SB_URL = Deno.env.get("SUPABASE_URL");
+const JWKS = createRemoteJWKSet(new URL(SB_URL + "/auth/v1/.well-known/jwks.json"));
+async function authSub(jwt) {
+  if (!jwt) return null;
   try {
-    const p = jwt.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-    return JSON.parse(atob(p + "===".slice((p.length + 3) % 4))).sub || null;
-  } catch (_) { return null; }
-}
-function jwtRole(jwt) {
-  try {
-    const p = jwt.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-    return JSON.parse(atob(p + "===".slice((p.length + 3) % 4))).role || null;
-  } catch (_) { return null; }
+    const { payload } = await jwtVerify(jwt, JWKS, { issuer: SB_URL + "/auth/v1" });
+    return payload.role === "authenticated" && payload.sub ? String(payload.sub) : null;
+  } catch (_) {
+    const { data } = await db.auth.getUser(jwt).catch(() => ({ data: null }));
+    return data?.user?.id || null;
+  }
 }
 const rid = () => "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
@@ -346,29 +349,26 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   try {
     const jwt = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
-    const sub = jwtSub(jwt);
-    if (!sub || jwtRole(jwt) !== "authenticated") return json({ error: "not_signed_in" });
-    const userP = Promise.resolve({ data: { user: { id: sub } } });
-    const body = await req.json();
+    const [sub, body] = await Promise.all([authSub(jwt), req.json()]);
+    if (!sub) return json({ error: "not_signed_in" });
     const tid = String(body.table_id ?? "");
     const action = String(body.action ?? "state");
     let room = String(body.room_id ?? "");
-    let checked = false;
 
     if (action === "list") {
-      const [{ data: u }, { data: C }] = await Promise.all([userP, db.rpc("hpl_vr_ctx", { p_uid: sub, p_tid: tid, p_rid: "" })]);
-      if (u?.user?.id !== sub) return json({ error: "not_signed_in" });
+      const { data: C } = await db.rpc("hpl_vr_ctx", { p_uid: sub, p_tid: tid, p_rid: "" });
       if (!C?.member) return json({ error: "not_member" });
       const { data: rows } = await db.from("hpl_vr").select("room_id, state").eq("table_id", tid);
       return json({ ok: true, rooms: (rows ?? []).map((r) => r.state), now: Date.now() });
     }
     if (action === "create") {
-      const [{ data: u }, { data: C }] = await Promise.all([userP, db.rpc("hpl_vr_ctx", { p_uid: sub, p_tid: tid, p_rid: "" })]);
-      if (u?.user?.id !== sub) return json({ error: "not_signed_in" });
+      const { data: C } = await db.rpc("hpl_vr_ctx", { p_uid: sub, p_tid: tid, p_rid: "" });
       if (!C?.member) return json({ error: "not_member" });
       if (!C.acct || !C.pid) return json({ error: "no_player" });
       await db.rpc("hpl_vr_gc", { p_tid: tid });
-      if ((C.rooms || 0) >= 12) return json({ error: "too_many_rooms" });
+      // si contano i tavoli dopo la pulizia, non prima
+      const { count: nRooms } = await db.from("hpl_vr").select("room_id", { count: "exact", head: true }).eq("table_id", tid);
+      if ((nRooms ?? C.rooms ?? 0) >= 12) return json({ error: "too_many_rooms" });
       const now = Date.now();
       room = rid();
       const ms = [2, 6, 9].includes(Number(body.maxSeats)) ? Number(body.maxSeats) : 6;
@@ -384,13 +384,7 @@ Deno.serve(async (req) => {
     }
 
     for (let attempt = 0; attempt < 6; attempt++) {
-      const ctxP = db.rpc("hpl_vr_ctx", { p_uid: sub, p_tid: tid, p_rid: room });
-      if (!checked) {
-        const [{ data: u }] = await Promise.all([userP, ctxP]);
-        if (u?.user?.id !== sub) return json({ error: "not_signed_in" });
-        checked = true;
-      }
-      const { data: C, error: ce } = await ctxP;
+      const { data: C, error: ce } = await db.rpc("hpl_vr_ctx", { p_uid: sub, p_tid: tid, p_rid: room });
       if (ce) return json({ error: ce.message });
       if (!C?.member) return json({ error: "not_member" });
       if (!C.acct || !C.pid) return json({ error: "no_player" });
@@ -402,6 +396,8 @@ Deno.serve(async (req) => {
         return json({ ok: true, deleted: true, killed: true, now: Date.now() });
       }
       const st = C.state, v = C.v, priv = C.priv || {};
+      // regole, avvio e stop: solo chi è seduto a quel tavolo (o un gestore)
+      if (["config", "start", "stop"].includes(action) && HE.seatOf(st, C.acct) < 0 && !C.mgr) return json({ error: "not_seated", state: st, now: Date.now() });
       const now = Date.now();
       let changed = false;
       try {
