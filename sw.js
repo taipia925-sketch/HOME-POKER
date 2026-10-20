@@ -41,6 +41,7 @@ self.addEventListener('push',e=>{
   e.waitUntil(self.registration.showNotification(d.title||'Home Poker',o));
 });
 function openApp(url){
+  if(!String(url).startsWith(self.registration.scope))url=self.registration.scope;
   return self.clients.matchAll({type:'window',includeUncontrolled:true}).then(cs=>{
     for(const c of cs){if(c.url.startsWith(self.registration.scope)){c.postMessage({url});return c.focus()}}
     return self.clients.openWindow(url);

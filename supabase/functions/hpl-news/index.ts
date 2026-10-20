@@ -67,8 +67,8 @@ const isPoker = (t, src) => {
 };
 function classify(t) {
   const s = t.toLowerCase();
-  if (/gossip|scandal|cheat|truff|barare|polemic|drama|vip|celebr|attor|cantant|calciat|influencer|streamer|lite|accus|arrest|denunc|squalific|ban\b|bannat/.test(s)) return "gossip";
-  if (/wsop|ept|wpt|world series|main event|bracelet|braccialett|torneo|tournament|high roller|final table|tavolo finale|vince|wins|champion|campion|festival|series/.test(s)) return "tornei";
+  if (/gossip|scandal|cheat|truff|barare|polemic|drama|\bvip\b|celebr|\battor[ei]\b|cantant|calciat|influencer|streamer|\blit[ei]\b|\baccus|arrest|denunc|squalific|\bban\b|bannat/.test(s)) return "gossip";
+  if (/wsop|\bept\b|\bwpt\b|world series|main event|bracelet|braccialett|torneo|tournament|high roller|final table|tavolo finale|\bvinc[eo]\w*|\bwins?\b|champion|campion|festival|\bseries\b/.test(s)) return "tornei";
   return "news";
 }
 const norm = (t) => t.toLowerCase().replace(/[^a-z0-9à-ù]+/g, " ").trim().slice(0, 60);
@@ -104,9 +104,12 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   try {
     const now = Date.now();
-    if (!cache || now - cache.at > TTL || !cache.items.length) {
+    // se tutte le fonti hanno fallito si riprova al massimo ogni 2 minuti, non a ogni apertura
+    const stale = !cache || now - cache.at > TTL || (!cache.items.length && now - (cache.tried || cache.at) > 120000);
+    if (stale) {
       const items = await collect();
-      if (items.length || !cache) cache = { at: now, items };
+      if (items.length || !cache) cache = { at: now, items, tried: now };
+      else cache.tried = now;
     }
     return json({ ok: true, at: cache.at, items: cache.items, feeds: stats });
   } catch (e) {
