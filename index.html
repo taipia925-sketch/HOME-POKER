@@ -1203,6 +1203,7 @@ span.chips i{position:absolute;left:0;bottom:calc(var(--j)*3px);width:18px;heigh
 .la-fold{background:#3A1418;color:#FF8A80}.la-check{background:#1E2E46;color:#B7CBFF}.la-call{background:#173A2A;color:#86EBAC}.la-raise{background:#4A3510;color:#FFD27A}.la-allin{background:linear-gradient(180deg,#E8435A,#B8213A);color:#fff;box-shadow:0 0 14px rgba(232,67,90,.6)}.la-blind{background:rgba(0,0,0,.45);color:#C9D2CC}
 .s3 .la.win{background:var(--gold-grad);color:var(--on-acc);font-size:12.5px;box-shadow:0 0 18px rgba(242,203,114,.6)}
 .s3.fold .s3-av,.s3.fold .s3-plate{opacity:.45;filter:grayscale(.9)}
+.s3.fold:not(.me) .la.la-fold{display:none}
 .s3.win .s3-ava .ava{box-shadow:0 0 0 3px #F2CB72,0 0 30px rgba(242,203,114,.9)}
 .s3.win .s3-av{animation:winBob .8s var(--spring)}
 @keyframes winBob{40%{transform:scale(1.15)}}
@@ -1563,15 +1564,15 @@ body::after{opacity:1;mix-blend-mode:normal;background-image:
 .gl-i:after{content:"";position:absolute;width:24px;height:24px;border-radius:50%;border:1.5px solid #A9ABB2;top:50%;left:50%;transform:translate(-50%,-50%)}
 @media (prefers-reduced-motion:reduce){.gl-sw{animation:none}}
 /* ===================== TAVOLO STILE "APP DI POKER" ===================== */
-.vt3{--pr:#D7262F;--pr2:#A9141D;background:radial-gradient(90% 55% at 50% 42%,#3A3B3E,#1C1D1F 70%,#141516)}
+.vt3{--pr:#D7262F;--pr2:#A9141D;background:radial-gradient(80% 30% at 50% -4%,rgba(220,40,60,.30),transparent 70%),radial-gradient(70% 40% at 100% 70%,rgba(90,60,255,.10),transparent 70%),radial-gradient(90% 55% at 50% 42%,#2E2530,#1A1419 70%,#110C11)}
 .vt3::before{display:none}
 .t3-top{min-height:52px;padding:6px 8px 0}
-.t3-ib{width:40px;height:40px;border-radius:11px;background:linear-gradient(180deg,#4A4B4F,#2E2F33);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 6px rgba(0,0,0,.5)}
+.t3-ib{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 2px 6px rgba(0,0,0,.4)}
 .t3-ib.on{background:linear-gradient(180deg,#E8434B,var(--pr2));color:#fff}
 .t3-tt b{font-family:var(--sans);font-size:15.5px;font-weight:800}
 .t3-tt span{color:#A9ABB0}
 /* il tavolo: panno verde acceso, bordo grigio scuro imbottito */
-.vt3 .t3-rail{inset:9% 9% 10%;padding:13px;background:linear-gradient(180deg,#55575C,#2B2C30 55%,#1E1F22);box-shadow:0 0 0 2px #0E0E10,0 24px 50px rgba(0,0,0,.75),inset 0 2px 1px rgba(255,255,255,.18),inset 0 -3px 6px rgba(0,0,0,.6)}
+.vt3 .t3-rail{inset:9% 9% 10%;padding:13px;background:linear-gradient(180deg,#55575C,#2B2C30 55%,#1E1F22);box-shadow:0 0 0 2px #0E0E10,0 0 0 4px rgba(228,182,86,.55),0 0 26px rgba(228,182,86,.18),0 24px 50px rgba(0,0,0,.75),inset 0 2px 1px rgba(255,255,255,.18),inset 0 -3px 6px rgba(0,0,0,.6)}
 .vt3 .t3-felt{background:radial-gradient(70% 55% at 50% 45%,#2FB25A,#1A8C3F 55%,#0F6A2E 100%);box-shadow:inset 0 0 0 3px rgba(0,0,0,.35),inset 0 0 40px rgba(0,0,0,.45)}
 .vt3 .t3-felt::before{inset:10px;border:2px solid rgba(255,255,255,.08)}
 .vt3 .t3-felt::after{background:radial-gradient(50% 26% at 50% 24%,rgba(255,255,255,.1),transparent 70%)}
@@ -2244,7 +2245,7 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 
 /* pulsante fluttuante */
 .ch-fab{position:relative;flex:none;margin-left:auto;margin-right:10px;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:22px;
-  background:radial-gradient(circle at 35% 30%,#7CF0A8,#1F9E5A 50%,#0D5A33);box-shadow:0 10px 24px rgba(0,0,0,.55),0 0 0 3px #FFC21A,inset 0 1px 0 rgba(255,255,255,.5);animation:chFabIn .4s cubic-bezier(.2,.9,.25,1.3)}
+  background:radial-gradient(circle at 35% 30%,#7CF0A8,#1F9E5A 50%,#0D5A33);box-shadow:0 10px 24px rgba(0,0,0,.55),0 0 0 3px #FFC21A,inset 0 1px 0 rgba(255,255,255,.5)}
 .ch-fab:active{transform:scale(.92)}
 .v2-chead{gap:8px}.v2-chead b{flex:1;min-width:0}.ch-full{flex:none;display:flex;align-items:center;gap:2px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800;color:#2A1600;background:linear-gradient(180deg,#FFE680,#FFC21A)}
 .ch-fab i{position:absolute;top:-4px;right:-4px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;font-style:normal;font-size:12px;font-weight:800;display:grid;place-items:center;color:#fff;background:#E01E37;box-shadow:0 0 0 2px #fff}
@@ -2481,6 +2482,9 @@ const picOf=n=>{try{if(typeof S==='undefined')return null;const k=String(n||'').
   if(mine){try{const c=JSON.parse(localStorage.getItem('hpl.mypic')||'null');if(c&&c.k===k&&c.pic)return c.pic}catch(e){}}
   return null}catch(e){return null}};
 const ava=(n,s)=>{const pc=picOf(n);return `<span class="ava ${s||''}${pc?' pic':''}" style="--h:${hueOf(n)}">${pc?(String(pc).slice(0,11)==='data:image/'?`<img class="aph" src="${pc}" alt="">`:`<i class="ap" aria-hidden="true">${pc}</i>`)+`<span class="sr">${esc(n)}</span>`:`<i>${esc(inits(n))}</i>`}</span>`};
+/* il PIN Admin si vede solo quando lo chiedi (e si ricopre da solo dopo 8 secondi) */
+const pinBar=(pin,style)=>{const on=PINSHOW>Date.now();return `<button class="pinbar" data-act="pinshow" style="width:100%;${style||''}" aria-label="${on?'PIN Admin '+esc(pin||''):'Mostra il PIN Admin'}"><span class="row" style="gap:8px">${ico('key',16)}<span>PIN Admin</span></span><span class="row" style="gap:10px"><b class="num">${on?esc(pin||'----'):'••••'}</b><span class="xs" style="opacity:.8">${on?'Nascondi':'Mostra'}</span></span></button>`};
+let PINSHOW=0,PINT=null;
 const dDay=iso=>new Date(iso).getDate();
 const pKey=(id,name)=>id&&id!=='dealer'?id:'n:'+String(name||'').trim().toLowerCase();
 const pName=(id,name)=>(id&&typeof S!=='undefined'&&S.players&&S.players[id]&&S.players[id].name)||name;
@@ -2899,7 +2903,7 @@ function tabSerata(D){
     h+=`<section class="hero stack" style="gap:16px"><div class="row sp"><span class="badge live"><i class="dot"></i>In corso</span><span class="xs mut">${dDay(live.scheduledAt)} ${dMon(live.scheduledAt)} · ${tHM(live.scheduledAt)}</span></div>
 <div><div class="mut sm">Montepremi</div><div class="bignum">${eur(netPot(live))}</div></div>
 <div class="row sp">${stackAva(L.map(p=>p.playerName))}<span class="mut sm">${L.length} al tavolo</span></div>
-${A?`<div class="pinbar"><span class="row" style="gap:8px">${ico('key',16)}<span>PIN Admin</span></span><b class="num">${esc(adminPinOf(live.id)||'----')}</b></div>`:''}
+${A?pinBar(adminPinOf(live.id)):''}
 <button class="btn" data-act="live" data-gid="${live.id}">Apri la cassa live</button></section>`;
   }else{
     h+=`<section class="hero stack" style="gap:16px"><div><h2 style="font-size:30px;line-height:1.08">Pronti a giocare?</h2><p class="mut" style="margin:8px 0 0">${realGames(gs).length?`Ultima serata: ${dDay(realGames(gs)[0].scheduledAt)} ${dMon(realGames(gs)[0].scheduledAt)}, ${eur(netPot(realGames(gs)[0]))} di montepremi.`:'Apri il tavolo, scegli chi gioca e la cassa si tiene da sola.'}</p></div><button class="btn" data-act="newgame">${ico('plus',18)} Nuova partita</button></section>`;
@@ -3057,7 +3061,7 @@ ${total>0?`<div class="meter" role="img" aria-label="Incassato ${eur(paid)}, da 
 <div class="kpis" style="margin-top:0"><div class="kpi"><div class="k">Incassato</div><div class="v num green">${eurS(paid)}</div></div>
 <div class="kpi"><div class="k">Da pagare</div><div class="v num" style="color:${pend>0?'#FF6A60':'var(--mut)'}">${eurS(pend)}</div></div>
 <div class="kpi"><div class="k">Fiches</div><div class="v num gold">${fch(inPlay)}</div>${safe>0?`<div class="s num">${eurS(safe)} al sicuro</div>`:''}</div></div>
-${A?`<div class="pinbar"><span class="row" style="gap:8px">${ico('key',16)}<span>PIN Admin</span></span><b class="num">${esc(pin||'----')}</b></div>`:''}</div>
+${A?pinBar(pin):''}</div>
 ${A?'':pinBox(gid,'Puoi guardare la cassa in tempo reale. Per registrare re-buy, cash out o chiudere la partita serve il PIN Admin.')}
 <div class="sec" style="margin-top:8px">Al tavolo <small>${L.length}</small></div>
 <div class="stack" style="gap:8px">${L.length?L.map(p=>livePlayer(g,p,A)).join(''):'<div class="card mut sm">Nessun giocatore al tavolo.</div>'}
@@ -3071,7 +3075,7 @@ ${g.maxSeats?`<div class="meter"><i class="m-o" style="flex:${Math.min(R.length,
 <div class="stack" style="gap:0">${resList(g,A)}</div>
 ${A?`<button class="link" style="align-self:center;color:#FF6A60" data-act="delgame">${armed.delgame?'Confermi? Tocca di nuovo':'Elimina partita'}</button>`:''}</div>`:''}</div>
 ${histBlock(g,'live')}</div></div>
-<div class="bar"><div class="bar-in">${A?`<button class="btn" data-act="startclose" ${closable(g)&&canWrite?'':'disabled'}>Chiudi partita e conta le fiches</button>
+<div class="bar"><div class="bar-in">${A?`<button class="btn" data-act="startclose" ${closable(g)&&canWrite?'':'disabled'}>Chiudi e conta le fiches</button>
 ${closable(g)?'':'<div class="mut xs" style="padding-top:6px">Servono almeno 2 giocatori per chiudere la partita.</div>'}`:'<div class="mut sm" style="text-align:center;padding:6px 0">Sola lettura: serve il PIN Admin per modificare.</div>'}</div></div>`;
 }
 function livePlayer(g,p,A){
@@ -4354,7 +4358,7 @@ function vTourLive(){
 <div class="tprog"><i id="tbar" style="width:${(c.frac*100).toFixed(2)}%"></i></div>
 <div class="mut sm" style="text-align:center;margin-top:8px">${nx?`Prossimo: ${bl(nx[0])} / ${bl(nx[1])} · livelli da ${(g.tour&&g.tour.mins)||15} minuti`:'Ultimo livello'}</div>
 ${A?`<div class="tctl"><button class="btn-s" data-act="tlevel" data-d="-1" aria-label="Livello precedente">${ico('back',20)}</button><button class="btn" data-act="ttoggle">${!c.started?'Avvia il timer':c.paused?'Riprendi':'Pausa'}</button><button class="btn-s" data-act="tlevel" data-d="1" aria-label="Livello successivo">${ico('chevr',20)}</button></div>`:''}
-${A?`<div class="pinbar" style="margin-top:12px"><span class="row" style="gap:8px">${ico('key',16)}<span>PIN Admin</span></span><b class="num">${esc(pin||'----')}</b></div>`:''}</div>
+${A?pinBar(pin,'margin-top:12px'):''}</div>
 ${A?'':pinBox(gid,'Per eliminare giocatori o gestire il timer serve il PIN Admin.')}
 <div class="card" style="margin-top:12px"><div class="row sp"><div><div class="mut sm">Montepremi</div><div class="num" style="font-family:var(--serif);font-weight:800;font-size:28px">${eur(pot)}</div></div><div class="stack" style="gap:2px;text-align:right">${pr.map((v,i)=>`<div class="num sm"><span class="mut">${i+1}°</span> <b>${eurS(v)}</b></div>`).join('')}</div></div></div>
 <div class="sec">In gioco <small>${inn.length}</small></div>
@@ -4642,6 +4646,7 @@ Object.assign(H,{
   },
   pushinvite(d){const g=S.games[d.gid];if(!g)return;pushSend({to:'all',title:`♠️ Poker ${new Date(g.scheduledAt).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})} alle ${tHM(g.scheduledAt)}`,body:`Ci sono ancora posti: tocca per prenotarti.`,url:deepUrl('book',d.gid),tag:'invito-'+d.gid});toast('Promemoria inviato al tavolo','ok')},
   pushtoggle(){S.pushOn?pushOff():pushOn()},
+  pinshow(){clearTimeout(PINT);if(PINSHOW>Date.now()){PINSHOW=0}else{PINSHOW=Date.now()+8000;PINT=setTimeout(()=>{PINSHOW=0;render()},8100)}render()},
   pushtest(){pushTest()},
   rename(){F.rn={name:S.acct?S.acct.name:'',pin:''};openSheet({type:'rename'})},
   renameok(){renameOk()}
@@ -8142,10 +8147,10 @@ const FX=(()=>{
     const SU=['♠','♥','♦','♣'];
     const n=o.n||120,ox=(o.x!=null?o.x:.5)*W,oy=(o.y!=null?o.y:.32)*H,P=[];
     for(let i=0;i<n;i++){
-      const a=(-90+(Math.random()-.5)*(o.spread||150))*Math.PI/180,sp=(o.power||13)*(.45+Math.random()*.75);
+      const a=((o.dir!=null?o.dir:-90)+(Math.random()-.5)*(o.spread||150))*Math.PI/180,sp=(o.power||13)*(.45+Math.random()*.75);
       const k=Math.random(),kind=k<.38?'chip':k<.58?'suit':'foil';
       P.push({x:ox+(Math.random()-.5)*40,y:oy+(Math.random()-.5)*20,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,r:kind==='chip'?6+Math.random()*5:kind==='suit'?9+Math.random()*7:3+Math.random()*4,
-        rot:Math.random()*6.28,vr:(Math.random()-.5)*.3,tilt:Math.random()*6.28,vt:.05+Math.random()*.12,c:COL[i%COL.length],kind,s:SU[i%4],life:0,max:110+Math.random()*70});
+        rot:Math.random()*6.28,vr:(Math.random()-.5)*.3,tilt:Math.random()*6.28,vt:.05+Math.random()*.12,c:COL[i%COL.length],kind,s:SU[i%4],life:0,max:(o.short?55:110)+Math.random()*(o.short?35:70)});
     }
     let alive=true;const t0=performance.now();
     const chip=(p,sx)=>{x.save();x.translate(p.x,p.y);x.rotate(p.rot);x.scale(sx,1);x.fillStyle=p.c;x.beginPath();x.arc(0,0,p.r,0,6.283);x.fill();
@@ -8183,7 +8188,7 @@ const FX=(()=>{
     const p=plist(g).find(x=>x.playerId===S.me.id);if(!p||!((p.netCents||0)>0))return;
     const k='cel:'+(S.table&&S.table.id)+':'+V.gid,done=LS.get('cel',{});if(done[k])return;
     done[k]=1;const keys=Object.keys(done);if(keys.length>60)delete done[keys[0]];LS.set('cel',done);
-    setTimeout(()=>confetti({n:130,y:.22}),550);
+    setTimeout(()=>{confetti({n:60,x:-.02,y:.7,dir:-62,spread:40,power:15,short:true});confetti({n:60,x:1.02,y:.7,dir:-118,spread:40,power:15,short:true})},550);
   }
 
   /* ---------- dopo ogni render ---------- */
@@ -9351,7 +9356,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792494019617';
+const APP_VERSION='1792501021030';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
