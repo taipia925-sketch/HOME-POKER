@@ -106,7 +106,7 @@ function rebuy(st,who){
   if(s.stack>0)E('has_chips');if(inLive(st,i))E('in_hand');
   s.stack=st.cfg.stack;s.rebuys=(s.rebuys||0)+1;s.out=false;return true;
 }
-function setAway(st,who,away){const i=seatOf(st,who.acct);if(i<0)E('not_seated');st.seats[i].away=!!away;return true}
+function setAway(st,who,away){const i=seatOf(st,who.acct);if(i<0)E('not_seated');st.seats[i].away=!!away;if(!away)st.seats[i].to=0;return true}
 function config(st,c){
   if(handLive(st))E('hand_running');if(sngOn(st))E('sng_running');
   const n=(x,lo,hi)=>{x=Math.round(+x);if(!(x>=lo&&x<=hi))E('bad_config');return x};
@@ -156,7 +156,7 @@ const canAct=(h,i)=>h.p[i]&&!h.p[i].folded&&!h.p[i].allin;
 function act(st,priv,who,a,now){
   const h=st.hand;if(!handLive(st))E('no_hand');
   const i=seatOf(st,who.acct);if(i<0||h.toAct!==i)E('not_your_turn');
-  if(st.seats[i].away)st.seats[i].away=false;
+  if(st.seats[i].away)st.seats[i].away=false;st.seats[i].to=0;
   apply(st,priv,i,a,now);return true;
 }
 function apply(st,priv,i,a,now){
@@ -295,7 +295,7 @@ function tick(st,priv,now){
   if(handLive(st)&&h.toAct!=null){
     const i=h.toAct,s=st.seats[i];
     if(now>=h.deadline||!s||s.away){
-      if(s&&!s.away&&now>=h.deadline)s.away=true;
+      if(s&&!s.away&&now>=h.deadline){s.to=(s.to||0)+1;if(s.to>=2)s.away=true}
       const P=h.p[i];apply(st,priv,i,{type:h.curBet-P.bet>0?'fold':'check'},now);
       return true;
     }
@@ -322,7 +322,7 @@ return {roomCheck,maxSeats,rebuysLeft,rebuyMax,LONELY_MS,initState,sit,leave,reb
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-region",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 const json = (o) => new Response(JSON.stringify(o), { headers: { ...cors, "Content-Type": "application/json" } });
@@ -334,6 +334,12 @@ function jwtSub(jwt) {
     return JSON.parse(atob(p + "===".slice((p.length + 3) % 4))).sub || null;
   } catch (_) { return null; }
 }
+function jwtRole(jwt) {
+  try {
+    const p = jwt.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(atob(p + "===".slice((p.length + 3) % 4))).role || null;
+  } catch (_) { return null; }
+}
 const rid = () => "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 Deno.serve(async (req) => {
@@ -341,8 +347,8 @@ Deno.serve(async (req) => {
   try {
     const jwt = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
     const sub = jwtSub(jwt);
-    if (!sub) return json({ error: "not_signed_in" });
-    const userP = db.auth.getUser(jwt);
+    if (!sub || jwtRole(jwt) !== "authenticated") return json({ error: "not_signed_in" });
+    const userP = Promise.resolve({ data: { user: { id: sub } } });
     const body = await req.json();
     const tid = String(body.table_id ?? "");
     const action = String(body.action ?? "state");
