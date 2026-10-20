@@ -32,12 +32,13 @@ Deno.serve(async (req) => {
     }
     const { data: row, error } = await db.from("hpl_chat").insert({ table_id: who.t, kind: "text", body, author_acct: who.a }).select("id, author_name").single();
     if (error) throw error;
-    await db.from("hpl_chat_read").upsert({ table_id: who.t, acct: who.a, last_id: row.id, updated_at: new Date().toISOString() });
-
-    // avvisa gli altri del tavolo, come un messaggio scritto dall'app
-    const { data: links } = await db.from("hpl_account_tables").select("account_id").eq("table_id", who.t);
+    // segna come letto e prepara l'avviso agli altri del tavolo, tutto insieme
+    const [, { data: links }, { data: tab }] = await Promise.all([
+      db.from("hpl_chat_read").upsert({ table_id: who.t, acct: who.a, last_id: row.id, updated_at: new Date().toISOString() }),
+      db.from("hpl_account_tables").select("account_id").eq("table_id", who.t),
+      db.from("hpl_tables").select("name").eq("id", who.t).maybeSingle(),
+    ]);
     const others = await dropMuted(db, who.t, [...new Set((links ?? []).map((l) => l.account_id).filter((a) => a !== who.a))]);
-    const { data: tab } = await db.from("hpl_tables").select("name").eq("id", who.t).maybeSingle();
     const first = String(row.author_name ?? "").split(/\s+/)[0] || "Qualcuno";
     await sendTo(db, who.t, others, {
       title: "💬 " + first + " · " + (tab?.name ?? "Chat"),

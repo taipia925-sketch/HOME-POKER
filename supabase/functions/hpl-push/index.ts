@@ -15,9 +15,11 @@ Deno.serve(async (req) => {
     if (!table_id) return json({ error: "bad_request" }, 400);
 
     // chi manda deve essere nel tavolo
-    const { data: mem } = await db.from("hpl_members").select("uid").eq("uid", uid).eq("table_id", table_id).maybeSingle();
+    const [{ data: mem }, { data: dev }] = await Promise.all([
+      db.from("hpl_members").select("uid").eq("uid", uid).eq("table_id", table_id).maybeSingle(),
+      db.from("hpl_devices").select("account_id").eq("uid", uid).maybeSingle(),
+    ]);
     if (!mem) return json({ error: "not_member" }, 403);
-    const { data: dev } = await db.from("hpl_devices").select("account_id").eq("uid", uid).maybeSingle();
 
     // a chi: tutto il tavolo (tranne chi manda), solo alcuni giocatori, oppure (prova) solo i propri telefoni
     let accounts: string[];
