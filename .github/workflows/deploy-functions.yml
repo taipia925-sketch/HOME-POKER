@@ -23,3 +23,5 @@ jobs:
             exit 1
           fi
           supabase functions deploy --project-ref nqlywzjhxykrfyrpkjdw --use-api
+          # la risposta dalla notifica arriva senza accesso: chi risponde lo dice il gettone firmato
+          supabase functions deploy hpl-chat-reply --project-ref nqlywzjhxykrfyrpkjdw --use-api --no-verify-jwt
