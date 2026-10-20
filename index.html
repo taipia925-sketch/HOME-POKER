@@ -3706,7 +3706,13 @@ async function makeBase(){
       onSnapshot(cb){return watch(()=>{const d=colDocs(c);return {docs:d,size:d.length,empty:!d.length}},cb)}});
     return {doc,collection,close(){clearInterval(iv);document.removeEventListener('visibilitychange',vis);try{sb.removeChannel(ch)}catch(e){}}};
   }
-  async function fn(name,body){const {data,error}=await sb.functions.invoke(name,{body});if(error)throw error;return data}
+  /* il mazziere dei tavoli virtuali gira vicino al database (Irlanda): ogni mossa fa meno strada */
+  let fnRegion=true;
+  async function fn(name,body){
+    const reg=name==='hpl-holdem'&&fnRegion;
+    let {data,error}=await sb.functions.invoke(name,reg?{body,region:'eu-west-1'}:{body});
+    if(error&&reg&&/Fetch|Failed to send/i.test(String(error.name)+' '+String(error.message))){fnRegion=false;({data,error}=await sb.functions.invoke(name,{body}))}
+    if(error)throw error;return data}
   return {getDoc,rpc,scope,fn,sb};
 }
 
@@ -5110,8 +5116,21 @@ setInterval(()=>{
   if(h&&h.stage!=='done'&&h.toAct!=null&&sn>h.deadline+400)need=true;
   if(h&&h.stage!=='done'&&h.toAct!=null&&st.seats[h.toAct]&&st.seats[h.toAct].away)need=true;
   if(st.running&&(!h||h.stage==='done')&&sn>((h&&h.endedAt)||0)+HE.NEXT_DELAY+300&&HE.eligible(st).length>=2)need=true;
-  if(need&&now-S.vt.lastTick>1500&&vtSeat()>=0){S.vt.lastTick=now;vtCall('tick',{},true)}
+  /* a far andare avanti la partita è uno solo (il primo seduto che non è in pausa): gli altri aspettano
+     un po' e intervengono solo se lui non lo fa, così i telefoni non si pestano i piedi */
+  if(!need){S.vt.needSince=0}
+  else if(vtSeat()>=0){
+    if(!S.vt.needSince)S.vt.needSince=now;
+    const order=st.seats.map((x,k)=>x&&!x.away?k:-1).filter(k=>k>=0);let rank=order.indexOf(vtSeat());if(rank<0)rank=order.length;
+    if(now-S.vt.needSince>=rank*1600&&now-S.vt.lastTick>1500){S.vt.lastTick=now;vtCall('tick',{},true)}
+  }
 },250);
+
+/* tornando sull'app (telefono sbloccato) il tavolo si aggiorna subito, carte comprese */
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden||!V||V.name!=='vt'||!S.table)return;
+  VT_LASTPOLL=Date.now();vtLoad();if(vtSeat()>=0)vtCall('state',{},true);
+});
 
 /* ---------- scelta della modalità ---------- */
 function vMode(){
@@ -9332,7 +9351,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792493755746';
+const APP_VERSION='1792494019617';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
