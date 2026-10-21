@@ -1429,15 +1429,15 @@ span.chips i{position:absolute;left:0;bottom:calc(var(--j)*3px);width:18px;heigh
 .bj-cards .cd{margin-left:-26px;box-shadow:0 6px 16px rgba(0,0,0,.5)}
 .bj-cards .cd:first-child{margin-left:0}
 .bj-tot{display:inline-block;min-width:44px;text-align:center;padding:3px 12px;border-radius:999px;font-family:var(--serif);font-weight:800;font-size:16px;background:rgba(6,12,9,.85);box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);animation:laIn .35s var(--spring) both}
-.bj-tot.bust,.bj-tot.lose{color:#FF9A90}
-.bj-tot.win,.bj-tot.bj{color:#1A1203;background:var(--gold-grad)}
-.bj-tot.push{color:#B7CBFF}
+.bj-tot.r-bust,.bj-tot.r-lose{color:#FF9A90}
+.bj-tot.r-win,.bj-tot.r-bj{color:#1A1203;background:var(--gold-grad)}
+.bj-tot.r-push{color:#B7CBFF}
 .bj-msg{position:relative;z-index:3;min-height:60px;display:flex;align-items:center;justify-content:center;margin-top:auto}
 .bj-player{position:relative;z-index:2;display:flex;justify-content:center;gap:10px;flex-wrap:nowrap;padding:0 10px 34px;min-height:200px;align-items:flex-end;margin-bottom:6%}
 .bj-hand{display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .35s var(--ease),opacity .35s}
 .bj-hand.act{transform:translateY(-8px)}
 .bj-hand.act .bj-cards .cd{box-shadow:0 0 0 2px #F2CB72,0 8px 18px rgba(0,0,0,.5)}
-.bj-hand.lose,.bj-hand.bust{opacity:.6}
+.bj-hand.r-lose,.bj-hand.r-bust{opacity:.6}
 .bj-player .bj-hand .cd.h{width:66px;height:93px}
 .bj-player:has(.bj-hand+.bj-hand) .cd.h{width:54px;height:76px}
 .bj-player:has(.bj-hand+.bj-hand) .cd.h .cd-ix b{font-size:22px}
@@ -5906,7 +5906,7 @@ Object.assign(H,{
   vtreshide(){const st=S.vt.st;if(st)F.vt.hideRes=st.sng&&st.sng.endedAt&&!st.closed?st.sng.endedAt:(st.closedAt||1);vtPaint()},
   vinvsend(){const ids=Object.keys(F.vinv||{}).filter(k=>F.vinv[k]);if(!ids.length)return;
     const st=V.name==='vt'?S.vt.st:null,n=st?st.seats.filter(Boolean).length:0;
-    pushSend({to:ids,title:`♠️ ${S.me.name} ti invita a Texas Hold'em`,body:st?`Tavolo «${st.room.name}» · ${st.cfg.mode==='sng'?'torneo':'cash'}${n?` · ${n} già sedut${n===1?'o':'i'}`:''}. Tocca per sederti.`:`Tavoli virtuali di ${S.table.name}. Tocca per entrare.`,url:deepUrl('vt',st?st.room.id:'x'),tag:'vt-'+S.table.id+(st?'-'+st.room.id:'')});
+    pushSend({to:ids,title:`♠️ ${S.me.name} ti invita a ${st&&st.cfg.game==='omaha'?'Omaha':'Texas Hold\'em'}`,body:st?`Tavolo «${st.room.name}» · ${st.cfg.mode==='sng'?'torneo':'cash'}${n?` · ${n} già sedut${n===1?'o':'i'}`:''}. Tocca per sederti.`:`Tavoli virtuali di ${S.table.name}. Tocca per entrare.`,url:deepUrl('vt',st?st.room.id:'x'),tag:'vt-'+S.table.id+(st?'-'+st.room.id:'')});
     F.vinv={};SH=null;render();toast(ids.length>1?'Invito inviato a '+ids.length+' giocatori':'Invito inviato','ok')}
 });
 
@@ -6483,7 +6483,7 @@ vtInvSheet=function(){
 <p class="mut sm" style="margin:0">Arriva una notifica sul telefono: toccandola si apre direttamente il tavolo.</p>
 ${L.length?`${free.length>1?`<button class="link" style="align-self:flex-start;min-height:36px" data-act="vinvall">${all?'Togli tutti':'Seleziona tutti'}</button>`:''}<div class="stack" style="gap:8px">${L.map(row).join('')}</div>${noPush.length?`<p class="mut xs" style="margin:0">${noPush.length===1?'Un giocatore non riceve':noPush.length+' giocatori non ricevono'} le notifiche finché non entra almeno una volta nell\'app aggiornata.</p>`:''}`:'<div class="mut sm">Nel tavolo non ci sono altri giocatori: invitali prima su WhatsApp.</div>'}
 <button class="btn" data-act="vinvsend" ${n?'':'disabled'}>${n?`Invia l'invito${n>1?' a '+n+' giocatori':''}`:'Scegli chi invitare'}</button>
-<a class="btn wa" href="${waHref('Vieni a giocare a Texas Hold\'em online nel tavolo '+S.table.name+' ♠️ '+location.origin+location.pathname)}" target="_blank" rel="noopener">Invita su WhatsApp</a>
+<a class="btn wa" href="${waHref('Vieni a giocare a '+(V.name==='vt'&&S.vt.st&&S.vt.st.cfg.game==='omaha'?'Omaha':'Texas Hold\'em')+' online nel tavolo '+S.table.name+' ♠️ '+location.origin+location.pathname)}" target="_blank" rel="noopener">Invita su WhatsApp</a>
 </div></div></div>`;
 };
 
@@ -7475,6 +7475,8 @@ function botMove(st,priv,i){
 
 /* --- il "server" locale: stesse risposte di hpl-holdem --- */
 function lrReply(r,extra){return Object.assign({ok:true,state:JSON.parse(JSON.stringify(r.st)),cards:r.priv.hand===(r.st.hand&&r.st.hand.no)&&r.priv.holes?r.priv.holes[myAcct()]||null:null,now:Date.now()},extra||{})}
+/* gli avversari scelti per la finestra «Contro il computer», nell'ordine in cui si siedono */
+const lnPool=n=>(n.pool||BOTS.map(x=>x[0])).map(nm=>BOTS.find(x=>x[0]===nm)).filter(Boolean).slice(0,n.bots);
 function lrCreate(b){
   const g=b.game==='omaha'?'omaha':'holdem',n=Math.max(1,Math.min(5,+b.bots||3)),[sb,bb]=b.blinds||[25,50],stack=+b.stack||bb*100;
   if(bank()<stack)return {error:'no_bank'};
@@ -7482,7 +7484,9 @@ function lrCreate(b){
   const st=HE.initState({id:rid,name:(g==='omaha'?'Omaha':'Texas Hold\'em')+' contro il computer',maxSeats:n+1,createdBy:myAcct(),createdAt:Date.now(),local:true});
   st.cfg=Object.assign(st.cfg,{sb,bb,stack,turnSec:40,mode:'cash',maxRebuys:99,game:g});if(g==='omaha')st.cfg.limit='pot';
   const priv={};HE.sit(st,meWho(),0);bankSet(bank()-stack);
-  const pool=BOTS.slice().sort(()=>Math.random()-.5).slice(0,n);
+  /* gli avversari sono quelli mostrati nella finestra «Contro il computer» */
+  const pick=Array.isArray(b.pool)?b.pool.map(nm=>BOTS.find(x=>x[0]===nm)).filter(Boolean):[];
+  const pool=(pick.length>=n?pick:BOTS.slice().sort(()=>Math.random()-.5)).slice(0,n);
   pool.forEach((x,k)=>{HE.sit(st,{acct:'bot'+k+rid,pid:null,name:x[0]},k+1);st.seats[k+1].bot=1});
   st.room.started=true;HE.start(st,priv,Date.now());st.v=1;
   LR[rid]={st,priv,botAt:0,last:Date.now()};lrSave();
@@ -7501,7 +7505,7 @@ function lrHandle(b){
       case 'act':HE.act(st,priv,me,b.move,now);break;
       case 'tick':HE.tick(st,priv,now);break;
       case 'start':HE.start(st,priv,now);break;
-      case 'stop':st.running=false;break;
+      case 'stop':st.running=false;if(st.room)st.room.started=false;break;
       case 'away':HE.setAway(st,me,b.away);break;
       case 'show':HE.show(st,priv,me);break;
       case 'config':HE.config(st,b.cfg);break;
@@ -7642,7 +7646,7 @@ function vBJ(){
   const b=bank(),P=BJ.phase,d=BJ.dealer,dt=bjTotal(BJ.hole?d.slice(0,1):d);
   const handsH=BJ.hands.map((h,k)=>{const t=bjTotal(h.cards),act=P==='play'&&k===BJ.cur&&BJ.hands.length>1;
     const lab=h.res==='bj'?'Blackjack!':h.res==='bust'?'Sballato':h.res==='win'?'Vinta':h.res==='lose'?'Persa':h.res==='push'?'Pari':(t.soft&&t.t<21?`${t.t-10}/${t.t}`:String(t.t));
-    return `<div class="bj-hand ${act?'act':''} ${h.res||''}"><div class="bj-cards">${bjCards(h.cards,false)}</div><span class="bj-tot ${h.res||''}">${h.cards.length?lab:''}</span><span class="bj-bet">${bjChipsHTML(h.bet)}<b class="num">${fchip(h.bet)}</b>${h.doubled?'<small>×2</small>':''}</span></div>`}).join('');
+    return `<div class="bj-hand ${act?'act':''} ${h.res?'r-'+h.res:''}"><div class="bj-cards">${bjCards(h.cards,false)}</div><span class="bj-tot ${h.res?'r-'+h.res:''}">${h.cards.length?lab:''}</span><span class="bj-bet">${bjChipsHTML(h.bet)}<b class="num">${fchip(h.bet)}</b>${h.doubled?'<small>×2</small>':''}</span></div>`}).join('');
   let ctl='';
   if(P==='bet'){
     ctl=`<div class="bj-chiprow">${BJCHIPS.map(([v,c1,c2])=>`<button class="bj-chip" style="--c:${c1};--e:${c2}" data-act="bjadd" data-v="${v}" ${b<BJ.bet+v?'disabled':''} aria-label="Aggiungi ${v}"><b>${v}</b></button>`).join('')}</div>
@@ -7775,7 +7779,7 @@ function lnewSheet(){
   const n=F.ln,g=GAMES[n.g],b=bank(),[sb,bb]=VC_BL[n.bi],stack=bb*n.depth;
   return `<div class="back" data-act="closesheet"><div class="sheet ${SH.anim?'anim':''}" role="dialog" aria-label="${g.t} contro il computer"><div class="grab"></div><div class="sheet-body">
 <div class="row sp"><div class="grow"><h2>${g.t}</h2><div class="mut sm">contro il computer</div></div><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
-<div class="vc-prev"><div class="vc-prev-mini">${gameBadge(n.g)}</div><div class="vc-prev-tx"><span class="vl-k">Avversari</span><b>${n.bots} ${n.bots===1?'avversario':'avversari'}</b><span>${BOTS.slice(0,n.bots).map(x=>x[1]).join(' ')} · bui ${fchip(sb)}/${fchip(bb)}${n.g==='omaha'?' · pot limit':''}</span></div></div>
+<div class="vc-prev"><div class="vc-prev-mini">${gameBadge(n.g)}</div><div class="vc-prev-tx"><span class="vl-k">Avversari</span><b>${n.bots} ${n.bots===1?'avversario':'avversari'}</b><span>${lnPool(n).map(x=>x[1]).join(' ')} · bui ${fchip(sb)}/${fchip(bb)}${n.g==='omaha'?' · pot limit':''}</span></div></div>
 <section class="vc-sec"><div class="vc-lab">Avversari</div><div class="vc-seats" style="grid-template-columns:repeat(5,minmax(0,1fr))">${[1,2,3,4,5].map(k=>`<button class="vc-seat ${n.bots===k?'on':''}" data-act="lnset" data-k="bots" data-v="${k}">${k}</button>`).join('')}</div></section>
 <section class="vc-sec"><div class="vc-lab">Bui</div><div class="vc-opts c4">${VC_BL.map(([s,b2,l],i)=>`<button class="vc-opt ${n.bi===i?'on':''}" data-act="lnset" data-k="bi" data-v="${i}"><b>${l}</b><span>${fchip(s)}/${fchip(b2)}</span></button>`).join('')}</div></section>
 <section class="vc-sec"><div class="vc-lab">Fiches con cui ti siedi</div><div class="vc-opts c3">${VC_DEPTH.map(([d,l])=>`<button class="vc-opt ${n.depth===d?'on':''}" data-act="lnset" data-k="depth" data-v="${d}" ${bb*d>b?'disabled':''}><b>${l}</b><span>${fchip(bb*d)}</span></button>`).join('')}</div></section>
@@ -7786,11 +7790,11 @@ ${stack>b?`<button class="btn ghost" data-act="bjrefill">${ico('coins',18)} Rica
 </div></div></div>`;
 }
 Object.assign(H,{
-  lnew(d){const b=bank();F.ln={g:d.g==='omaha'?'omaha':'holdem',bots:3,bi:b>=25000?1:0,depth:100,busy:false};if(VC_BL[F.ln.bi][1]*100>b)F.ln.depth=50;openSheet({type:'lnew'})},
+  lnew(d){const b=bank();F.ln={g:d.g==='omaha'?'omaha':'holdem',bots:3,pool:BOTS.map(x=>x[0]).sort(()=>Math.random()-.5),bi:b>=25000?1:0,depth:100,busy:false};if(VC_BL[F.ln.bi][1]*100>b)F.ln.depth=50;openSheet({type:'lnew'})},
   lnset(d){F.ln[d.k]=+d.v;render()},
   async lcreate(){
     const n=F.ln;if(!n||n.busy)return;const [sb,bb]=VC_BL[n.bi];n.busy=true;render();
-    const r=await vtCall('create',{local:true,game:n.g,bots:n.bots,blinds:[sb,bb],stack:bb*n.depth},false);
+    const r=await vtCall('create',{local:true,game:n.g,bots:n.bots,pool:lnPool(n).map(x=>x[0]),blinds:[sb,bb],stack:bb*n.depth},false);
     n.busy=false;
     if(r&&r.rid){S.vt.rooms[r.rid]=r.state;SH=null;vtOpenRoom(r.rid)}else render();
   }
@@ -7809,7 +7813,7 @@ const RULES={
   omaha:{t:'Omaha Pot Limit',p:[
     ['Come l\'Hold\'em, ma…','Si gioca come il Texas Hold\'em (bui, flop, turn, river, quattro giri di puntata), con due differenze importanti.'],
     ['4 carte, ne usi 2','Ognuno riceve 4 carte coperte. Per fare il punto devi usare esattamente 2 delle tue carte e esattamente 3 di quelle in tavola. Non una di più, non una di meno: se in tavola ci sono quattro cuori e tu ne hai una sola, non hai colore.'],
-    ['Pot limit','Il rilancio più alto possibile è grande quanto il piatto: il piatto in quel momento più quello che ti serve per chiamare. Per questo il pulsante di puntata massima si chiama "Max" e non "All-in".'],
+    ['Pot limit','Il rilancio più alto possibile è grande quanto il piatto: il piatto in quel momento più quello che ti serve per chiamare. Per questo, se porti la barra della puntata fino in fondo, il pulsante dice «Rilancia a…» con il massimo consentito e non sempre «All-in».'],
     ['Perché è diverso','Con 4 carte a testa le mani forti escono molto più spesso: una coppia o una doppia coppia valgono meno che nell\'Hold\'em, e servono spesso scale, colori e full per vincere.'],
     ['Lo showdown','Si confrontano i punti come nell\'Hold\'em. L\'app ti mostra sotto le tue carte il punto migliore che stai facendo con la regola 2+3.']]},
   blackjack:{t:'Blackjack',p:[
@@ -9231,7 +9235,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792530922037';
+const APP_VERSION='1792562946269';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;

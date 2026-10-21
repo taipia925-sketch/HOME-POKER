@@ -371,7 +371,7 @@ Deno.serve(async (req) => {
       if ((nRooms ?? C.rooms ?? 0) >= 12) return json({ error: "too_many_rooms" });
       const now = Date.now();
       room = rid();
-      const ms = [2, 6, 9].includes(Number(body.maxSeats)) ? Number(body.maxSeats) : 6;
+      const ms = Number.isInteger(Number(body.maxSeats)) && Number(body.maxSeats) >= 2 && Number(body.maxSeats) <= 9 ? Number(body.maxSeats) : 6;
       const name = String(body.name || "").trim().slice(0, 28) || "Tavolo di " + String(C.name).split(" ")[0];
       const st = HE.initState({ id: room, name, maxSeats: ms, createdBy: C.name, createdAt: now, started: false });
       try { HE.config(st, body.cfg || {}); HE.sit(st, { acct: C.acct, pid: C.pid, name: C.name }, 0); }
@@ -409,7 +409,7 @@ Deno.serve(async (req) => {
         else if (action === "config") changed = HE.config(st, body.cfg || {});
         else if (action === "start") changed = HE.start(st, priv, now);
         else if (action === "show") changed = HE.show(st, priv, who);
-        else if (action === "stop") { st.running = false; changed = true; }
+        else if (action === "stop") { st.running = false; if (st.room) st.room.started = false; changed = true; } // ferma davvero: niente ripartenza automatica finché qualcuno non tocca «Riprendi la partita»
         else if (action === "act") changed = HE.act(st, priv, who, body.move || {}, now);
         else if (action === "tick") changed = HE.tick(st, priv, now);
       } catch (e) {
