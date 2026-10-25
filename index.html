@@ -2436,6 +2436,13 @@ function settle(nets){
   while(i<d.length&&j<c.length){const m=Math.min(d[i].a,c[j].a);out.push({from:d[i].n,to:c[j].n,fromId:d[i].id,toId:c[j].id,amt:m});d[i].a-=m;c[j].a-=m;if(d[i].a===0)i++;if(c[j].a===0)j++}
   return out;
 }
+/* il dealer della serata: uno dei giocatori del tavolo (le mance diventano soldi da ricevere per lui) */
+const dealerCands=()=>Object.entries(S.players||{}).filter(([id,p])=>id!=='dealer'&&p&&p.name&&p.registered!==false).map(([id,p])=>({id,name:p.name})).sort((a,b)=>a.name.localeCompare(b.name,'it'));
+const dealerLabel=g=>g&&g.dealerPid&&g.dealerPid!=='dealer'?pName(g.dealerPid,g.dealerName):'';
+function dealerPicker(cur,act){
+  const L=dealerCands();
+  return `<div class="field" style="margin-top:12px"><span>Chi ha fatto il dealer?</span><div class="chips" style="margin-top:6px">${act==='cldealer'?`<button type="button" class="chip t ${!cur?'on':''}" data-act="${act}" data-pid="">Nessuno del tavolo</button>`:''}${L.map(x=>`<button type="button" class="chip t ${cur===x.id?'on':''}" data-act="${act}" data-pid="${esc(x.id)}">${esc(x.name)}</button>`).join('')}</div><span class="xs">Le mance diventano soldi che riceve lui, come un normale saldo.</span></div>`;
+}
 function calcClose(g,cl){
   const L=plist(g);
   const dealer=String(cl.dealer||'').trim()===''?0:parseEur(cl.dealer);
@@ -2459,9 +2466,13 @@ function calcClose(g,cl){
     for(let k=0;k<Math.abs(rem);k++)adj[idx[k]]+=step;
   }
   const nets=rows.map((r,i)=>({name:r.p.playerName,pid:r.p.playerId,net:r.fin-r.inv+adj[i],fin:r.fin,inv:r.inv}));
-  if(dealer>0)nets.push({name:'Dealer',pid:'dealer',net:dealer,dealer:true});
+  const dp=cl.dealerPid&&S.players&&S.players[cl.dealerPid]?cl.dealerPid:'';
+  if(dealer>0)nets.push({name:dp?S.players[dp].name:'Dealer',pid:dp||'dealer',net:dealer,dealer:true});
   const sumNet=sum(nets.map(x=>x.net));
-  return {ok:true,rows,dealer,totIn,totFin,bal,nets,sumNet,tx:settle(nets)};
+  /* se il dealer ha anche giocato, mance e risultato si sommano in un solo saldo */
+  const pay=nets.map(x=>Object.assign({},x)),di=pay.findIndex(x=>x.dealer),mi=dp?pay.findIndex(x=>!x.dealer&&x.pid===dp):-1;
+  if(di>=0&&mi>=0){pay[mi].net+=pay[di].net;pay.splice(di,1)}
+  return {ok:true,rows,dealer,dealerPid:dp,totIn,totFin,bal,nets,sumNet,tx:settle(pay)};
 }
 function recompute(d){
   d.paidAmount=sum(d.transactions.filter(t=>t.status==='PAID').map(t=>t.amount));
@@ -3109,7 +3120,7 @@ ${A?'':'<div class="mut xs" style="padding-top:8px">Solo chi ha il PIN Admin pu�
 /* --- Chiusura cassa --- */
 function startClose(){
   const g=S.games[V.gid];const d=g.dealerChips||0;
-  F.cl={step:1,dealer:d?(d/100).toFixed(2).replace('.',','):'',vals:{},holeMode:'split_all'};
+  F.cl={step:1,dealer:d?(d/100).toFixed(2).replace('.',','):'',dealerPid:g.dealerPid&&g.dealerPid!=='dealer'?g.dealerPid:'',vals:{},holeMode:'split_all'};
   plist(g).forEach(p=>{F.cl.vals[p.playerId]={mode:'chips',v:''}});
   go('close',V.gid);
 }
@@ -3122,7 +3133,7 @@ function vClose(){
   if(cl.step===1){
     return `<div class="wrap">${head}<p class="mut sm num" style="margin:0 0 12px">Per ogni giocatore inserisci quante fiches ha davanti (esclusi i cash out già messi al sicuro). Cambio: ${eur(g.buyInCents)} = ${fch(g.chipsPerBuyIn)} fiches</p>
 <div class="stack">
-<div class="card"><label class="field"><span>Fiches / Mance Dealer (opzionale)</span><input class="in" id="cl-dealer" inputmode="decimal" data-bind="cl.dealer" value="${esc(cl.dealer)}" placeholder="Importo in euro"><span class="xs">L'importo viene sottratto dal montepremi: la somma algebrica di tutti i saldi torna a 0,00 €.</span></label></div>
+<div class="card"><label class="field"><span>Fiches / Mance Dealer (opzionale)</span><input class="in" id="cl-dealer" inputmode="decimal" data-bind="cl.dealer" value="${esc(cl.dealer)}" placeholder="Importo in euro"><span class="xs">L'importo viene sottratto dal montepremi: la somma algebrica di tutti i saldi torna a 0,00 €.</span></label>${dealerPicker(cl.dealerPid,'cldealer')}</div>
 ${L.map(p=>{const v=cl.vals[p.playerId]||{mode:'chips',v:''},s=safeOf(p);return `<div class="card stack" style="gap:12px"><div class="row">${ava(p.playerName)}<div class="grow"><div class="pl-name">${esc(p.playerName)}</div><div class="mut sm num">ha investito ${eur(inv(p))}</div></div></div>
 ${s>0?`<div class="box o sm num">💰 Ha già incassato ${eur(s)} durante la partita: inserisci solo le fiches rimaste sul tavolo.</div>`:''}
 <div class="row"><input class="in big-n" id="cv-${p.playerId}" inputmode="decimal" data-bind="cl.vals.${p.playerId}.v" value="${esc(v.v)}" placeholder="${v.mode==='chips'?'Fiches':'Euro'}">
@@ -3151,11 +3162,22 @@ ${b>0?`<div class="box o"><b class="gold">Avanzo di ${eur(b)}</b><div class="sm"
   const sorted=c.nets.slice().sort((a,b)=>b.net-a.net);
   return `<div class="wrap">${head}<div class="stack">
 <div class="card stack" style="gap:10px"><div class="lbl in">Risultati netti</div>
-${sorted.map(x=>`<div class="row">${x.dealer?'<span class="ava s" style="--h:45">🃏</span>':ava(x.name,'s')}<span class="grow">${x.dealer?'🃏 Dealer':esc(x.name)}</span><b class="num ${x.net>=0?'green':'red'}" style="font-size:17px">${sgn(x.net)}</b></div>`).join('')}
+${sorted.map(x=>`<div class="row">${x.dealer?'<span class="ava s" style="--h:45">🃏</span>':ava(x.name,'s')}<span class="grow">${x.dealer?(x.pid!=='dealer'?'🃏 Mance dealer · '+esc(x.name):'🃏 Dealer'):esc(x.name)}</span><b class="num ${x.net>=0?'green':'red'}" style="font-size:17px">${sgn(x.net)}</b></div>`).join('')}
 <div class="hr"></div><div class="row sp mut sm"><span>Somma algebrica dei saldi</span><b class="num">${eur(c.sumNet)}</b></div></div>
 <div class="card stack" style="gap:10px"><div class="lbl in">Saldi da fare</div>
 ${c.tx.length?`<div class="mut sm">Bastano ${c.tx.length} transazion${c.tx.length===1?'e':'i'} per saldare tutto.</div>${c.tx.map(t=>`<div class="num" style="padding:6px 0;border-top:1px solid var(--line2)"><b>${esc(t.from)}</b> dà <b class="gold">${eur(t.amt)}</b> a <b>${esc(t.to)}</b></div>`).join('')}`:'<div class="mut sm">Nessuna transazione necessaria ✅</div>'}</div>
 <div class="two"><button class="btn ghost" data-act="clback">←</button><button class="btn" data-act="clsave">Salva e chiudi partita</button></div></div></div>`;
+}
+async function dealerAssign(gid,pid){
+  if(!pid||!S.players[pid])return;
+  const nm=S.players[pid].name;
+  const ok=await saveGame(gid,g=>{
+    if(!(g.debts||[]).some(isDealerD))return false;
+    /* chi doveva le mance a se stesso non deve più niente */
+    g.debts=(g.debts||[]).filter(d=>!(isDealerD(d)&&d.fromPlayerId===pid)).map(d=>isDealerD(d)?Object.assign({},d,{toPlayerId:pid,toPlayerName:nm}):d);
+    g.dealerPid=pid;g.dealerName=nm;
+  });
+  if(ok){toast('Mance assegnate a '+nm,'ok');render()}
 }
 async function saveClose(){
   const gid=V.gid;const cl=F.cl;
@@ -3163,7 +3185,7 @@ async function saveClose(){
     const c=calcClose(g,cl);if(!c.ok)return false;
     const now=new Date().toISOString();
     c.rows.forEach((r,i)=>{const p=g.players[r.p.playerId];p.cashOutCents=r.fin;p.netCents=c.nets[i].net});
-    g.holeCents=-c.bal;g.holeMode=c.bal<0?cl.holeMode:c.bal>0?'split_all':'';g.dealerChips=c.dealer;
+    g.holeCents=-c.bal;g.holeMode=c.bal<0?cl.holeMode:c.bal>0?'split_all':'';g.dealerChips=c.dealer;g.dealerPid=c.dealerPid||null;g.dealerName=c.dealerPid?S.players[c.dealerPid].name:null;
     g.debts=c.tx.map((t,i)=>({debtId:'debt_'+(i+1)+'_'+Math.random().toString(36).slice(2,5),fromPlayerName:t.from,toPlayerName:t.to,fromPlayerId:t.fromId,toPlayerId:t.toId,totalAmount:t.amt,paidAmount:0,remainingAmount:t.amt,transactions:[{subId:nid('s'),amount:t.amt,status:'PENDING',lastUpdated:now}]}));
     g.status='closed';g.closedAt=now;
   });
@@ -3174,7 +3196,7 @@ async function saveClose(){
 function waText(gid){
   const g=S.games[gid],L=plist(g).slice().sort((a,b)=>(b.netCents||0)-(a.netCents||0));
   let t=`♠️ *Home Poker — Resoconto*\n📅 ${dShort(g.scheduledAt)}\n👥 ${L.length} giocatori · Montepremi ${eur(netPot(g))}\n`;
-  if((g.dealerChips||0)>0)t+=`🃏 Mance dealer: ${eur(g.dealerChips)} (già sottratte dal montepremi)\n`;
+  if((g.dealerChips||0)>0)t+=`🃏 Mance dealer${dealerLabel(g)?' ('+dealerLabel(g)+')':''}: ${eur(g.dealerChips)} (già sottratte dal montepremi)\n`;
   t+=`\n*Risultati netti*\n`+L.map(p=>`• ${p.playerName}: ${sgn(p.netCents||0)}`).join('\n');
   t+=`\n\n*Saldi da fare*\n`;
   t+=(g.debts&&g.debts.length)?g.debts.map(d=>`• ${d.fromPlayerName} → ${d.toPlayerName}: ${eur(d.totalAmount)}  ${d.remainingAmount===0?'✅ pagato':`(pagati ${eur(d.paidAmount)}, restano ${eur(d.remainingAmount)})`}`).join('\n'):'• Nessuna transazione necessaria ✅';
@@ -3222,7 +3244,8 @@ ${D.slice().sort((a,b)=>(a.remainingAmount===0)-(b.remainingAmount===0)||(meIsFr
 <div class="sec">Risultati</div>
 <div class="card" style="padding:4px 16px">${L.map(resRow).join('')}</div>
 <div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="kpi"><div class="k">Montepremi</div><div class="v num">${eur(netPot(g))}</div></div><div class="kpi"><div class="k">Giocatori</div><div class="v num">${L.length}</div></div><div class="kpi"><div class="k">Cassa</div><div class="v ${hole===0?'green':'gold'}" style="font-size:16px">${cassa}</div></div></div>
-${(g.dealerChips||0)>0?`<div class="mut sm num" style="margin:8px 4px 0">Mance dealer: ${eur(g.dealerChips)}, già tolte dal montepremi.</div>`:''}
+${(g.dealerChips||0)>0?`<div class="mut sm num" style="margin:8px 4px 0">Mance dealer${dealerLabel(g)?' a '+esc(dealerLabel(g)):''}: ${eur(g.dealerChips)}, già tolte dal montepremi.</div>`:''}
+${closed&&(A||isManager())&&D.some(isDealerD)?`<div class="card" style="margin-top:12px"><b>Le mance sono ancora al «Dealer»</b><div class="mut sm">Scegli chi ha fatto il dealer: le mance diventano soldi da ricevere per lui.</div>${dealerPicker('','dealerset')}</div>`:''}
 ${closed?`${histBlock(g,'detail')}<div class="sec">Condividi</div><div class="stack" style="margin-top:10px">
 <a class="btn wa" href="${waHref(waText(gid))}" target="_blank" rel="noopener">Manda il resoconto su WhatsApp</a>
 <button class="btn ghost" data-act="copytxt" data-gid="${gid}">Copia il resoconto</button></div>`:''}
@@ -3518,6 +3541,8 @@ const H={
   },
   closesheet(d,e){if(e.target===e.currentTarget||e.currentTarget.classList.contains('x')){SH=null;render()}},
   startclose(){startClose()},
+  cldealer(d){F.cl.dealerPid=d.pid||'';render()},
+  dealerset(d){dealerAssign(V.gid,d.pid||'')},
   clmode(d){F.cl.vals[d.pid].mode=d.m;F.cl.vals[d.pid].v='';render()},
   lost(d){F.cl.vals[d.pid].v='0';render()},
   clnext(){F.cl.step=Math.min(3,F.cl.step+1);ENTER=true;render();window.scrollTo(0,0)},
@@ -9235,7 +9260,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792562946269';
+const APP_VERSION='1792919032259';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
