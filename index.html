@@ -2643,9 +2643,10 @@ function undoEntry(gid,hid){
     e.undone={at:new Date().toISOString(),by:S.me?S.me.name:''};
   }).then(ok=>{if(ok)toast('Annullato: '+msg,'ok');else if(why)toast(why,'err');return ok});
 }
+const undoDown=c=>((c.a&&c.a.paidAmount)||0)>((c.b&&c.b.paidAmount)||0);
 function histCan(gid,g,e){
   if(e.undone)return false;
-  if(e.ch.every(c=>c.k[0]==='d'))return e.ch.every(c=>debtPerm(gid,c.a||c.b).can);
+  if(e.ch.every(c=>c.k[0]==='d'))return e.ch.every(c=>debtPerm(gid,c.a||c.b,undoDown(c)).can);
   return g.status==='live'&&isAdmin(gid);
 }
 function histBlock(g,mode){
@@ -2653,7 +2654,7 @@ function histBlock(g,mode){
   if(!H0.length)return '';
   const open=!!F.open['hist:'+gid],L=H0.slice().reverse();
   return `<div class="card" style="margin-top:12px"><button class="row sp" data-act="histopen" style="width:100%;min-height:44px"><b>Cronologia modifiche (${H0.length})</b><span class="gold">${ico(open?'chevu':'chev',20)}</span></button>
-${open?`<div class="mut xs" style="margin:2px 0 6px">Puoi annullare una modifica in qualsiasi momento.${mode==='live'?' Serve la modalità Admin.':' I saldi li annulla solo chi li riscuote.'}</div>${L.map(e=>{const can=histCan(gid,g,e);return `<div class="row" style="min-height:56px;border-top:1px solid var(--line2);padding:6px 0;${e.undone?'opacity:.5':''}"><span class="mut xs num" style="width:42px">${tHM(e.at)}</span><div class="grow"><div style="font-weight:600;${e.undone?'text-decoration:line-through':''}">${esc(e.msg)}</div><div class="mut xs">${esc(hWhoAll(e))}${e.by?` · da ${esc(e.by)}`:''}${e.undone?` · annullata${e.undone.by?' da '+esc(e.undone.by):''}`:''}</div></div>${can?`<button class="btn-s" style="min-height:40px" data-act="histundo" data-hid="${e.id}">Annulla</button>`:''}</div>`}).join('')}`:''}</div>`;
+${open?`<div class="mut xs" style="margin:2px 0 6px">Puoi annullare una modifica in qualsiasi momento.${mode==='live'?' Serve la modalità Admin.':' Un incasso segnato per sbaglio lo annulla solo chi paga.'}</div>${L.map(e=>{const can=histCan(gid,g,e);return `<div class="row" style="min-height:56px;border-top:1px solid var(--line2);padding:6px 0;${e.undone?'opacity:.5':''}"><span class="mut xs num" style="width:42px">${tHM(e.at)}</span><div class="grow"><div style="font-weight:600;${e.undone?'text-decoration:line-through':''}">${esc(e.msg)}</div><div class="mut xs">${esc(hWhoAll(e))}${e.by?` · da ${esc(e.by)}`:''}${e.undone?` · annullata${e.undone.by?' da '+esc(e.undone.by):''}`:''}</div></div>${can?`<button class="btn-s" style="min-height:40px" data-act="histundo" data-hid="${e.id}">Annulla</button>`:''}</div>`}).join('')}`:''}</div>`;
 }
 
 /* ===== Navigazione ===== */
@@ -2783,14 +2784,17 @@ async function doAuth(){
   S.players[id]=doc;if(!hasManagers())saveCfg({managers:((S.cfg&&S.cfg.managers)||[]).filter(x=>S.players[x]).concat([id])});enterAs(id,doc.name);
 }
 const isCreditor=d=>!!S.me&&(d.toPlayerId?d.toPlayerId===S.me.id:S.me.name.toLowerCase()===String(d.toPlayerName).toLowerCase());
-function debtPerm(gid,d){
+/* chi riceve i soldi li segna come ricevuti; un pagamento segnato per sbaglio lo può togliere
+   solo chi li deve (down=true), così il creditore non può rimettere da pagare un debito già saldato */
+function debtPerm(gid,d,down){
   const dealer=d.toPlayerId?d.toPlayerId==='dealer':String(d.toPlayerName)==='Dealer';
   if(dealer)return {can:isAdmin(gid),needPin:false,who:'chi ha avviato la partita'};
+  if(down)return {can:meIsFrom(d),needPin:true,who:pName(d.fromPlayerId,d.fromPlayerName)};
   return {can:isCreditor(d),needPin:true,who:d.toPlayerName};
 }
-async function authDebt(did){
+async function authDebt(did,down){
   const g=S.games[V.gid],d=g&&(g.debts||[]).find(x=>x.debtId===did);if(!d)return false;
-  const perm=debtPerm(V.gid,d);
+  const perm=debtPerm(V.gid,d,down);
   if(!perm.can){toast('Solo '+perm.who+' può modificare questo saldo','err');return false}
   if(perm.needPin){
     const p=S.me&&S.players[S.me.id];
@@ -3224,6 +3228,7 @@ function debtRow(gid,d){
 ${part?`<div class="meter thin" style="margin-top:10px"><i class="m-g" style="flex:${d.paidAmount} 1 0"></i><i class="m-r" style="flex:${d.remainingAmount} 1 0"></i></div>`:''}
 ${perm.can&&!done?`<button class="btn green sm" data-act="settle" data-did="${d.debtId}">${ico('check',18)} ${toMe?'Li ho ricevuti':'Segna come ricevuto'}</button>`:''}
 ${perm.can&&done&&!nt?`<button class="link" style="min-height:34px;font-size:14px" data-act="settle" data-did="${d.debtId}">Modifica</button>`:''}
+${mine&&d.paidAmount>0&&!nt&&debtPerm(gid,d,true).can?`<button class="link" style="min-height:34px;font-size:14px" data-act="settle" data-did="${d.debtId}">Segnato per sbaglio? Correggi</button>`:''}
 ${mine&&!done?`<div class="stack" style="margin-top:10px;gap:8px">${payBlock(d)}</div>`:''}</div>`;
 }
 function vDetail(){
@@ -3338,21 +3343,23 @@ ${S.bioOk?(bm?'<button class="btn ghost" data-act="biooff">Disattiva Face ID su 
   }else if(s.type==='undo'&&g){
     const e=(g.hist||[]).find(x=>x.id===s.hid),d=e&&(e.ch.find(c=>c.k[0]==='d')||{}).a;
     if(!e||!d)return '';
-    const perm=debtPerm(V.gid,d);
+    const perm=debtPerm(V.gid,d,!!s.down);
     title='Annulla modifica';
     body=`<div><b>${esc(e.msg)}</b><div class="mut sm">${esc(hWhoAll(e))} · ${dShort(e.at)} alle ${tHM(e.at)}</div></div>
 ${pinField(perm)}
 <button class="btn redb" data-act="undook" ${pinReady(perm)?'':'disabled'}>Annulla questa modifica</button>`;
   }else if(s.type==='settle'&&g){
     const d=(g.debts||[]).find(x=>x.debtId===s.did);if(!d)return '';
-    const perm=debtPerm(V.gid,d),pr=pinReady(perm),rem=d.remainingAmount,pv=parseEur(F.pay.v);
+    const up=debtPerm(V.gid,d),dn=debtPerm(V.gid,d,true),own=up.can,perm=own?up:dn,pr=pinReady(perm),rem=d.remainingAmount,pv=parseEur(F.pay.v);
     title='Saldo';
     body=`<div class="row" style="gap:12px"><div class="pair">${avaN(d.fromPlayerName)}<span class="arr">${ico('chevr',18)}</span>${avaN(d.toPlayerName)}</div><div class="grow"><b>${esc(d.fromPlayerName)}</b> <span class="mut">dà a</span> <b>${esc(d.toPlayerName)}</b><div class="mut sm num">${rem?`Restano ${eur(rem)} su ${eur(d.totalAmount)}`:`Pagato tutto: ${eur(d.totalAmount)}`}</div></div></div>
+${!own&&dn.can?`<div class="box o sm">Se ${esc(pName(d.toPlayerId,d.toPlayerName))} ha segnato per sbaglio più soldi di quelli che gli hai dato, rimettili da pagare qui con il tuo PIN. Solo tu puoi farlo.</div>`:''}
 ${pinField(perm)}
-${rem?`<button class="btn green" data-act="sfull" ${pr?'':'disabled'}>${ico('check',18)} Ricevuti ${eur(rem)}</button>
+${rem&&own?`<button class="btn green" data-act="sfull" ${pr?'':'disabled'}>${ico('check',18)} Ricevuti ${eur(rem)}</button>
 ${F.pay.partial?`<label class="field"><span>Quanto hai ricevuto?</span><input class="in big-n" id="pay-v" inputmode="decimal" data-bind="pay.v" value="${esc(F.pay.v)}" placeholder="Es. 10,00"></label>
 <button class="btn" data-act="spartok" ${pv>0&&pv<rem&&pr?'':'disabled'}>${pv>0&&pv<rem?`Registra ${eur(pv)} · restano ${eur(rem-pv)}`:'Registra acconto'}</button>`:`<button class="btn ghost" data-act="paypart">Ho ricevuto solo una parte</button>`}`:''}
-${d.paidAmount>0?`<button class="btn redb" data-act="sundo" ${pr?'':'disabled'}>Rimetti ${rem?'tutto ':''}da pagare</button>`:''}`;
+${d.paidAmount>0&&dn.can?`<button class="btn redb" data-act="sundo" ${pr?'':'disabled'}>Rimetti ${rem?'tutto ':''}da pagare</button>`:''}
+${d.paidAmount>0&&own&&!dn.can?`<div class="mut xs">Se hai segnato più soldi di quelli ricevuti, chiedi a ${esc(pName(d.fromPlayerId,d.fromPlayerName))} di correggere: solo chi paga può rimettere un importo da pagare.</div>`:''}`;
   }else if(s.type==='rebuy'&&g&&g.players[s.pid]){
     title='Re-buy · '+g.players[s.pid].playerName;
     body=`<p class="mut sm" style="margin:0">Registra importo e stato del pagamento.</p>${buyForm(g,'Registra re-buy',1)}`;
@@ -3385,13 +3392,13 @@ ${F.pay.partial?`<label class="field"><span>Importo dell'acconto (euro)</span><i
   }else if(s.type==='paid'&&g){
     const d=(g.debts||[]).find(x=>x.debtId===s.did),t=d&&d.transactions.find(x=>x.subId===s.sid);
     if(!t)return '';
-    const perm=debtPerm(V.gid,d),pr=pinReady(perm),mv=parseEur(F.mod.v),max=t.amount+d.remainingAmount,ok=mv>0&&mv!==t.amount&&mv<=max&&pr;
+    const up=debtPerm(V.gid,d),dn=debtPerm(V.gid,d,true),perm=up.can?up:dn,pr=pinReady(perm),mv=parseEur(F.mod.v),max=t.amount+d.remainingAmount,ok=mv>0&&mv<=max&&pr&&(mv>t.amount?up.can:mv<t.amount&&dn.can);
     title='Pagamento registrato';
     body=`<div class="num"><b>${esc(d.fromPlayerName)}</b> → <b>${esc(d.toPlayerName)}</b> · pagati <b class="green">${eur(t.amount)}</b></div>
 ${pinField(perm)}
 <label class="field"><span>Nuovo importo</span><input class="in big-n" id="mod-v" inputmode="decimal" data-bind="mod.v" value="${esc(F.mod.v)}" placeholder="${(t.amount/100).toFixed(2).replace('.',',')}"><span class="xs">Massimo ${eur(max)}. La differenza si sposta sul residuo da pagare.</span></label>
 <button class="btn" data-act="modok" ${ok?'':'disabled'}>Modifica importo</button>
-<button class="btn redb" data-act="restore" ${pr?'':'disabled'}>Ripristina a Da pagare</button>`;
+${dn.can?`<button class="btn redb" data-act="restore" ${pr?'':'disabled'}>Ripristina a Da pagare</button>`:`<span class="xs">Puoi solo aumentare l'importo: per abbassarlo o ripristinarlo serve chi paga.</span>`}`;
   }else if(s.type==='chpin'){
     const ok=PIN_RE.test(F.chpin.old)&&PIN_RE.test(F.chpin.nw);
     title='Cambia PIN';
@@ -3552,12 +3559,12 @@ const H={
   hole(d){F.cl.holeMode=d.m;render()},
   clsave(){saveClose()},
   delgame(){if(!arm('delgame'))return;deleteGame(V.gid)},
-  subtap(d){const g=S.games[V.gid],dd=g.debts.find(x=>x.debtId===d.did),t=dd.transactions.find(x=>x.subId===d.sid);if(!debtPerm(V.gid,dd).can)return;F.pay={partial:false,v:''};F.mod={v:''};F.pinp='';openSheet({type:t.status==='PAID'?'paid':'pay',did:d.did,sid:d.sid})},
+  subtap(d){const g=S.games[V.gid],dd=g.debts.find(x=>x.debtId===d.did),t=dd.transactions.find(x=>x.subId===d.sid);if(!debtPerm(V.gid,dd).can&&!(t.status==='PAID'&&debtPerm(V.gid,dd,true).can))return;F.pay={partial:false,v:''};F.mod={v:''};F.pinp='';openSheet({type:t.status==='PAID'?'paid':'pay',did:d.did,sid:d.sid})},
   paypart(){F.pay.partial=true;render()},
   async payfull(){const s=SH;if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dPayFull(g.debts.find(x=>x.debtId===s.did),s.sid,new Date().toISOString()),'Pagamento registrato');if(ok){SH=null;render()}},
   async payconf(){const s=SH,a=parseEur(F.pay.v);if(!(a>0))return;if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dPartial(g.debts.find(x=>x.debtId===s.did),s.sid,a,new Date().toISOString()),'Acconto registrato');if(ok){SH=null;render()}},
-  async modok(){const s=SH,a=parseEur(F.mod.v);if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dModify(g.debts.find(x=>x.debtId===s.did),s.sid,a,new Date().toISOString()),'Importo modificato');if(ok){SH=null;render()}},
-  async restore(){const s=SH;if(!(await authDebt(s.did)))return;const ok=await saveGame(V.gid,g=>dRestore(g.debts.find(x=>x.debtId===s.did),s.sid,new Date().toISOString()),'Ripristinato a Da pagare');if(ok){SH=null;render()}},
+  async modok(){const s=SH,a=parseEur(F.mod.v),g0=S.games[V.gid],t0=g0&&g0.debts.find(x=>x.debtId===s.did).transactions.find(x=>x.subId===s.sid);if(!(await authDebt(s.did,!!t0&&a<t0.amount)))return;const ok=await saveGame(V.gid,g=>dModify(g.debts.find(x=>x.debtId===s.did),s.sid,a,new Date().toISOString()),'Importo modificato');if(ok){SH=null;render()}},
+  async restore(){const s=SH;if(!(await authDebt(s.did,true)))return;const ok=await saveGame(V.gid,g=>dRestore(g.debts.find(x=>x.debtId===s.did),s.sid,new Date().toISOString()),'Ripristinato a Da pagare');if(ok){SH=null;render()}},
   copyjson(d){copyText(JSON.stringify(jsonFor(d.gid),null,2))},
   copytxt(d){copyText(waText(d.gid))},
   tab(d){LS.set('tab',d.t);ENTER='fade';render();window.scrollTo(0,0)},
@@ -3608,10 +3615,10 @@ const H={
   histundo(d){
     const g=S.games[V.gid],e=g&&(g.hist||[]).find(x=>x.id===d.hid);if(!e)return;
     const dc=e.ch.find(c=>c.k[0]==='d');
-    if(dc&&debtPerm(V.gid,dc.a||dc.b).needPin){F.pinp='';F.bioOk=0;openSheet({type:'undo',hid:d.hid,did:(dc.a||dc.b).debtId});return}
+    if(dc&&debtPerm(V.gid,dc.a||dc.b,undoDown(dc)).needPin){F.pinp='';F.bioOk=0;openSheet({type:'undo',hid:d.hid,did:(dc.a||dc.b).debtId,down:undoDown(dc)});return}
     undoEntry(V.gid,d.hid);
   },
-  async undook(){const s=SH;if(!(await authDebt(s.did)))return;const ok=await undoEntry(V.gid,s.hid);if(ok){SH=null;render()}},
+  async undook(){const s=SH;if(!(await authDebt(s.did,!!s.down)))return;const ok=await undoEntry(V.gid,s.hid);if(ok){SH=null;render()}},
   sheetclose(){SH=null;render()},
   delme(){F.dpin='';openSheet({type:'delme'})},
   async delmeok(){
@@ -3648,7 +3655,7 @@ const H={
   settle(d){F.pay={partial:false,v:''};F.pinp='';F.bioOk=0;openSheet({type:'settle',did:d.did})},
   async sfull(){const s=SH,gid=V.gid;if(!(await authDebt(s.did)))return;const ok=await saveGame(gid,g=>{const d=g.debts.find(x=>x.debtId===s.did);const now=new Date().toISOString();let c=0;d.transactions.filter(t=>t.status==='PENDING').map(t=>t.subId).forEach(sid=>{if(dPayFull(d,sid,now))c++});return c?undefined:false},()=>'Saldo ricevuto');if(ok){SH=null;render()}},
   async spartok(){const s=SH,gid=V.gid,a=parseEur(F.pay.v);if(!(a>0))return;if(!(await authDebt(s.did)))return;const ok=await saveGame(gid,g=>{const d=g.debts.find(x=>x.debtId===s.did);const t=d.transactions.find(x=>x.status==='PENDING');if(!t||a>=d.remainingAmount)return false;return dPartial(d,t.subId,a,new Date().toISOString())?undefined:false},'Acconto di '+eur(a)+' ricevuto');if(ok){SH=null;render()}},
-  async sundo(){const s=SH,gid=V.gid;if(!(await authDebt(s.did)))return;const ok=await saveGame(gid,g=>{const d=g.debts.find(x=>x.debtId===s.did);const now=new Date().toISOString();let c=0;d.transactions.filter(t=>t.status==='PAID').map(t=>t.subId).forEach(sid=>{if(dRestore(d,sid,now))c++});return c?undefined:false},'Rimesso da pagare');if(ok){SH=null;render()}},
+  async sundo(){const s=SH,gid=V.gid;if(!(await authDebt(s.did,true)))return;const ok=await saveGame(gid,g=>{const d=g.debts.find(x=>x.debtId===s.did);const now=new Date().toISOString();let c=0;d.transactions.filter(t=>t.status==='PAID').map(t=>t.subId).forEach(sid=>{if(dRestore(d,sid,now))c++});return c?undefined:false},'Rimesso da pagare');if(ok){SH=null;render()}},
   rk(d){F.open['rk:'+d.k]=!F.open['rk:'+d.k];render()},
   authmode(d){F.auth.mode=d.m;F.auth.err='';F.auth.pin='';F.auth.pin2='';render()},
   authpick(d){F.auth.name=d.n;render()},
@@ -3975,9 +3982,9 @@ ${acctBio()?'<button class="btn ghost" data-act="logout">Blocca l\'app</button>'
 /* il PIN ora è quello dell'account e lo controlla il server */
 const checkMyPin=async pin=>{try{return !!(await BASE.rpc('hpl_check_pin',{p_pin:pin}))}catch(e){toast(errMsg(e),'err');return null}};
 bioFresh=async function(){return bioFreshUi()&&!!acctBio()};
-authDebt=async function(did){
+authDebt=async function(did,down){
   const g=S.games[V.gid],d=g&&(g.debts||[]).find(x=>x.debtId===did);if(!d)return false;
-  const perm=debtPerm(V.gid,d);
+  const perm=debtPerm(V.gid,d,down);
   if(!perm.can){toast('Solo '+perm.who+' può modificare questo saldo','err');return false}
   if(perm.needPin){
     const b=bioMine();
@@ -9264,7 +9271,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792919320821';
+const APP_VERSION='1792919542808';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
