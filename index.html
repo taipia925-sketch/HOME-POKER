@@ -7517,7 +7517,7 @@ function lrCreate(b){
   const g=b.game==='omaha'?'omaha':'holdem',n=Math.max(1,Math.min(5,+b.bots||3)),[sb,bb]=b.blinds||[25,50],stack=+b.stack||bb*100;
   if(bank()<stack)return {error:'no_bank'};
   const rid='L'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-  const st=HE.initState({id:rid,name:(g==='omaha'?'Omaha':'Texas Hold\'em')+' contro il computer',maxSeats:n+1,createdBy:myAcct(),createdAt:Date.now(),local:true});
+  const st=HE.initState({id:rid,name:'Sfida al computer',maxSeats:n+1,createdBy:myAcct(),createdAt:Date.now(),local:true});
   st.cfg=Object.assign(st.cfg,{sb,bb,stack,turnSec:40,mode:'cash',maxRebuys:99,game:g});if(g==='omaha')st.cfg.limit='pot';
   const priv={};HE.sit(st,meWho(),0);bankSet(bank()-stack);
   /* gli avversari sono quelli mostrati nella finestra «Contro il computer» */
@@ -7776,7 +7776,7 @@ vLobby=function(){
   let body='';
   if(t==='bj'){
     body=`${banner('bj')}
-<button class="sg-play" data-act="bjopen"><span class="sg-play-ic">♣</span><span class="grow"><b>Gioca a blackjack</b><span>Tu contro il banco · 6 mazzi · subito</span></span><span class="sg-play-go">GIOCA</span></button>
+<button class="sg-play" data-act="bjopen"><span class="sg-play-ic">♣</span><span class="grow"><b>Gioca a blackjack</b><span>Tu contro il banco · 6 mazzi</span></span><span class="sg-play-go">GIOCA</span></button>
 <div class="sg-how"><div><b>1</b><span>Punta le fiches e distribuisci</span></div><div><b>2</b><span>Chiedi carta o stai: non superare 21</span></div><div><b>3</b><span>Batti il banco: blackjack paga 3 a 2</span></div></div>
 ${rules('bj')}`;
   }else{
@@ -9271,7 +9271,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1793709346809';
+const APP_VERSION='1793709439159';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
