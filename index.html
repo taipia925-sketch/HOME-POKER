@@ -8226,7 +8226,7 @@ vAccount=function(){
   return `<div class="app ent"><main class="ent-in">${entLogo()}
 ${entFelt(`<span class="pk-cards ent-cards"><span class="c1">${cardHTML('As','b')}</span><span class="c2">${cardHTML('Ah','b')}</span></span><span class="pk-stack ent-c1">${pkChips(['r','r','b','r'],'ea1')}</span><span class="pk-stack ent-c2">${pkChips(['g','g','g'],'ea2')}</span>`)}
 <form id="f-acct" class="ent-form">
-<div class="ent-hello"><span>${reg?'Benvenuto al tavolo':'Bentornato'}</span><h1>${reg?'Crea il tuo account':'Accedi'}</h1><p>${reg?'Un solo nome utente e un PIN per tutti i tuoi tavoli.':'Usa il tuo nome utente e il PIN: gli stessi di sempre.'}</p></div>
+<div class="ent-hello"><span>${reg?'Benvenuto al tavolo':LS.get('hadacct',0)?'Bentornato':'Benvenuto'}</span><h1>${reg?'Crea il tuo account':'Accedi'}</h1><p>${reg?'Un solo nome utente e un PIN per tutti i tuoi tavoli.':'Usa il tuo nome utente e il PIN: gli stessi di sempre.'}</p></div>
 <div class="seg ent-seg"><button type="button" class="${!reg?'on':''}" data-act="acmode" data-m="login">Accedi</button><button type="button" class="${reg?'on':''}" data-act="acmode" data-m="reg">Registrati</button></div>
 <label class="field"><span>Nome utente</span><input class="in" id="ac-name" data-bind="ac.name" value="${esc(a.name)}" autocomplete="username" maxlength="24" autocapitalize="words" placeholder="Es. Granchio"></label>
 <label class="field"><span>PIN (da 4 a 6 cifre)</span><input class="in" id="ac-pin" type="password" inputmode="numeric" maxlength="6" data-digits="1" data-bind="ac.pin" value="${esc(a.pin)}" autocomplete="${reg?'new-password':'current-password'}" placeholder="••••"></label>
@@ -9067,7 +9067,7 @@ async function chSetMute(ms){
 }
 function chMuteSheet(){
   const on=chMuted(),u=on&&CH.mute.until?new Date(CH.mute.until):null;
-  const st=!on?'Ricevi una notifica quando qualcuno scrive.':u?'Silenziata fino a '+u.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})+' alle '+chTime(u):'Silenziata: non ricevi notifiche dei messaggi.';
+  const st=!on?'Ricevi una notifica quando qualcuno scrive.':u?'Silenziata fino a '+u.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})+' alle '+chTime(u)+'.':'Silenziata: non ricevi notifiche dei messaggi.';
   const it=(ms,ic,l,cur)=>`<button class="li" data-act="chmuteset" data-ms="${ms}"><span class="lic">${ic}</span><span class="grow">${l}</span>${cur?ico('check',18):''}</button>`;
   return `<div class="back" data-act="closesheet"><div class="sheet ${SH.anim?'anim':''}" role="dialog" aria-label="Notifiche della chat"><div class="grab"></div><div class="sheet-body">
 <div class="row sp"><h2>Notifiche della chat</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
@@ -9271,7 +9271,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1793709439159';
+const APP_VERSION='1793709542952';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
