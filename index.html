@@ -2414,8 +2414,8 @@ const sum=a=>a.reduce((x,y)=>x+y,0);
 const p2=n=>String(n).padStart(2,'0');
 const nid=p=>p+'_'+Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-3);
 const nf=new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
-const eur=c=>nf.format(c/100)+' €';
-const sgn=c=>(c>0?'+':c<0?'−':'')+nf.format(Math.abs(c)/100)+' €';
+const eur=c=>nf.format(c/100)+'\u00a0€';
+const sgn=c=>(c>0?'+':c<0?'−':'')+nf.format(Math.abs(c)/100)+'\u00a0€';
 const fch=n=>Math.round(n).toLocaleString('it-IT');
 function parseEur(s){s=String(s==null?'':s).trim().replace(/\s|€/g,'');if(!s)return NaN;if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');const n=Number(s);return isFinite(n)&&n>=0?Math.round(n*100):NaN}
 function parseCh(s){s=String(s==null?'':s).replace(/[\s.]/g,'');if(!s)return NaN;const n=Number(s);return isFinite(n)&&n>=0?Math.round(n):NaN}
@@ -2549,7 +2549,7 @@ const dDay=iso=>new Date(iso).getDate();
 const pKey=(id,name)=>id&&id!=='dealer'?id:'n:'+String(name||'').trim().toLowerCase();
 const pName=(id,name)=>(id&&typeof S!=='undefined'&&S.players&&S.players[id]&&S.players[id].name)||name;
 const sgnS=c=>(c>0?'+':c<0?'−':'')+eurS(Math.abs(c));
-const eurS=c=>(c%100===0?(c/100).toLocaleString('it-IT'):nf.format(c/100))+' €';
+const eurS=c=>(c%100===0?(c/100).toLocaleString('it-IT'):nf.format(c/100))+'\u00a0€';
 const dMon=iso=>new Date(iso).toLocaleDateString('it-IT',{month:'short'}).replace('.','');
 const stackAva=(names,max)=>{const a=names.slice(0,max||5);return `<div class="stk">${a.map(n=>ava(n,'s')).join('')}${names.length>a.length?`<span class="more">+${names.length-a.length}</span>`:''}</div>`};
 const TAB=()=>{const t=LS.get('tab','serata');return ['serata','storico','classifica'].includes(t)?t:'serata'};
@@ -2907,7 +2907,7 @@ function vSettings(){
 ${!hasManagers()?`<div class="hero stack" style="gap:12px;padding:20px"><div><b style="font-size:18px">Il tavolo non ha ancora un gestore</b><p class="mut sm" style="margin:6px 0 0">Il gestore può rimuovere giocatori e scegliere il buy-in predefinito.</p></div><button class="btn" data-act="claimmgr">Diventa gestore</button></div>`:M?'':`<div class="note" style="margin:0">Solo i gestori del tavolo possono cambiare queste impostazioni.</div>`}
 <div class="card stack" style="gap:12px"><div class="lbl in">Giocatori registrati <span class="mut" style="font-weight:500">· ${players.length}</span></div>
 ${players.map(p=>{const isM=mgr.includes(p.id),self=S.me&&p.id===S.me.id;return `<div class="prow"><div class="row" style="gap:12px">${ava(p.name,'s')}<div class="grow"><div style="font-weight:600">${esc(p.name)}${self?' <span class="mut">(tu)</span>':''}</div><div class="mut xs">${p.games} partit${p.games===1?'a':'e'}${isM?' · gestore':''}</div></div>${isM?'<span class="badge paid">Gestore</span>':''}</div>
-${M&&!self?`<div class="pacts"><button class="btn-s" data-act="mgrtoggle" data-id="${p.id}">${isM?'Togli gestore':'Rendi gestore'}</button><button class="btn-s" style="color:#FF6A60" data-act="rmplayer" data-id="${p.id}">${armed['rm'+p.id]?'Tocca di nuovo':'Rimuovi'}</button></div>`:''}</div>`}).join('')}
+${M&&!self?`<div class="pacts"><button class="btn-s" data-act="mgrtoggle" data-id="${p.id}">${isM?'Togli gestore':'Rendi gestore'}</button><button class="btn-s" style="color:#FF6A60;background:rgba(255,106,96,.1);box-shadow:inset 0 0 0 1px rgba(255,106,96,.25)" data-act="rmplayer" data-id="${p.id}">${armed['rm'+p.id]?'Tocca di nuovo':'Rimuovi'}</button></div>`:''}</div>`}).join('')}
 <div class="mut xs">Chi viene rimosso può tornare quando vuole: basta registrarsi di nuovo al tavolo. Rientrando con il suo account ritrova storico e saldi.</div></div>
 <div class="card stack" style="gap:12px"><div class="lbl in">Nuova partita: valori predefiniti</div>
 <div class="field"><span>Buy-in</span><div class="chips">${[500,1000,2000,5000].map(c=>`<button class="chip t ${buy===c?'on':''}" data-act="setbuy" data-v="${c}" ${M?'':'disabled'}>${c/100} €</button>`).join('')}</div></div>
@@ -3238,7 +3238,7 @@ function vDetail(){
   const cassa=!closed?'—':hole===0?'Perfetta':hole>0?`Ammanco ${eur(hole)}`:`Avanzo ${eur(-hole)}`;
   const me=S.me&&L.find(p=>p.playerId===S.me.id||p.playerName.toLowerCase()===S.me.name.toLowerCase());
   const nDone=D.filter(d=>d.remainingAmount===0).length,totD=sum(D.map(d=>d.totalAmount)),paidD=sum(D.map(d=>d.paidAmount));
-  const resRow=(p,i)=>{const open=!!F.open['res:'+gid+p.playerId],net=p.netCents||0;return `<div class="rrow"><button class="row" style="width:100%;text-align:left;gap:12px;min-height:56px" data-act="resopen" data-k="${gid+p.playerId}">${closed?`<span class="mut num" style="width:16px;text-align:center;font-weight:700">${i+1}</span>`:''}${ava(p.playerName,'s')}<div class="grow"><div style="font-weight:600">${esc(p.playerName)}</div><div class="mut xs num">${eur(inv(p))} investiti${closed?` · ${eur(p.cashOutCents||0)} incassati`:''}</div></div>${closed?`<b class="num ${net>0?'green':net<0?'red':'mut'}" style="font-family:var(--serif);font-size:19px">${sgn(net)}</b>`:''}<span class="mut">${ico(open?'chevu':'chev',16)}</span></button>
+  const resRow=(p,i)=>{const open=!!F.open['res:'+gid+p.playerId],net=p.netCents||0;return `<div class="rrow"><button class="row" style="width:100%;text-align:left;gap:12px;min-height:56px" data-act="resopen" data-k="${gid+p.playerId}">${closed?`<span class="mut num" style="width:16px;text-align:center;font-weight:700">${i+1}</span>`:''}${ava(p.playerName,'s')}<div class="grow"><div style="font-weight:600">${esc(p.playerName)}</div><div class="mut xs num"><span style="white-space:nowrap">${eur(inv(p))} investiti</span>${closed?` · <span style="white-space:nowrap">${eur(p.cashOutCents||0)} incassati</span>`:''}</div></div>${closed?`<b class="num ${net>0?'green':net<0?'red':'mut'}" style="font-family:var(--serif);font-size:19px">${sgn(net)}</b>`:''}<span class="mut">${ico(open?'chevu':'chev',16)}</span></button>
 ${open?`<div class="chips" style="gap:6px;padding:0 0 12px 28px">${p.buyIns.map((b,k)=>`<span class="badge ${b.paymentStatus==='PAID'?'paid':'pend'} num">${k?'Re-buy':'Buy-in'} ${eur(b.amountCents)} · ${b.paymentStatus==='PAID'?'pagato':'da pagare'}</span>`).join('')}${(p.cashOuts||[]).map(c=>`<span class="badge grey num">Cash out ${eur(c.amountCents)}</span>`).join('')}</div>`:''}</div>`};
   return `<div class="wrap">${backBtn('home','Home')}
 <div class="row sp" style="align-items:flex-start"><div class="grow"><h1>${(t=>t[0].toUpperCase()+t.slice(1))(new Date(g.scheduledAt).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}))}</h1><div class="mut sm" style="margin-top:4px">${new Date(g.scheduledAt).getFullYear()} · cassa di ${esc(g.hostName)}</div></div><span style="margin-top:6px">${closed?'<span class="badge grey">Conclusa</span>':'<span class="badge live"><i class="dot"></i>In corso</span>'}</span></div>
@@ -3288,12 +3288,12 @@ ${closed?'<div class="box o">Questa serata è conclusa: le prenotazioni sono chi
 
 /* ===== Sheets ===== */
 function buyForm(g,btnLabel,count){
-  const b=F.bi,amts=[...new Set([g.buyInCents,500,1000,2000])];
+  const b=F.bi,amts=[...new Set([g.buyInCents,500,1000,2000])].sort((x,y)=>x-y);
   const amt=b.custom?parseEur(b.cv):b.amt;
   return `<div class="field"><span>Importo${count>1?' (a testa)':''}</span><div class="chips">${amts.map(c=>`<button class="chip ${!b.custom&&b.amt===c?'on':''}" data-act="bamt" data-v="${c}">${c/100} €</button>`).join('')}<button class="chip ${b.custom?'on':''}" data-act="bamt" data-v="custom">Altro…</button></div>
 ${b.custom?`<input class="in" id="bi-cv" inputmode="decimal" data-bind="bi.cv" value="${esc(b.cv)}" placeholder="Importo in euro">`:''}</div>
 <div class="field"><span>Come paga?</span><div class="pay2"><button class="big ${b.status==='PAID'?'sel-g':''}" data-act="bst" data-s="PAID">Pagato subito</button><button class="big ${b.status==='PENDING'?'sel-r':''}" data-act="bst" data-s="PENDING">Da pagare</button></div></div>
-<button class="btn" data-act="bsave" ${amt>0?'':'disabled'}>${btnLabel} · ${amt>0?eur(amt*(count||1)):'—'}</button>`;
+<button class="btn" data-act="bsave" ${amt>0?'':'disabled'}>${btnLabel}${amt>0?' · '+eur(amt*(count||1)):''}</button>`;
 }
 function freshBi(g){F.bi={amt:g.buyInCents,custom:false,cv:'',status:'PENDING'}}
 function sheetHtml(){
@@ -3373,7 +3373,7 @@ ${d.paidAmount>0&&own&&!dn.can?`<div class="mut xs">Se hai segnato più soldi di
 <div class="field"><span>Quanto ritiri?</span><div class="chips"><button class="chip" data-act="copct" data-p="25">25%</button><button class="chip" data-act="copct" data-p="50">50%</button><button class="chip" data-act="copct" data-p="100">Tutto</button></div></div>
 <div class="row"><input class="in big-n" id="co-v" inputmode="decimal" data-bind="co.v" value="${esc(co.v)}" placeholder="${co.mode==='chips'?'Fiches':'Euro'}"><div class="seg"><button class="${co.mode==='chips'?'on':''}" data-act="comode" data-m="chips">Fiches</button><button class="${co.mode==='eur'?'on':''}" data-act="comode" data-m="eur">€</button></div></div>
 <div class="sm num">${cents>0?`Verranno messi al sicuro <b class="gold">${eur(cents)}</b>${cents>activeE?' <span class="mut">(più dello stack iniziale: include eventuali vincite)</span>':''}`:'Inserisci quanto ritiri'}</div>
-<button class="btn" data-act="cosave" ${cents>0?'':'disabled'}>Incassa e metti al sicuro · ${cents>0?eur(cents):'—'}</button>`;
+<button class="btn" data-act="cosave" ${cents>0?'':'disabled'}>Incassa e metti al sicuro${cents>0?' · '+eur(cents):''}</button>`;
   }else if(s.type==='delpl'){
     const p=S.players[s.id];title='Eliminare dalla rubrica?';
     body=`<p style="margin:0">Sei sicuro di voler eliminare <b>${esc(p?p.name:'')}</b> dalla rubrica? L'azione è definitiva.</p><div class="two"><button class="btn ghost" data-act="sheetback">Annulla</button><button class="btn redb" data-act="delplok" data-id="${s.id}">Elimina</button></div>`;
@@ -9271,7 +9271,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1792919542808';
+const APP_VERSION='1793709346809';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
