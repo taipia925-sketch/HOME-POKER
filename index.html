@@ -2031,6 +2031,8 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .vc-prev-tx b,.rl-sec b,.pb-info h1,.pb-lbl,.gm-tx b,.t3-win b,.tcard-foot b{font-family:var(--sans)!important;font-weight:800!important}
 /* ===== entrata del casinò (sblocco / accesso) ===== */
 .app.ent{min-height:100dvh;background:none}
+.psec{margin:12px 4px -2px;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.phead{gap:14px;width:100%;padding:4px 0}
 .ent-help{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:18px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-size:20px;font-weight:800;color:var(--gold-l);background:rgba(0,0,0,.35);box-shadow:inset 0 0 0 1px rgba(228,182,86,.45);z-index:3}
 .tutov{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.82);display:grid;place-items:center;padding:16px;animation:fadeIn .2s}
 .tutov-in{width:100%;max-width:420px;max-height:100%;display:flex;flex-direction:column;gap:10px}
@@ -4104,7 +4106,7 @@ Object.assign(H,{
   tables(){SH=null;backToTables()},
   leave(){SH=null;backToTables()},
   acctopen(){openSheet({type:'acct'})},
-  tutorial(){tutorialOpen()},
+  tutorial(){if(SH){SH=null;render()}tutorialOpen()},
   opentable(d){const t=(S.acct.tables||[]).find(x=>x.id===d.id);if(t)openTable(t)},
   tbshow(d){F.tbOpen=true;F.tb.mode=d.m;F.tb.err='';render()},
   usepin(){F.usePin=true;F.pinp='';render();setTimeout(()=>{const i=$('#pay-pin');if(i)i.focus()},50)},
@@ -9289,7 +9291,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1793956013678';
+const APP_VERSION='1793956300698';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
@@ -9311,6 +9313,52 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdat
 setInterval(checkUpdate,15*60*1000);
 
 /* ===== Avvio ===== */
+/* =====================================================================
+   PROFILO E ACCOUNT: le voci raccolte in sezioni (profilo, tavolo, app, account)
+   ===================================================================== */
+const _sheetProf=sheetHtml;
+sheetHtml=function(){
+  const s=SH;
+  if(!s||!((s.type==='me'&&S.me)||(s.type==='acct'&&S.acct)))return _sheetProf();
+  const li=(icon,label,act,opt)=>{opt=opt||{};return `<button class="li" data-act="${act}" ${opt.attrs||''}><span class="lic">${opt.lic||ico(icon,17)}</span><span class="grow">${label}${opt.sub?`<span class="mut xs" style="display:block;white-space:normal">${opt.sub}</span>`:''}</span>${opt.sw!=null?`<span class="sw ${opt.sw?'on':''}"><i></i></span>`:ico('chevr',16)}</button>`};
+  const sec=(t,rows)=>rows.filter(Boolean).length?`<div class="psec">${t}</div><div class="list">${rows.filter(Boolean).join('')}</div>`:'';
+  const pushErr=!S.pushOn&&LS.get('pusherr','');
+  const pushSub=!pushSupported()&&isIOS()&&!isStandalone()?'Aggiungi prima l\'app alla schermata Home':pushErr?`<span style="color:#FF8A8F">${esc(pushErr)}</span>`:'Serate, inviti, pagamenti e chat';
+  const app=[
+    li('bell','Notifiche','pushtoggle',{sw:!!S.pushOn,sub:pushSub}),
+    S.pushOn?li('bell','Prova le notifiche','pushtest',{sub:'Manda una notifica a questo telefono'}):'',
+    li('music','Musica di sottofondo','vtmusic',{sw:S.vt.music!==false,sub:'Jazz leggero in tutta l\'app'}),
+    S.bioOk?li('face','Accesso con Face ID',acctBio()?'biooff':'bioask',{sw:!!acctBio(),sub:'Entri e confermi i pagamenti senza PIN'}):'',
+    li('play','Guarda il tutorial','tutorial',{sub:'Come funziona l\'app, in 2 minuti e mezzo'})];
+  const acct=[li('user','Cambia nome utente','rename'),li('key','Cambia PIN','chpin')];
+  let title,body;
+  if(s.type==='me'){
+    const me=S.players[S.me.id]||{},mgr=isManager();
+    title='Profilo';
+    body=`<button class="row phead" data-act="picopen" aria-label="Cambia immagine del profilo">${ava(S.me.name,'l')}<div class="grow" style="text-align:left"><div class="pl-name">${esc(S.me.name)}</div><div class="mut sm">${esc(S.table?S.table.name:'')}${mgr?' · <b class="gold">gestore</b>':''}</div></div></button>
+${sec('Il tuo profilo',[
+  li('','Immagine del profilo','picopen',{lic:me.pic?ava(S.me.name,'xs'):'🦀',sub:'Una tua foto o un animale al posto delle iniziali'}),
+  li('bars','Le mie statistiche','pstats',{attrs:`data-k="${esc(S.me.id)}"`}),
+  li('coins','Come vuoi essere pagato','paym',{sub:'PayPal, IBAN o altro: lo vede chi ti deve soldi'})])}
+${sec('Questo tavolo',[
+  li('gear','Impostazioni tavolo','settings',{sub:mgr?'Giocatori, gestori e nuova partita':'Giocatori e nuova partita'}),
+  li('share','Esporta i dati','export',{sub:'Excel o copia di sicurezza'}),
+  li('chip','Cambia tavolo','tables',{sub:'Torna all\'elenco dei tuoi tavoli'}),
+  legacyProfiles().length?li('link','Collega il mio vecchio profilo','relink'):''])}
+${sec('App',app)}
+${sec('Account',acct)}
+<button class="btn ghost" style="margin-top:6px" data-act="logout">${acctBio()?'Blocca l\'app':'Esci dall\'account'}</button>
+<button class="link" style="align-self:center;color:#FF6A60;min-height:40px" data-act="delme">Esci da questo tavolo</button>`;
+  }else{
+    const n=(S.acct.tables||[]).length;title='Account';
+    body=`<div class="row" style="gap:14px">${ava(S.acct.name,'l')}<div class="grow"><div class="pl-name">${esc(S.acct.name)}</div><div class="mut sm">${n} tavol${n===1?'o':'i'}</div></div></div>
+${sec('App',app)}
+${sec('Account',acct)}
+${acctBio()?'<button class="btn ghost" style="margin-top:6px" data-act="logout">Blocca l\'app</button>':''}<button class="btn ghost" style="color:#FF6A60${acctBio()?'':';margin-top:6px'}" data-act="fulllogout">Esci da questo telefono</button>
+<button class="link" style="align-self:center;color:#FF6A60;min-height:40px" data-act="delacct">Elimina il mio account</button>`;
+  }
+  return `<div class="back" data-act="closesheet"><div class="sheet ${s.anim?'anim':''}" role="dialog" aria-label="${esc(title)}"><div class="grab"></div><div class="sheet-body"><div class="row sp"><h2 style="font-size:22px">${esc(title)}</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>${body}</div></div></div>`;
+};
 (async function start(){
   render();
   if(SB_URL.indexOf('__')===0){S.dbReady=false;render();return}
