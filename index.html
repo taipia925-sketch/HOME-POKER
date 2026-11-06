@@ -2031,7 +2031,14 @@ body::after{opacity:1!important;background-image:url("data:image/svg+xml,%3Csvg 
 .vc-prev-tx b,.rl-sec b,.pb-info h1,.pb-lbl,.gm-tx b,.t3-win b,.tcard-foot b{font-family:var(--sans)!important;font-weight:800!important}
 /* ===== entrata del casinò (sblocco / accesso) ===== */
 .app.ent{min-height:100dvh;background:none}
-.ent-in{max-width:460px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 16px) 20px calc(env(safe-area-inset-bottom,0px) + 28px);display:flex;flex-direction:column}
+.ent-help{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:18px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-size:20px;font-weight:800;color:var(--gold-l);background:rgba(0,0,0,.35);box-shadow:inset 0 0 0 1px rgba(228,182,86,.45);z-index:3}
+.tutov{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.82);display:grid;place-items:center;padding:16px;animation:fadeIn .2s}
+.tutov-in{width:100%;max-width:420px;max-height:100%;display:flex;flex-direction:column;gap:10px}
+.tutov-hd{display:flex;align-items:center;justify-content:space-between;color:var(--ivory);font-size:17px}
+.tutov-x{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);color:var(--ivory)}
+.tutov video{width:100%;max-height:calc(100dvh - 140px);border-radius:16px;background:#000;object-fit:contain}
+.tutov p{margin:0;color:rgba(255,255,255,.6);font-size:13px;text-align:center}
+.ent-in{position:relative;max-width:460px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 16px) 20px calc(env(safe-area-inset-bottom,0px) + 28px);display:flex;flex-direction:column}
 .ent-logo{justify-content:center}
 .ent-felt{position:relative;isolation:isolate;overflow:hidden;height:210px;margin:22px 0 0;border-radius:24px;background:radial-gradient(70% 60% at 50% 55%,#2FB25A,#1A8C3F 50%,#0B4D24 85%);box-shadow:inset 0 0 0 10px #2B2C30,inset 0 0 0 12px rgba(255,194,26,.55),inset 0 0 40px 12px rgba(0,0,0,.45),0 22px 46px -20px rgba(30,200,110,.5)}
 .ent-rays{position:absolute;inset:-60%;z-index:-1;background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,255,255,.08) 0 5deg,transparent 5deg 15deg);-webkit-mask:radial-gradient(circle,#000 0,transparent 55%);mask:radial-gradient(circle,#000 0,transparent 55%);animation:pkRays 50s linear infinite}
@@ -3123,6 +3130,16 @@ ${(p.cashOuts||[]).map((c,k)=>{const ck=c.id||('i'+k);return `<div class="mv"><i
 ${A?'':'<div class="mut xs" style="padding-top:8px">Solo chi ha il PIN Admin può registrare movimenti.</div>'}</div>`:''}</div>`;
 }
 
+/* --- Video tutorial: si apre dal «?» della schermata di accesso --- */
+function tutorialOpen(){
+  if($$id('tutov'))return;
+  const el=document.createElement('div');el.id='tutov';el.className='tutov';el.setAttribute('role','dialog');el.setAttribute('aria-label','Video tutorial');
+  el.innerHTML=`<div class="tutov-in"><div class="tutov-hd"><b>Come funziona Home Poker</b><button type="button" class="tutov-x" aria-label="Chiudi">${ico('close',20)}</button></div><video src="tutorial.mp4" poster="tutorial.jpg" controls playsinline preload="metadata"></video><p>2 minuti e mezzo: account, tavolo, serate, sala giochi e chat.</p></div>`;
+  const close=()=>{const v=el.querySelector('video');try{v.pause()}catch(e){}el.remove()};
+  el.addEventListener('click',e=>{if(e.target===el||e.target.closest('.tutov-x'))close()});
+  document.body.appendChild(el);
+  const v=el.querySelector('video');try{v.play().catch(()=>{})}catch(e){}
+}
 /* --- Chiusura cassa --- */
 function startClose(){
   const g=S.games[V.gid];const d=g.dealerChips||0;
@@ -4087,6 +4104,7 @@ Object.assign(H,{
   tables(){SH=null;backToTables()},
   leave(){SH=null;backToTables()},
   acctopen(){openSheet({type:'acct'})},
+  tutorial(){tutorialOpen()},
   opentable(d){const t=(S.acct.tables||[]).find(x=>x.id===d.id);if(t)openTable(t)},
   tbshow(d){F.tbOpen=true;F.tb.mode=d.m;F.tb.err='';render()},
   usepin(){F.usePin=true;F.pinp='';render();setTimeout(()=>{const i=$('#pay-pin');if(i)i.focus()},50)},
@@ -8223,7 +8241,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&S.locked&
 vAccount=function(){
   const a=F.ac;if(a.mode===null)a.mode='login';
   const reg=a.mode==='reg';
-  return `<div class="app ent"><main class="ent-in">${entLogo()}
+  return `<div class="app ent"><main class="ent-in"><button type="button" class="ent-help" data-act="tutorial" aria-label="Guarda il video tutorial">?</button>${entLogo()}
 ${entFelt(`<span class="pk-cards ent-cards"><span class="c1">${cardHTML('As','b')}</span><span class="c2">${cardHTML('Ah','b')}</span></span><span class="pk-stack ent-c1">${pkChips(['r','r','b','r'],'ea1')}</span><span class="pk-stack ent-c2">${pkChips(['g','g','g'],'ea2')}</span>`)}
 <form id="f-acct" class="ent-form">
 <div class="ent-hello"><span>${reg?'Benvenuto al tavolo':LS.get('hadacct',0)?'Bentornato':'Benvenuto'}</span><h1>${reg?'Crea il tuo account':'Accedi'}</h1><p>${reg?'Un solo nome utente e un PIN per tutti i tuoi tavoli.':'Usa il tuo nome utente e il PIN: gli stessi di sempre.'}</p></div>
@@ -9271,7 +9289,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1793709542952';
+const APP_VERSION='1793956013678';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
