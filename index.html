@@ -5359,7 +5359,7 @@ document.addEventListener('input',e=>{if(e.target&&e.target.id==='vt-range'){F.v
 async function vtDo(action,extra){if(S.vt.busy)return;S.vt.busy=true;render();const r=await vtCall(action,extra);S.vt.busy=false;render();return r}
 Object.assign(H,{
   mode(){go('mode')},
-  goreal(){go('home')},
+  goreal(){LS.set('tab','serata');go('home')},
   govt(){F.vt.raise=null;go('vt');vtSubscribe();if(vtSeat()>=0)vtCall('state',{},true)},
   totables(){backToTables()},
   vtsit(d){vtDo('sit',{seat:+d.seat<0?null:+d.seat}).then(r=>{if(r)toast('Sei seduto: buona fortuna!','ok')})},
@@ -9291,7 +9291,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1793956300698';
+const APP_VERSION='1794068593152';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
