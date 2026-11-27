@@ -22,8 +22,8 @@ jobs:
             echo "::error::Manca il secret SUPABASE_ACCESS_TOKEN (Settings > Secrets and variables > Actions)"
             exit 1
           fi
-          supabase functions deploy --project-ref nqlywzjhxykrfyrpkjdw --use-api
+          supabase functions deploy --project-ref nqlywzjhxykrfyrpkjdw --use-api --yes
           # la risposta dalla notifica arriva senza accesso: chi risponde lo dice il gettone firmato
-          supabase functions deploy hpl-chat-reply --project-ref nqlywzjhxykrfyrpkjdw --use-api --no-verify-jwt
+          supabase functions deploy hpl-chat-reply --project-ref nqlywzjhxykrfyrpkjdw --use-api --no-verify-jwt --yes
           # il widget Android non ha accesso: si riconosce con il suo gettone personale
-          supabase functions deploy hpl-widget --project-ref nqlywzjhxykrfyrpkjdw --use-api --no-verify-jwt
+          supabase functions deploy hpl-widget --project-ref nqlywzjhxykrfyrpkjdw --use-api --no-verify-jwt --yes
