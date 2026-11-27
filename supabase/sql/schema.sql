@@ -792,3 +792,71 @@ grant execute on function public.hpl_widget_revoke() to authenticated;
 create table if not exists public.hpl_build_secrets (name text primary key, value text not null, updated_at timestamptz not null default now());
 alter table public.hpl_build_secrets enable row level security;
 revoke all on public.hpl_build_secrets from anon, authenticated;
+
+-- Modifiche dal widget Android (re-buy e annulla): solo chi tiene il banco della serata, come nell'app.
+-- La chiama solo la funzione hpl-widget (service role).
+create or replace function public.hpl_widget_act(p_token text, p_tid text, p_gid text, p_act text, p_pid text default null, p_hid text default null)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+declare
+  a uuid; me text; who text; d jsonb; pl jsonb; aft jsonb; bi jsonb; e jsonb; h jsonb; i int; now_s text; hid text;
+  rnd text := substr(md5(gen_random_bytes(8)::text), 1, 6) || to_hex((extract(epoch from now())*1000)::bigint % 46656);
+begin
+  select account_id into a from hpl_widget_tokens where token = p_token;
+  if a is null then return jsonb_build_object('error','bad_token'); end if;
+  select player_id into me from hpl_account_tables where account_id = a and table_id = p_tid;
+  if me is null then return jsonb_build_object('error','not_member'); end if;
+  select data into d from hpl_docs where path = 't/'||p_tid||'/games/'||p_gid for update;
+  if d is null then return jsonb_build_object('error','not_found'); end if;
+  if d->>'status' <> 'live' then return jsonb_build_object('error','not_live'); end if;
+  if coalesce(d->>'hostId','') <> me then return jsonb_build_object('error','not_host'); end if;
+  select coalesce(d->'players'->me->>'playerName', name) into who from hpl_accounts where id = a;
+  now_s := to_char(now() at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"');
+
+  if p_act = 'rebuy' then
+    pl := d->'players'->p_pid;
+    if pl is null then return jsonb_build_object('error','no_player'); end if;
+    if coalesce((d->>'buyInCents')::int, 0) <= 0 then return jsonb_build_object('error','no_amount'); end if;
+    bi := jsonb_build_object('buyInId','b_'||rnd,'amountCents',(d->>'buyInCents')::int,'paymentStatus','PENDING','timestamp',now_s);
+    aft := jsonb_set(pl, '{buyIns}', coalesce(pl->'buyIns','[]'::jsonb) || jsonb_build_array(bi));
+    hid := 'h_'||rnd;
+    e := jsonb_build_object('id',hid,'at',now_s,'by',who,'msg','Re-buy registrato','src','widget',
+           'ch', jsonb_build_array(jsonb_build_object('k','p:'||p_pid,'b',pl,'a',aft)));
+    d := jsonb_set(d, array['players',p_pid], aft);
+    h := coalesce(d->'hist','[]'::jsonb) || jsonb_build_array(e);
+    while jsonb_array_length(h) > 80 loop h := h - 0; end loop;
+    d := jsonb_set(d, '{hist}', h);
+    d := jsonb_set(d, '{rev}', to_jsonb(coalesce((d->>'rev')::int,0)+1));
+    update hpl_docs set data = d, updated_at = now() where path = 't/'||p_tid||'/games/'||p_gid;
+    return jsonb_build_object('ok',true,'hid',hid,'name',pl->>'playerName','amount',(d->>'buyInCents')::int);
+
+  elsif p_act = 'undo' then
+    h := coalesce(d->'hist','[]'::jsonb);
+    i := null;
+    for k in 0 .. jsonb_array_length(h)-1 loop
+      if h->k->>'id' = p_hid then i := k; end if;
+    end loop;
+    if i is null then return jsonb_build_object('error','no_entry'); end if;
+    e := h->i;
+    if e ? 'undone' then return jsonb_build_object('error','already'); end if;
+    for k in 0 .. jsonb_array_length(e->'ch')-1 loop
+      if substr(e->'ch'->k->>'k',1,2) <> 'p:' then return jsonb_build_object('error','changed'); end if;
+      if (d->'players'->substr(e->'ch'->k->>'k',3)) is distinct from (e->'ch'->k->'a') then return jsonb_build_object('error','changed'); end if;
+    end loop;
+    for k in 0 .. jsonb_array_length(e->'ch')-1 loop
+      if jsonb_typeof(e->'ch'->k->'b') = 'null' or (e->'ch'->k->'b') is null then
+        d := d #- array['players', substr(e->'ch'->k->>'k',3)];
+      else
+        d := jsonb_set(d, array['players', substr(e->'ch'->k->>'k',3)], e->'ch'->k->'b');
+      end if;
+    end loop;
+    e := e || jsonb_build_object('undone', jsonb_build_object('at',now_s,'by',who));
+    h := jsonb_set(h, array[i::text], e);
+    d := jsonb_set(d, '{hist}', h);
+    d := jsonb_set(d, '{rev}', to_jsonb(coalesce((d->>'rev')::int,0)+1));
+    update hpl_docs set data = d, updated_at = now() where path = 't/'||p_tid||'/games/'||p_gid;
+    return jsonb_build_object('ok',true,'name',e->'ch'->0->'b'->>'playerName');
+  end if;
+  return jsonb_build_object('error','bad_action');
+end $$;
+revoke all on function public.hpl_widget_act(text,text,text,text,text,text) from public, anon, authenticated;
+grant execute on function public.hpl_widget_act(text,text,text,text,text,text) to service_role;

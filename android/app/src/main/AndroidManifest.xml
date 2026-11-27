@@ -68,6 +68,8 @@
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/poker_widget_info" />
         </receiver>
 
+        <service android:name=".LiveListService" android:exported="false" android:permission="android.permission.BIND_REMOTEVIEWS" />
+
         <!-- Le notifiche del sito arrivano come notifiche di questa app. -->
         <service android:name="com.google.androidbrowserhelper.trusted.DelegationService" android:exported="true" android:enabled="true">
             <meta-data android:name="android.support.customtabs.trusted.SMALL_ICON" android:resource="@drawable/ic_stat" />

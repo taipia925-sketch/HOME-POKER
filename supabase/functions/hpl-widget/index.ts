@@ -17,11 +17,24 @@ const sum = (a: number[]) => a.reduce((x, y) => x + (y || 0), 0);
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   try {
-    let token = req.headers.get("x-widget-token") ?? new URL(req.url).searchParams.get("t") ?? "";
-    if (!token && req.method === "POST") { try { token = String((await req.json()).token ?? ""); } catch { /* corpo vuoto */ } }
+    let body: Record<string, any> = {};
+    if (req.method === "POST") { try { body = await req.json(); } catch { /* corpo vuoto */ } }
+    const token = req.headers.get("x-widget-token") ?? new URL(req.url).searchParams.get("t") ?? String(body.token ?? "");
     if (!/^[0-9a-f]{48}$/.test(token)) return json({ error: "bad_token" }, 401);
 
     const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
+
+    // modifiche dal widget (re-buy, annulla): le regole sono nel database, come nell'app
+    if (body.action) {
+      const s = (v: unknown) => (typeof v === "string" && /^[A-Za-z0-9_.~-]{1,80}$/.test(v) ? v : null);
+      if (!s(body.tid) || !s(body.gid)) return json({ error: "bad_request" }, 400);
+      const { data, error } = await db.rpc("hpl_widget_act", {
+        p_token: token, p_tid: body.tid, p_gid: body.gid, p_act: String(body.action), p_pid: s(body.pid), p_hid: s(body.hid),
+      });
+      if (error) throw error;
+      if (data?.error === "bad_token") return json(data, 401);
+      return json(data, data?.ok ? 200 : 409);
+    }
     const { data: tk } = await db.from("hpl_widget_tokens").select("account_id").eq("token", token).maybeSingle();
     if (!tk) return json({ error: "bad_token" }, 401);
     const acct = tk.account_id as string;
@@ -69,7 +82,21 @@ Deno.serve(async (req) => {
       const g = lives[0];
       const P = Object.values(g.data.players ?? {}) as any[];
       const gross = sum(P.flatMap((p) => (p.buyIns ?? []).map((b: any) => Number(b.amountCents) || 0)));
-      live = { table: tname(tid(g.path)), tid: tid(g.path), id: gid(g.path), pot: gross - (Number(g.data.dealerChips) || 0), players: P.length, since: g.data.scheduledAt ?? g.data.createdAt ?? null, kind: g.data.kind === "tournament" ? "torneo" : "cash" };
+      const me = L.find((l) => l.table_id === tid(g.path))?.player_id;
+      const list = P.slice().sort((x, y) => (x.seq ?? 0) - (y.seq ?? 0)).map((p) => {
+        const B = (p.buyIns ?? []) as any[];
+        return {
+          pid: p.playerId, name: p.playerName ?? "", n: B.length,
+          in: sum(B.map((b) => Number(b.amountCents) || 0)),
+          pend: sum(B.filter((b) => b.paymentStatus !== "PAID").map((b) => Number(b.amountCents) || 0)),
+          out: p.cashOutCents != null || (p.cashOuts ?? []).length > 0,
+        };
+      });
+      live = {
+        table: tname(tid(g.path)), tid: tid(g.path), id: gid(g.path), pot: gross - (Number(g.data.dealerChips) || 0), players: P.length,
+        since: g.data.scheduledAt ?? g.data.createdAt ?? null, kind: g.data.kind === "tournament" ? "torneo" : "cash",
+        host: !!me && g.data.hostId === me, buyIn: Number(g.data.buyInCents) || 0, list,
+      };
     }
 
     // prossima serata programmata
