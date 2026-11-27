@@ -9292,7 +9292,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1795814034258';
+const APP_VERSION='1795816934365';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
@@ -9330,11 +9330,26 @@ async function widgetLink(quiet){
 // dentro l'app Android il widget si collega da solo, al primo tocco (Chrome apre l'app solo dopo un tocco)
 document.addEventListener('pointerup',()=>{try{if(!inAndroidApp()||!S.acct||S.locked||sessionStorage.getItem('hp_wlink')===S.acct.id)return}catch(e){return}widgetLink(true)},true);
 H.widgetlink=()=>widgetLink(false);
-H.widgetget=()=>{const a=document.createElement('a');a.href='home-poker.apk';a.download='Home-Poker.apk';document.body.appendChild(a);a.click();a.remove();
-  toast('Download avviato: aprilo e scegli Installa')};
+// il file si scarica con Chrome vero (dall'app installata si aprirebbe una finestrella che non installa)
+const APK_URL='https://taipia925-sketch.github.io/HOME-POKER/home-poker.apk';
+H.widgetget=()=>{SH={type:'apk',anim:true};render()};
 const _sheetProf=sheetHtml;
 sheetHtml=function(){
   const s=SH;
+  if(s&&s.type==='apk'){
+    const href='intent://'+APK_URL.replace(/^https:\/\//,'')+'#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url='+encodeURIComponent(APK_URL)+';end';
+    const st=(n,t)=>`<div class="row" style="gap:12px;align-items:flex-start;margin:10px 0"><b class="gold" style="flex:0 0 22px;height:22px;border-radius:11px;border:1px solid var(--gold);display:grid;place-items:center;font-size:12px">${n}</b><span class="sm" style="line-height:1.45">${t}</span></div>`;
+    return `<div class="back" data-act="closesheet"><div class="sheet ${s.anim?'anim':''}" role="dialog" aria-label="App Android"><div class="grab"></div><div class="sheet-body"><div class="row sp"><h2 style="font-size:22px">App Android con widget</h2><button class="x" data-act="closesheet" aria-label="Chiudi">${ico('close',20)}</button></div>
+<p class="mut sm" style="margin:0 0 6px">È questa stessa app, con il tuo account, più il widget per la schermata Home: serata aperta, re-buy con un tocco, saldo e chat.</p>
+${st(1,'Tocca <b>Scarica l\'app</b>: si apre Chrome e parte il download.')}
+${st(2,'Se Chrome avvisa che il file potrebbe essere dannoso, tocca <b>Scarica comunque</b>: succede con tutte le app che non vengono dal Play Store.')}
+${st(3,'Tocca <b>Apri</b> sulla notifica del download. Se il telefono lo chiede, consenti a Chrome di <b>installare app</b>, poi torna indietro.')}
+${st(4,'Tocca <b>Installa</b>, apri <b>Home Poker</b> e tocca un punto qualsiasi: il widget si collega da solo.')}
+${st(5,'Tieni premuto sulla schermata Home → <b>Widget</b> → <b>Home Poker</b>. Meglio grande (4×3), per vedere tutti i giocatori.')}
+<a class="btn" style="margin-top:8px;text-decoration:none;display:flex;justify-content:center;align-items:center" href="${href}" target="_blank" rel="noopener">Scarica l'app</a>
+<p class="mut xs" style="margin:10px 0 0;text-align:center">Non parte? Apri Chrome e vai su<br><span style="user-select:all">${esc(APK_URL)}</span></p>
+</div></div></div>`;
+  }
   if(!s||!((s.type==='me'&&S.me)||(s.type==='acct'&&S.acct)))return _sheetProf();
   const li=(icon,label,act,opt)=>{opt=opt||{};return `<button class="li" data-act="${act}" ${opt.attrs||''}><span class="lic">${opt.lic||ico(icon,17)}</span><span class="grow">${label}${opt.sub?`<span class="mut xs" style="display:block;white-space:normal">${opt.sub}</span>`:''}</span>${opt.sw!=null?`<span class="sw ${opt.sw?'on':''}"><i></i></span>`:ico('chevr',16)}</button>`};
   const sec=(t,rows)=>rows.filter(Boolean).length?`<div class="psec">${t}</div><div class="list">${rows.filter(Boolean).join('')}</div>`:'';
@@ -9345,7 +9360,7 @@ sheetHtml=function(){
     S.pushOn?li('bell','Prova le notifiche','pushtest',{sub:'Manda una notifica a questo telefono'}):'',
     li('music','Musica di sottofondo','vtmusic',{sw:S.vt.music!==false,sub:'Jazz leggero in tutta l\'app'}),
     S.bioOk?li('face','Accesso con Face ID',acctBio()?'biooff':'bioask',{sw:!!acctBio(),sub:'Entri e confermi i pagamenti senza PIN'}):'',
-    isAndroid()?(inAndroidApp()?li('grid','Widget sulla schermata Home','widgetlink',{sub:'Già collegato al tuo account. Per aggiungerlo: tieni premuto sulla Home → Widget → Home Poker'}):li('grid','App Android con widget','widgetget',{sub:'Stessa app, stesso account, più il widget con serata, saldo e chat'})):'',
+    isAndroid()?(inAndroidApp()?li('grid','Widget sulla schermata Home','widgetlink',{sub:'Già collegato al tuo account. Per aggiungerlo: tieni premuto sulla Home → Widget → Home Poker'}):li('grid','App Android con widget','widgetget',{sub:'Stessa app, stesso account, più il widget: serata aperta, re-buy, saldo e chat'})):'',
     li('play','Guarda il tutorial','tutorial',{sub:'Come funziona l\'app, in 2 minuti e mezzo'})];
   const acct=[li('user','Cambia nome utente','rename'),li('key','Cambia PIN','chpin')];
   let title,body;

@@ -5,7 +5,9 @@ quindi si resta collegati con il proprio account, e notifiche e Face ID funziona
 In più ha il **widget** per la schermata Home.
 
 ## Cosa mostra il widget
-- Serata in corso: montepremi, giocatori, cash o torneo (tocco → apre la serata).
+- Serata aperta del tavolo: montepremi e lista dei giocatori con quanto hanno messo e quanto devono ancora pagare.
+  Chi tiene il banco fa il **re-buy con un tocco** («+ € 20», poi «Confermi?») e può fare **Annulla** per 10 minuti.
+  Le modifiche finiscono nella cronologia della serata, come quelle fatte dall'app. Gli altri vedono la lista in sola lettura.
 - Altrimenti la prossima serata: giorno, ora, posti presi, luogo (tocco → apre la prenotazione).
 - «Ti devono» e «Devi» su tutti i tuoi tavoli.
 - Messaggi non letti della chat (tocco sul bollino → apre la chat).

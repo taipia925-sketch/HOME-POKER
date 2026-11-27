@@ -9,6 +9,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.SizeF
 
 import android.widget.RemoteViews
@@ -29,24 +31,97 @@ class PokerWidget : AppWidgetProvider() {
     override fun onDisabled(c: Context) = Refresh.cancel(c)
 
     override fun onReceive(c: Context, i: Intent) {
-        if (i.action == ACTION_REFRESH) {
-            if (Store.token(c) != null) Refresh.now(c)
+        when (i.action) {
+            ACTION_REFRESH -> { if (Store.token(c) != null) Refresh.now(c); renderAll(c) }
+            ACTION_REBUY -> rebuy(c, i.getStringExtra(EXTRA_PID) ?: return)
+            ACTION_UNDO -> undo(c)
+            else -> super.onReceive(c, i)
+        }
+    }
+
+    /** Primo tocco: chiede conferma. Secondo tocco entro pochi secondi: registra il re-buy. */
+    private fun rebuy(c: Context, pid: String) {
+        if (Store.busy(c) != null) return
+        val lv = Store.data(c)?.optJSONObject("live") ?: return
+        val pending = goAsync()
+        if (Store.armed(c) != pid) {
+            Store.arm(c, pid); renderAll(c)
+            Handler(Looper.getMainLooper()).postDelayed({ renderAll(c); pending.finish() }, Store.ARM_MS + 300)
+            return
+        }
+        Store.arm(c, null); Store.setBusy(c, pid); Store.setNote(c, null); renderAll(c)
+        Thread {
+            val r = Store.act(c, JSONObject().put("action", "rebuy").put("tid", lv.optString("tid")).put("gid", lv.optString("id")).put("pid", pid))
+            if (r?.optBoolean("ok") == true) {
+                val amt = r.optLong("amount")
+                bump(c, pid, amt)
+                Store.setLast(c, JSONObject().put("hid", r.optString("hid")).put("tid", lv.optString("tid")).put("gid", lv.optString("id"))
+                    .put("text", "Re-buy a ${r.optString("name")} · ${euro(amt)}").put("at", System.currentTimeMillis()))
+            } else Store.setNote(c, why(r), true)
+            Store.setBusy(c, null)
             renderAll(c)
-        } else super.onReceive(c, i)
+            Refresh.now(c)
+            pending.finish()
+        }.start()
+    }
+
+    private fun undo(c: Context) {
+        val last = Store.last(c) ?: return
+        if (Store.busy(c) != null) return
+        val pending = goAsync()
+        Store.setBusy(c, "undo"); renderAll(c)
+        Thread {
+            val r = Store.act(c, JSONObject().put("action", "undo").put("tid", last.optString("tid")).put("gid", last.optString("gid")).put("hid", last.optString("hid")))
+            if (r?.optBoolean("ok") == true) { Store.setLast(c, null); Store.setNote(c, "Annullato: " + last.optString("text").replaceFirstChar { it.lowercase() }) }
+            else { if (r?.optString("error") in setOf("already", "no_entry")) Store.setLast(c, null); Store.setNote(c, why(r), true) }
+            Store.setBusy(c, null)
+            renderAll(c)
+            Refresh.now(c)
+            pending.finish()
+        }.start()
+    }
+
+    /** Aggiorna subito i numeri in memoria, senza aspettare il server. */
+    private fun bump(c: Context, pid: String, amt: Long) {
+        val d = Store.data(c) ?: return
+        val lv = d.optJSONObject("live") ?: return
+        lv.put("pot", lv.optLong("pot") + amt)
+        val a = lv.optJSONArray("list") ?: return
+        for (k in 0 until a.length()) {
+            val p = a.optJSONObject(k) ?: continue
+            if (p.optString("pid") == pid) { p.put("in", p.optLong("in") + amt); p.put("n", p.optInt("n") + 1); p.put("pend", p.optLong("pend") + amt) }
+        }
+        Store.saveData(c, d)
+    }
+
+    private fun why(r: JSONObject?) = when (r?.optString("error")) {
+        null -> "Nessuna connessione: riprova"
+        "not_host" -> "Solo chi tiene il banco può fare re-buy"
+        "not_live" -> "La serata è già stata chiusa"
+        "no_player" -> "Giocatore non più al tavolo"
+        "changed" -> "Modificato nel frattempo: annulla dall'app"
+        "already" -> "Era già stato annullato"
+        "bad_token" -> "Widget scollegato: apri l'app"
+        else -> "Non riuscito: riprova dall'app"
     }
 
     companion object {
         const val ACTION_REFRESH = "it.homepoker.app.REFRESH"
+        const val ACTION_REBUY = "it.homepoker.app.REBUY"
+        const val ACTION_UNDO = "it.homepoker.app.UNDO"
+        const val EXTRA_PID = "pid"
         private val IT = Locale.ITALY
 
         fun renderAll(c: Context) {
             val m = AppWidgetManager.getInstance(c)
-            m.getAppWidgetIds(ComponentName(c, PokerWidget::class.java)).forEach { render(c, m, it) }
+            val ids = m.getAppWidgetIds(ComponentName(c, PokerWidget::class.java))
+            ids.forEach { render(c, m, it) }
+            if (ids.isNotEmpty()) m.notifyAppWidgetViewDataChanged(ids, R.id.list)
         }
 
         fun render(c: Context, m: AppWidgetManager, id: Int) {
             val v = Model(c)
-            val large = build(c, R.layout.widget_large, v)
+            val large = if (v.live) buildLive(c, v, id) else build(c, R.layout.widget_large, v)
             val small = build(c, R.layout.widget_small, v)
             val rv = if (Build.VERSION.SDK_INT >= 31) {
                 RemoteViews(mapOf(SizeF(100f, 40f) to small, SizeF(170f, 120f) to large))
@@ -161,6 +236,51 @@ class PokerWidget : AppWidgetProvider() {
             }
             return r
         }
+
+        private fun buildLive(c: Context, v: Model, id: Int): RemoteViews {
+            val r = RemoteViews(c.packageName, R.layout.widget_live)
+            val lv = Store.data(c)?.optJSONObject("live")
+            val host = lv?.optBoolean("host") == true
+            r.setTextViewText(R.id.label, "SERATA IN CORSO" + (lv?.optString("table")?.takeIf { it.isNotEmpty() }?.let { " · " + it.uppercase(IT) } ?: ""))
+            val n = lv?.optInt("players") ?: 0
+            r.setTextViewText(R.id.sub, "montepremi · $n ${if (n == 1) "giocatore" else "giocatori"} · ${lv?.optString("kind", "cash")}")
+            r.setTextViewText(R.id.big, v.big)
+            r.setViewVisibility(R.id.chat, if (v.chat > 0) android.view.View.VISIBLE else android.view.View.GONE)
+            r.setTextViewText(R.id.chat, "💬 ${v.chat}")
+            v.chatUrl?.let { r.setOnClickPendingIntent(R.id.chat, open(c, it, 2)) }
+            r.setOnClickPendingIntent(R.id.head, open(c, v.openUrl, 1))
+
+            val svc = Intent(c, LiveListService::class.java).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
+            svc.data = Uri.parse(svc.toUri(Intent.URI_INTENT_SCHEME))
+            @Suppress("DEPRECATION") r.setRemoteAdapter(R.id.list, svc)
+            r.setEmptyView(R.id.list, R.id.empty)
+            val tpl = Intent(c, PokerWidget::class.java).setAction(ACTION_REBUY)
+            r.setPendingIntentTemplate(R.id.list, PendingIntent.getBroadcast(c, 20, tpl,
+                PendingIntent.FLAG_UPDATE_CURRENT or (if (Build.VERSION.SDK_INT >= 31) PendingIntent.FLAG_MUTABLE else 0)))
+
+            val note = Store.note(c)
+            val last = Store.last(c)
+            val busy = Store.busy(c)
+            var undo = false
+            val (txt, col) = when {
+                busy == "undo" -> "Annullo…" to R.color.muted
+                note != null -> note.first to (if (note.second) R.color.lose else R.color.win)
+                last != null -> { undo = true; "✓ " + last.optString("text") to R.color.win }
+                Store.armed(c) != null -> "Tocca di nuovo per confermare" to R.color.gold
+                !host -> "Il re-buy lo fa chi tiene il banco" to R.color.muted
+                else -> v.updated to R.color.gold_dim
+            }
+            r.setTextViewText(R.id.status, txt)
+            r.setTextColor(R.id.status, c.getColor(col))
+            r.setViewVisibility(R.id.undo, if (undo) android.view.View.VISIBLE else android.view.View.GONE)
+            r.setOnClickPendingIntent(R.id.undo, PendingIntent.getBroadcast(c, 21, Intent(c, PokerWidget::class.java).setAction(ACTION_UNDO),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+            r.setOnClickPendingIntent(R.id.refresh, refresh(c))
+            return r
+        }
+
+        fun euroShort(cents: Long): String =
+            if (cents % 100 == 0L) "€ ${cents / 100}" else euro(cents)
 
         private fun deep(view: String, tid: String, gid: String) =
             if (tid.isEmpty()) BuildConfig.WEB_URL
