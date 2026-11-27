@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.HomePoker" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/felt_dark</item>
+        <item name="android:statusBarColor">@color/felt_dark</item>
+        <item name="android:navigationBarColor">@color/felt_dark</item>
+    </style>
+    <style name="Theme.HomePoker.Launch">
+        <item name="android:windowBackground">@color/felt_dark</item>
+    </style>
+    <style name="Theme.HomePoker.Invisible" parent="android:Theme.Translucent.NoTitleBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+</resources>

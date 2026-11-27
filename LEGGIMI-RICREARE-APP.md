@@ -15,6 +15,9 @@ Questo pacchetto contiene **tutto il codice** di Home Poker. Chi lo riceve, pers
 | `supabase/functions/hpl-push/` | Invio delle notifiche push ai telefoni del tavolo. |
 | `supabase/functions/hpl-chat-reply/` | Risposte e «mi piace» dati direttamente dalla notifica. |
 | `supabase/functions/hpl-news/` | Notizie dal mondo del poker. |
+| `supabase/functions/hpl-widget/` | Riassunto per il widget Android (serata, saldo, chat). |
+| `android/` | App Android con widget: vedi `android/LEGGIMI.md`. |
+| `home-poker.apk` | L'app Android già pronta da installare. |
 | `supabase/functions/_shared/push.ts` | Codice condiviso delle notifiche. |
 | `.github/workflows/deploy-functions.yml` | Pubblica automaticamente le funzioni su Supabase. |
 
@@ -39,12 +42,13 @@ Questo pacchetto contiene **tutto il codice** di Home Poker. Chi lo riceve, pers
    - `VAPID_SUBJECT`: per esempio `mailto:tuaemail@esempio.com`.
 
    `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` le mette Supabase da solo.
-4. **Funzioni.** Pubblica le quattro funzioni con la Supabase CLI:
+4. **Funzioni.** Pubblica le cinque funzioni con la Supabase CLI:
    ```
    supabase functions deploy hpl-holdem
    supabase functions deploy hpl-push
    supabase functions deploy hpl-news
    supabase functions deploy hpl-chat-reply --no-verify-jwt
+   supabase functions deploy hpl-widget --no-verify-jwt
    ```
    In alternativa puoi usare il workflow GitHub incluso. In quel caso serve il secret del repository `SUPABASE_ACCESS_TOKEN`, e nel file del workflow va sostituito `nqlywzjhxykrfyrpkjdw` con l'ID del nuovo progetto.
 5. **Collegare l'app al nuovo progetto.** In `index.html` sostituisci:

@@ -6160,6 +6160,7 @@ vLobby=function(){
    scaricare). Si accende e si spegne dalle impostazioni del tavolo.
    ===================================================================== */
 Object.assign(IP,{music:'M9 18V5l12-2v13M9 18a3 3 0 11-6 0 3 3 0 016 0zM21 16a3 3 0 11-6 0 3 3 0 016 0z'});
+Object.assign(IP,{grid:'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z'});
 S.vt.music=LS.get('vtmusic',true);
 const MUS=(()=>{
   let A=null,bus=null,mg=null,timer=null,step=0,next=0,duck=0;
@@ -9291,7 +9292,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1794068593152';
+const APP_VERSION='1795814034258';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
@@ -9316,6 +9317,21 @@ setInterval(checkUpdate,15*60*1000);
 /* =====================================================================
    PROFILO E ACCOUNT: le voci raccolte in sezioni (profilo, tavolo, app, account)
    ===================================================================== */
+/* Widget Android: l'app "Home Poker" per Android apre questo stesso sito con Chrome (stesso account)
+   e ha un widget per la schermata Home. Il widget si collega all'account con un gettone personale. */
+const isAndroid=()=>/Android/i.test(navigator.userAgent);
+const inAndroidApp=()=>{try{if(/^android-app:\/\/it\.homepoker\.app/.test(document.referrer||''))sessionStorage.setItem('hp_twa','1');return sessionStorage.getItem('hp_twa')==='1'}catch(e){return false}};
+async function widgetLink(quiet){
+  if(!S.acct)return;
+  try{const t=await BASE.rpc('hpl_widget_token');if(!/^[0-9a-f]{48}$/.test(t||''))throw 0;
+    try{sessionStorage.setItem('hp_wlink',S.acct.id)}catch(e){}
+    location.href='intent://widget?t='+t+(quiet?'&quiet=1':'')+'#Intent;scheme=homepoker;package=it.homepoker.app;end';
+  }catch(e){if(!quiet)toast('Non riesco a collegare il widget: riprova tra poco','err')}}
+// dentro l'app Android il widget si collega da solo, al primo tocco (Chrome apre l'app solo dopo un tocco)
+document.addEventListener('pointerup',()=>{try{if(!inAndroidApp()||!S.acct||S.locked||sessionStorage.getItem('hp_wlink')===S.acct.id)return}catch(e){return}widgetLink(true)},true);
+H.widgetlink=()=>widgetLink(false);
+H.widgetget=()=>{const a=document.createElement('a');a.href='home-poker.apk';a.download='Home-Poker.apk';document.body.appendChild(a);a.click();a.remove();
+  toast('Download avviato: aprilo e scegli Installa')};
 const _sheetProf=sheetHtml;
 sheetHtml=function(){
   const s=SH;
@@ -9329,6 +9345,7 @@ sheetHtml=function(){
     S.pushOn?li('bell','Prova le notifiche','pushtest',{sub:'Manda una notifica a questo telefono'}):'',
     li('music','Musica di sottofondo','vtmusic',{sw:S.vt.music!==false,sub:'Jazz leggero in tutta l\'app'}),
     S.bioOk?li('face','Accesso con Face ID',acctBio()?'biooff':'bioask',{sw:!!acctBio(),sub:'Entri e confermi i pagamenti senza PIN'}):'',
+    isAndroid()?(inAndroidApp()?li('grid','Widget sulla schermata Home','widgetlink',{sub:'Già collegato al tuo account. Per aggiungerlo: tieni premuto sulla Home → Widget → Home Poker'}):li('grid','App Android con widget','widgetget',{sub:'Stessa app, stesso account, più il widget con serata, saldo e chat'})):'',
     li('play','Guarda il tutorial','tutorial',{sub:'Come funziona l\'app, in 2 minuti e mezzo'})];
   const acct=[li('user','Cambia nome utente','rename'),li('key','Cambia PIN','chpin')];
   let title,body;

@@ -1,0 +1,2 @@
+-keep class com.google.androidbrowserhelper.** { *; }
+-keep class it.homepoker.app.** { *; }
