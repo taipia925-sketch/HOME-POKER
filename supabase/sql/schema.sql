@@ -753,3 +753,42 @@ alter publication supabase_realtime add table public.hpl_vt;
 insert into storage.buckets (id,name,public,file_size_limit,allowed_mime_types) values ('hpl-chat','hpl-chat',false,6291456,'{image/jpeg,image/png,image/webp,image/gif,audio/webm,audio/mp4,audio/aac,audio/mpeg,audio/ogg,audio/x-m4a}'::text[]);
 create policy "hpl_chat_img_ins" on storage.objects as PERMISSIVE for INSERT to authenticated with check (((bucket_id = 'hpl-chat'::text) AND hpl_is_member(split_part(name, '/'::text, 1))));
 create policy "hpl_chat_img_sel" on storage.objects as PERMISSIVE for SELECT to authenticated using (((bucket_id = 'hpl-chat'::text) AND hpl_is_member(split_part(name, '/'::text, 1))));
+
+-- ============================================================
+-- Widget Android: gettone personale per leggere il riassunto (funzione hpl-widget)
+-- ============================================================
+create table if not exists public.hpl_widget_tokens (
+  token text primary key,
+  account_id uuid not null references public.hpl_accounts(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  used_at timestamptz
+);
+create index if not exists hpl_widget_tokens_acct on public.hpl_widget_tokens(account_id);
+alter table public.hpl_widget_tokens enable row level security;
+revoke all on public.hpl_widget_tokens from anon, authenticated;
+
+create or replace function public.hpl_widget_token() returns text
+language plpgsql security definer set search_path = public, extensions as $$
+declare a uuid := hpl_acc(); t text;
+begin
+  if a is null then raise exception 'not_signed_in'; end if;
+  select token into t from hpl_widget_tokens where account_id = a order by created_at desc limit 1;
+  if t is null then
+    t := encode(gen_random_bytes(24), 'hex');
+    insert into hpl_widget_tokens (token, account_id) values (t, a);
+  end if;
+  return t;
+end $$;
+
+create or replace function public.hpl_widget_revoke() returns void
+language sql security definer set search_path = public as $$ delete from hpl_widget_tokens where account_id = hpl_acc() $$;
+
+revoke all on function public.hpl_widget_token() from public, anon;
+revoke all on function public.hpl_widget_revoke() from public, anon;
+grant execute on function public.hpl_widget_token() to authenticated;
+grant execute on function public.hpl_widget_revoke() to authenticated;
+
+-- Chiave di firma dell'app Android (solo il server la legge; mai nel repository)
+create table if not exists public.hpl_build_secrets (name text primary key, value text not null, updated_at timestamptz not null default now());
+alter table public.hpl_build_secrets enable row level security;
+revoke all on public.hpl_build_secrets from anon, authenticated;

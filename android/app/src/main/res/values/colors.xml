@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="felt_dark">#050807</color>
+    <color name="felt">#0E3B26</color>
+    <color name="felt_light">#15573A</color>
+    <color name="gold">#E3C16F</color>
+    <color name="gold_dim">#B39552</color>
+    <color name="cream">#F4EBD3</color>
+    <color name="muted">#A8B8AE</color>
+    <color name="win">#5FD38D</color>
+    <color name="lose">#FF6B6B</color>
+    <color name="red_live">#E5484D</color>
+</resources>

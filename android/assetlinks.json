@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "it.homepoker.app",
+    "sha256_cert_fingerprints": ["FE:10:0D:4B:FD:A1:0D:E8:DE:8A:E8:B0:C8:67:12:61:6C:14:DA:FA:E2:FA:93:B5:C8:29:28:1A:79:CE:97:80"]
+  }
+}]

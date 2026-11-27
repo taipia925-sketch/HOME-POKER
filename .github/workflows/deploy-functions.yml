@@ -25,3 +25,5 @@ jobs:
           supabase functions deploy --project-ref nqlywzjhxykrfyrpkjdw --use-api
           # la risposta dalla notifica arriva senza accesso: chi risponde lo dice il gettone firmato
           supabase functions deploy hpl-chat-reply --project-ref nqlywzjhxykrfyrpkjdw --use-api --no-verify-jwt
+          # il widget Android non ha accesso: si riconosce con il suo gettone personale
+          supabase functions deploy hpl-widget --project-ref nqlywzjhxykrfyrpkjdw --use-api --no-verify-jwt
