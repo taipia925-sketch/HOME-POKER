@@ -8,7 +8,9 @@ import java.util.concurrent.TimeUnit
 class RefreshWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
     override suspend fun doWork(): Result {
         val c = applicationContext
+        val before = Store.data(c)
         val r = Store.fetch(c)
+        if (r == Store.Result.Ok) Store.data(c)?.let { runCatching { Notifier.check(c, before, it) } }
         Store.setLoading(c, false)
         PokerWidget.renderAll(c)
         return if (r == Store.Result.Offline && runAttemptCount < 3) Result.retry() else Result.success()
@@ -19,7 +21,7 @@ object Refresh {
     private val net = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
     fun schedule(c: Context) {
-        val req = PeriodicWorkRequestBuilder<RefreshWorker>(30, TimeUnit.MINUTES)
+        val req = PeriodicWorkRequestBuilder<RefreshWorker>(15, TimeUnit.MINUTES)
             .setConstraints(net)
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
             .build()

@@ -112,14 +112,24 @@ Deno.serve(async (req) => {
 
     // messaggi non letti nella chat del tavolo principale
     let chat = 0;
+    let msgs: { id: number; who: string; text: string }[] = [];
     const { data: rd } = await db.from("hpl_chat_read").select("last_id").eq("table_id", main.table_id).eq("acct", acct).maybeSingle();
     if (rd) {
       const { count: cc } = await db.from("hpl_chat").select("id", { count: "exact", head: true })
         .eq("table_id", main.table_id).eq("deleted", false).neq("author_acct", acct).gt("id", rd.last_id ?? 0);
       chat = Math.min(cc ?? 0, 99);
     }
+    // gli ultimi messaggi degli altri (per le notifiche del programma Android)
+    const { data: ms } = await db.from("hpl_chat").select("id, author_name, kind, body")
+      .eq("table_id", main.table_id).eq("deleted", false).neq("author_acct", acct).gt("id", rd?.last_id ?? 0)
+      .order("id", { ascending: false }).limit(5);
+    const label: Record<string, string> = { photo: "📷 Foto", audio: "🎤 Messaggio vocale", poll: "📊 Sondaggio", sticker: "Adesivo", dice: "🎲 Dadi", card: "🃏 Carta", coin: "🪙 Moneta", event: "📅 Serata", result: "🏆 Risultati" };
+    msgs = (ms ?? []).reverse().map((m: any) => ({
+      id: m.id, who: m.author_name ?? "",
+      text: m.kind === "text" ? String(m.body?.t ?? m.body?.text ?? "").slice(0, 160) : (label[m.kind] ?? "Nuovo messaggio"),
+    }));
 
-    return json({ ok: true, name: acc?.name ?? "", table: { id: main.table_id, name: tname(main.table_id) }, live, next, owed, owe, chat, at: new Date().toISOString() });
+    return json({ ok: true, name: acc?.name ?? "", table: { id: main.table_id, name: tname(main.table_id) }, live, next, owed, owe, chat, msgs, at: new Date().toISOString() });
   } catch (e) {
     console.error("hpl-widget", e);
     return json({ error: "server" }, 500);

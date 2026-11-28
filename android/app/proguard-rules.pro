@@ -1,2 +1,2 @@
--keep class com.google.androidbrowserhelper.** { *; }
 -keep class it.homepoker.app.** { *; }
+-keepclassmembers class * { @android.webkit.JavascriptInterface <methods>; }

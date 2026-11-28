@@ -13,12 +13,11 @@ android {
 
     defaultConfig {
         applicationId = "it.homepoker.app"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = (System.getenv("HP_VERSION_CODE") ?: "1").toInt()
         versionName = System.getenv("HP_VERSION_NAME") ?: "1.0"
         manifestPlaceholders["hostName"] = "taipia925-sketch.github.io"
-        manifestPlaceholders["defaultUrl"] = webUrl
         buildConfigField("String", "WEB_URL", "\"$webUrl\"")
         buildConfigField("String", "WIDGET_API", "\"https://nqlywzjhxykrfyrpkjdw.supabase.co/functions/v1/hpl-widget\"")
     }
@@ -49,6 +48,6 @@ android {
 }
 
 dependencies {
-    implementation("com.google.androidbrowserhelper:androidbrowserhelper:2.5.0")
+    implementation("androidx.webkit:webkit:1.12.1")
     implementation("androidx.work:work-runtime-ktx:2.9.1")
 }
