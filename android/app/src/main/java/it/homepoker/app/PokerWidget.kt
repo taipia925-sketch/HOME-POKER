@@ -139,25 +139,19 @@ class PokerWidget : AppWidgetProvider() {
             var label = ""; var big = ""; var sub = ""; var live = false
             var owed = 0L; var owe = 0L; var chat = 0; var money = false
             var updated = ""; var openUrl = BuildConfig.WEB_URL; var chatUrl: String? = null
-            var balance = ""; var balanceColor = 0; var tableName = ""
+            var balance = ""; var balanceColor = 0xE6FFFFFF.toInt(); var tableName = ""
 
             init {
                 val d = Store.data(c)
                 when {
-                    Store.token(c) == null -> {
-                        label = "COLLEGA IL WIDGET"; big = "Apri Home Poker"
-                        sub = "si collega da solo al tuo account"
-                    }
-                    d == null -> {
-                        label = "HOME POKER"; big = "Carico…"; sub = if (Store.failed(c)) "nessuna connessione" else "un attimo"
-                    }
+                    Store.token(c) == null -> { label = "HOME POKER"; big = "COLLEGA IL WIDGET"; sub = "Apri l'app: si collega da solo" }
+                    d == null -> { label = "HOME POKER"; big = "UN ATTIMO…"; sub = if (Store.failed(c)) "Nessuna connessione" else "Carico i dati del tavolo" }
                     else -> fill(c, d)
                 }
-                balanceColor = c.getColor(R.color.muted)
-                if (money) {
-                    if (owe > 0) { balance = "Devi ${euroShort(owe)}"; balanceColor = 0xFFFF7A7F.toInt() }
-                    else if (owed > 0) { balance = "Ti devono ${euroShort(owed)}"; balanceColor = 0xFF6FE3A0.toInt() }
-                    else { balance = "Conti in pari"; balanceColor = c.getColor(R.color.muted) }
+                if (money) balance = when {
+                    owe > 0 -> "Devi ${eurS(owe)}"
+                    owed > 0 -> "Ti devono ${eurS(owed)}"
+                    else -> "Conti in pari"
                 }
             }
 
@@ -167,23 +161,22 @@ class PokerWidget : AppWidgetProvider() {
                 val main = d.optJSONObject("table")
                 val mainName = main?.optString("name").orEmpty()
                 val mainId = main?.optString("id").orEmpty()
+                tableName = mainName
                 val lv = d.optJSONObject("live")
                 val nx = d.optJSONObject("next")
                 when {
-                    main == null -> { label = "NESSUN TAVOLO"; big = "Entra in un tavolo"; sub = "dall'app Home Poker"; money = false }
+                    main == null -> { label = "HOME POKER"; big = "ENTRA IN UN TAVOLO"; sub = "Dall'app Home Poker"; money = false }
                     lv != null -> {
                         live = true
-                        val other = lv.optString("table").takeIf { it.isNotEmpty() && it != mainName }
-                        label = "SERATA IN CORSO" + (other?.let { " · $it" } ?: "")
-                        big = euroShort(lv.optLong("pot"))
+                        label = "IN CORSO · " + lv.optString("table").ifEmpty { mainName }.uppercase(IT)
+                        big = eur(lv.optLong("pot"))
                         val n = lv.optInt("players")
-                        sub = "montepremi · $n ${if (n == 1) "giocatore" else "giocatori"} · ${lv.optString("kind", "cash")}"
-                        openUrl = deep("detail", lv.optString("tid"), lv.optString("id"))
+                        sub = "Montepremi · $n al tavolo"
+                        openUrl = deep("live", lv.optString("tid"), lv.optString("id"))
                     }
                     nx != null -> {
-                        val other = nx.optString("table").takeIf { it.isNotEmpty() && it != mainName }
-                        label = "PROSSIMA SERATA" + (other?.let { " · $it" } ?: "")
-                        big = whenText(nx.optString("at"))
+                        label = "PROSSIMA SERATA · " + nx.optString("table").ifEmpty { mainName }.uppercase(IT)
+                        big = whenText(nx.optString("at")).uppercase(IT)
                         val seats = if (nx.isNull("seats")) 0 else nx.optInt("seats")
                         val b = nx.optInt("booked")
                         val parts = mutableListOf(if (seats > 0) "$b/$seats posti presi" else "$b ${if (b == 1) "prenotato" else "prenotati"}")
@@ -191,64 +184,68 @@ class PokerWidget : AppWidgetProvider() {
                         sub = parts.joinToString(" · ")
                         openUrl = deep("book", nx.optString("tid"), nx.optString("id"))
                     }
-                    else -> { label = "NESSUNA SERATA"; big = mainName.ifEmpty { "Tutto tranquillo" }; sub = "nessuna serata in programma" }
+                    else -> { label = mainName.uppercase(IT).ifEmpty { "HOME POKER" }; big = "NESSUNA SERATA"; sub = "Nessuna serata in programma" }
                 }
                 if (mainId.isNotEmpty()) chatUrl = deep("chat", mainId, "0")
-                val at = Store.dataAt(c)
-                val hhmm = SimpleDateFormat("HH:mm", IT).format(Date(at))
+                val hhmm = SimpleDateFormat("HH:mm", IT).format(Date(Store.dataAt(c)))
                 updated = when {
-                    Store.loading(c) -> "aggiorno…"
-                    Store.failed(c) -> "offline · dati delle $hhmm"
-                    else -> "aggiornato alle $hhmm"
+                    Store.loading(c) -> "Aggiorno…"
+                    Store.failed(c) -> "Offline · dati delle $hhmm"
+                    else -> "Aggiornato alle $hhmm"
                 }
-                tableName = mainName
             }
         }
 
         private fun build(c: Context, layout: Int, v: Model): RemoteViews {
             val r = RemoteViews(c.packageName, layout)
             val isLarge = layout == R.layout.widget_large
-            r.setTextViewText(R.id.label, if (isLarge) v.label else (if (v.live) "LIVE" + (v.tableName.takeIf { it.isNotEmpty() }?.let { " · " + it.uppercase(IT) } ?: "") else v.label.substringBefore(" · ")))
+            val vis = { b: Boolean -> if (b) android.view.View.VISIBLE else android.view.View.GONE }
+            r.setTextViewText(R.id.label, v.label)
             r.setTextViewText(R.id.big, v.big)
-            r.setViewVisibility(R.id.dot, if (v.live) android.view.View.VISIBLE else android.view.View.GONE)
-            r.setViewVisibility(R.id.chat, if (v.chat > 0) android.view.View.VISIBLE else android.view.View.GONE)
-            r.setTextViewText(R.id.chat, "${v.chat}")
+            r.setViewVisibility(R.id.chat, vis(v.chat > 0))
+            r.setTextViewText(R.id.chat, if (layout == R.layout.widget_small) "${v.chat}" else "${v.chat} ${if (v.chat == 1) "nuovo" else "nuovi"}")
             r.setOnClickPendingIntent(R.id.root, open(c, v.openUrl, 1))
             v.chatUrl?.let { r.setOnClickPendingIntent(R.id.chat, open(c, it, 2)) }
             if (isLarge) {
-                r.setTextViewText(R.id.table, "♠\uFE0E " + (v.tableName.ifEmpty { "Home Poker" }).uppercase(IT))
                 r.setTextViewText(R.id.sub, v.sub)
-                r.setViewVisibility(R.id.money, if (v.money) android.view.View.VISIBLE else android.view.View.GONE)
-                r.setTextViewText(R.id.owed, euroShort(v.owed))
-                r.setTextColor(R.id.owed, if (v.owed > 0) 0xFF6FE3A0.toInt() else 0xFFF8EBC4.toInt())
-                r.setTextViewText(R.id.owe, euroShort(v.owe))
-                r.setTextColor(R.id.owe, if (v.owe > 0) 0xFFFF7A7F.toInt() else 0xFFF8EBC4.toInt())
-                r.setTextViewText(R.id.updated, v.updated.removePrefix("aggiornato alle "))
-                r.setViewVisibility(R.id.refresh, if (v.updated.isEmpty()) android.view.View.GONE else android.view.View.VISIBLE)
+                r.setViewVisibility(R.id.money, vis(v.money))
+                r.setTextViewText(R.id.owed, eurS(v.owed))
+                r.setTextColor(R.id.owed, if (v.owed > 0) GREEN else IVORY)
+                r.setTextViewText(R.id.owe, eurS(v.owe))
+                r.setTextColor(R.id.owe, if (v.owe > 0) RED else IVORY)
+                r.setTextViewText(R.id.updated, v.updated)
+                r.setViewVisibility(R.id.refresh, vis(v.updated.isNotEmpty()))
                 r.setOnClickPendingIntent(R.id.refresh, refresh(c))
                 r.setOnClickPendingIntent(R.id.money, open(c, BuildConfig.WEB_URL, 3))
             } else {
-                if (v.money) {
-                    r.setTextViewText(R.id.sub, v.balance); r.setTextColor(R.id.sub, v.balanceColor)
-                } else {
-                    r.setTextViewText(R.id.sub, v.sub); r.setTextColor(R.id.sub, c.getColor(R.color.muted))
-                }
+                r.setViewVisibility(R.id.dot, vis(v.live))
+                r.setTextViewText(R.id.sub, if (v.money) v.balance else v.sub)
             }
             return r
         }
+
+        private val GREEN = 0xFF46DA80.toInt()
+        private val RED = 0xFFFF5C50.toInt()
+        private val IVORY = 0xFFF7F3EA.toInt()
 
         private fun buildLive(c: Context, v: Model, id: Int): RemoteViews {
             val r = RemoteViews(c.packageName, R.layout.widget_live)
             val lv = Store.data(c)?.optJSONObject("live")
             val host = lv?.optBoolean("host") == true
-            r.setTextViewText(R.id.label, "♠\uFE0E " + (lv?.optString("table")?.takeIf { it.isNotEmpty() } ?: "Serata in corso").uppercase(IT))
             val n = lv?.optInt("players") ?: 0
-            r.setTextViewText(R.id.sub, "$n ${if (n == 1) "giocatore" else "giocatori"} · ${lv?.optString("kind", "cash")}")
-            r.setTextViewText(R.id.big, euroShort(lv?.optLong("pot") ?: 0L))
+            r.setTextViewText(R.id.kicker, (lv?.optString("table")?.ifEmpty { null } ?: v.tableName).uppercase(IT) + " · $n AL TAVOLO")
+            r.setTextViewText(R.id.label, if (lv?.optString("kind") == "torneo") "TORNEO LIVE" else "CASSA LIVE")
+            r.setTextViewText(R.id.big, eur(lv?.optLong("pot") ?: 0L))
+            var tot = 0L; var pend = 0L
+            lv?.optJSONArray("list")?.let { a -> for (k in 0 until a.length()) a.optJSONObject(k)?.let { tot += it.optLong("in"); pend += it.optLong("pend") } }
+            r.setTextViewText(R.id.paid, "Incassato ${eurS(tot - pend)}")
+            r.setTextViewText(R.id.pend, "Da pagare ${eurS(pend)}")
+            r.setProgressBar(R.id.bar, 100, if (tot > 0) ((tot - pend) * 100 / tot).toInt() else 100, false)
             r.setViewVisibility(R.id.chat, if (v.chat > 0) android.view.View.VISIBLE else android.view.View.GONE)
-            r.setTextViewText(R.id.chat, "${v.chat}")
+            r.setTextViewText(R.id.chat, "${v.chat} ${if (v.chat == 1) "nuovo" else "nuovi"}")
             v.chatUrl?.let { r.setOnClickPendingIntent(R.id.chat, open(c, it, 2)) }
             r.setOnClickPendingIntent(R.id.head, open(c, v.openUrl, 1))
+            r.setOnClickPendingIntent(R.id.potBox, open(c, v.openUrl, 4))
 
             val svc = Intent(c, LiveListService::class.java).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
             svc.data = Uri.parse(svc.toUri(Intent.URI_INTENT_SCHEME))
@@ -271,13 +268,19 @@ class PokerWidget : AppWidgetProvider() {
                 else -> v.updated to R.color.gold_dim
             }
             r.setTextViewText(R.id.status, txt)
-            r.setTextColor(R.id.status, when (col) { R.color.win -> 0xFF6FE3A0.toInt(); R.color.lose -> 0xFFFF7A7F.toInt(); R.color.muted -> 0xFF9FBFAE.toInt(); else -> 0xFFC9A859.toInt() })
+            r.setTextColor(R.id.status, when (col) { R.color.win -> GREEN; R.color.lose -> RED; R.color.gold -> 0xFFFFD27A.toInt(); else -> 0xFF7C8A82.toInt() })
             r.setViewVisibility(R.id.undo, if (undo) android.view.View.VISIBLE else android.view.View.GONE)
             r.setOnClickPendingIntent(R.id.undo, PendingIntent.getBroadcast(c, 21, Intent(c, PokerWidget::class.java).setAction(ACTION_UNDO),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
             r.setOnClickPendingIntent(R.id.refresh, refresh(c))
             return r
         }
+
+        private val NF = NumberFormat.getNumberInstance(IT).apply { minimumFractionDigits = 2; maximumFractionDigits = 2 }
+        /** come nell'app: 140,00 € */
+        fun eur(cents: Long): String = NF.format(cents / 100.0) + "\u00A0€"
+        /** come nell'app: 80 € (i decimali solo se servono) */
+        fun eurS(cents: Long): String = (if (cents % 100 == 0L) NumberFormat.getIntegerInstance(IT).format(cents / 100) else NF.format(cents / 100.0)) + "\u00A0€"
 
         fun euroShort(cents: Long): String =
             if (cents % 100 == 0L) "€ ${cents / 100}" else euro(cents)

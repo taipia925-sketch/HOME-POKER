@@ -63,7 +63,7 @@ object Notifier {
         if (lv != null && lv.optString("id") != olv?.optString("id")) {
             val n = lv.optInt("players")
             show(c, ID_LIVE, "Serata iniziata · ${lv.optString("table")}", "Montepremi ${PokerWidget.euro(lv.optLong("pot"))} · $n ${if (n == 1) "giocatore" else "giocatori"}",
-                deep("detail", lv.optString("tid"), lv.optString("id")))
+                deep("live", lv.optString("tid"), lv.optString("id")))
         }
         val nx = now.optJSONObject("next"); val onx = old.optJSONObject("next")
         if (nx != null && nx.optString("id") != onx?.optString("id")) {
