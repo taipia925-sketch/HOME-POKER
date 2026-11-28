@@ -9292,7 +9292,7 @@ afterData=async function(){const r=await _afterDataDeep.apply(this,arguments);
   return r};
 
 /* ===== Aggiornamento automatico (anche per l'app installata sul telefono) ===== */
-const APP_VERSION='1795853231563';
+const APP_VERSION='1795858064088';
 let updShown=false;
 async function checkUpdate(){
   if(updShown||!/^https?:/.test(location.protocol))return;
@@ -9332,11 +9332,18 @@ async function widgetLink(quiet){
 // dentro l'app Android il widget si collega da solo, al primo tocco (Chrome apre l'app solo dopo un tocco)
 // nel programma Android il collegamento passa direttamente, appena sei entrato
 setInterval(()=>{try{if(!window.HPAndroid||!S.acct||S.locked||sessionStorage.getItem('hp_wlink')===S.acct.id)return;sessionStorage.setItem('hp_wlink',S.acct.id)}catch(e){return}widgetLink(true)},3000);
+// dentro il programma Android: se ne esiste una versione più nuova, lo dice una volta
+setTimeout(()=>{try{if(appOld()&&!sessionStorage.getItem('hp_upd')){sessionStorage.setItem('hp_upd','1');toast('C\'è una nuova versione dell\'app Android: tocca il tuo nome in alto → Aggiorna')}}catch(e){}},6000);
 H.appnotif=()=>{try{window.HPAndroid.notifSettings()}catch(e){}};
 document.addEventListener('pointerup',()=>{try{if(!inAndroidApp()||!S.acct||S.locked||sessionStorage.getItem('hp_wlink')===S.acct.id)return}catch(e){return}widgetLink(true)},true);
 H.widgetlink=()=>widgetLink(false);
 // il file si scarica con Chrome vero (dall'app installata si aprirebbe una finestrella che non installa)
-const APK_URL='https://taipia925-sketch.github.io/HOME-POKER/home-poker.apk';
+const APK_VER='1.6';
+// il numero nell'indirizzo evita che il telefono riscarichi una copia vecchia dalla memoria
+const APK_URL='https://taipia925-sketch.github.io/HOME-POKER/home-poker.apk?v='+APK_VER;
+const appVer=()=>{try{return window.HPAndroid&&window.HPAndroid.version?String(window.HPAndroid.version()):''}catch(e){return ''}};
+const verLess=(a,b)=>{const x=a.split('.').map(Number),y=b.split('.').map(Number);for(let i=0;i<Math.max(x.length,y.length);i++){if((x[i]||0)!==(y[i]||0))return (x[i]||0)<(y[i]||0)}return false};
+const appOld=()=>{const v=appVer();return !!v&&verLess(v,APK_VER)};
 H.widgetget=()=>{SH={type:'apk',anim:true};render()};
 const _sheetProf=sheetHtml;
 sheetHtml=function(){
@@ -9365,7 +9372,7 @@ ${st(5,'Tieni premuto sulla schermata Home → <b>Widget</b> → <b>Home Poker</
     !inNativeApp()&&S.pushOn?li('bell','Prova le notifiche','pushtest',{sub:'Manda una notifica a questo telefono'}):'',
     li('music','Musica di sottofondo','vtmusic',{sw:S.vt.music!==false,sub:'Jazz leggero in tutta l\'app'}),
     S.bioOk?li('face','Accesso con Face ID',acctBio()?'biooff':'bioask',{sw:!!acctBio(),sub:'Entri e confermi i pagamenti senza PIN'}):'',
-    isAndroid()?(inAndroidApp()?li('grid','Widget sulla schermata Home','widgetlink',{sub:'Già collegato al tuo account. Per aggiungerlo: tieni premuto sulla Home → Widget → Home Poker (meglio 4×3)'}):li('grid','App Android con widget','widgetget',{sub:'Stessa app, stesso account, più il widget: serata aperta, re-buy, saldo e chat'})):'',
+    appOld()?li('grid','<b class="gold">Aggiorna l\'app Android</b>','widgetget',{sub:'C\'è la versione '+APK_VER+' (hai la '+esc(appVer())+'): tocca per scaricarla'}):isAndroid()?(inAndroidApp()?li('grid','Widget sulla schermata Home','widgetlink',{sub:'Già collegato al tuo account. Per aggiungerlo: tieni premuto sulla Home → Widget → Home Poker'+(appVer()?' · app '+esc(appVer()):'')+''}):li('grid','App Android con widget','widgetget',{sub:'Stessa app, stesso account, più il widget: serata aperta, re-buy, saldo e chat'})):'',
     li('play','Guarda il tutorial','tutorial',{sub:'Come funziona l\'app, in 2 minuti e mezzo'})];
   const acct=[li('user','Cambia nome utente','rename'),li('key','Cambia PIN','chpin')];
   let title,body;
