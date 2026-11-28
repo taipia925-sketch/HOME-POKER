@@ -40,6 +40,9 @@ object Store {
         prefs(c).edit().putString("note", t).putLong("noteAt", System.currentTimeMillis()).putBoolean("noteErr", err).apply()
     fun saveData(c: Context, o: JSONObject) = prefs(c).edit().putString("data", o.toString()).apply()
     const val ARM_MS = 6000L
+    /** il widget mostra il tavolo aperto (true) o il saldo (false) */
+    fun tableMode(c: Context, id: Int) = prefs(c).getBoolean("table_$id", false)
+    fun setTableMode(c: Context, id: Int, on: Boolean) = prefs(c).edit().putBoolean("table_$id", on).apply()
 
     /** Manda una modifica (re-buy, annulla). null = nessuna connessione. */
     fun act(c: Context, body: JSONObject): JSONObject? {

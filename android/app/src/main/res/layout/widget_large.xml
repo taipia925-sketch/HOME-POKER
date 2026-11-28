@@ -5,14 +5,13 @@
     android:layout_height="match_parent"
     android:background="@drawable/w2_root"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="8dp">
 
+    <!-- striscia rossa: prossima serata, oppure la serata in corso da aprire -->
     <FrameLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:minHeight="74dp">
+        android:layout_height="52dp">
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -20,9 +19,9 @@
             android:src="@drawable/w2_hero" />
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="52dp"
+            android:layout_height="34dp"
             android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="14dp"
+            android:layout_marginEnd="12dp"
             android:adjustViewBounds="true"
             android:src="@drawable/w2_chips" />
         <LinearLayout
@@ -30,91 +29,93 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="96dp">
-            <TextView
-                android:id="@+id/label"
+            android:paddingStart="14dp"
+            android:paddingEnd="70dp">
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="PROSSIMA SERATA · BURCIONE"
-                android:textColor="#E0FFFFFF"
-                android:textSize="10sp"
-                android:letterSpacing="0.14"
-                android:fontFamily="@font/is_bold" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:id="@+id/dot"
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:layout_marginEnd="5dp"
+                    android:src="@drawable/w2_dot" />
+                <TextView
+                    android:id="@+id/label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="PROSSIMA SERATA · BURCIONE"
+                    android:textColor="#E0FFFFFF"
+                    android:textSize="9sp"
+                    android:letterSpacing="0.14"
+                    android:fontFamily="@font/is_bold" />
+            </LinearLayout>
             <TextView
                 android:id="@+id/big"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="SAB 5 DIC · 21:00"
+                android:text="SAB 5 DIC · 20:00"
                 android:textColor="#FFFFFF"
-                android:textSize="22sp"
+                android:textSize="17sp"
                 android:fontFamily="@font/is_bold_italic"
                 android:includeFontPadding="false"
                 android:shadowColor="#66000000"
                 android:shadowDy="2"
-                android:shadowRadius="6" />
-            <TextView
-                android:id="@+id/sub"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="5/8 posti presi · Casa di Marco"
-                android:textColor="#E6FFFFFF"
-                android:textSize="12sp"
-                android:fontFamily="@font/is_semibold" />
+                android:shadowRadius="5" />
         </LinearLayout>
     </FrameLayout>
 
+    <!-- il saldo: la cosa più importante -->
     <LinearLayout
         android:id="@+id/money"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="6dp"
         android:orientation="horizontal">
         <LinearLayout
             android:id="@+id/owedBox"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="3dp"
             android:background="@drawable/w2_tile"
             android:gravity="center"
-            android:orientation="vertical"
-            android:paddingTop="7dp"
-            android:paddingBottom="8dp">
+            android:orientation="vertical">
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Ti devono" android:textColor="#A4B0A8" android:textSize="12sp" android:fontFamily="@font/is_semibold" />
             <TextView android:id="@+id/owed" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:maxLines="1" android:text="65 €" android:textColor="#46DA80" android:textSize="21sp" android:fontFamily="@font/bricolage_heavy" />
+                android:maxLines="1" android:text="65 €" android:textColor="#46DA80" android:textSize="26sp"
+                android:letterSpacing="-0.02" android:fontFamily="@font/bricolage_heavy" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/oweBox"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="3dp"
             android:background="@drawable/w2_tile"
             android:gravity="center"
-            android:orientation="vertical"
-            android:paddingTop="7dp"
-            android:paddingBottom="8dp">
+            android:orientation="vertical">
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Devi" android:textColor="#A4B0A8" android:textSize="12sp" android:fontFamily="@font/is_semibold" />
             <TextView android:id="@+id/owe" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:maxLines="1" android:text="23,50 €" android:textColor="#FF5C50" android:textSize="21sp" android:fontFamily="@font/bricolage_heavy" />
+                android:maxLines="1" android:text="23,50 €" android:textColor="#FF5C50" android:textSize="26sp"
+                android:letterSpacing="-0.02" android:fontFamily="@font/bricolage_heavy" />
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/refresh"
         android:layout_width="match_parent"
-        android:layout_height="24dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="2dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="6dp">
@@ -123,6 +124,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="Aggiornato alle 20:42"
             android:textColor="#7C8A82"
             android:textSize="11sp"
@@ -130,7 +133,7 @@
         <TextView
             android:id="@+id/chat"
             android:layout_width="wrap_content"
-            android:layout_height="24dp"
+            android:layout_height="22dp"
             android:layout_marginStart="6dp"
             android:background="@drawable/w2_due"
             android:drawableStart="@drawable/w2_chat"
@@ -138,13 +141,14 @@
             android:gravity="center_vertical"
             android:paddingStart="9dp"
             android:paddingEnd="10dp"
-            android:text="2 nuovi"
+            android:text="3 nuovi"
             android:textColor="#FFFFFF"
             android:textSize="11sp"
             android:fontFamily="@font/is_bold" />
         <ImageView
             android:layout_width="16dp"
             android:layout_height="16dp"
+            android:layout_marginStart="6dp"
             android:layout_marginEnd="4dp"
             android:src="@drawable/w2_refresh" />
     </LinearLayout>

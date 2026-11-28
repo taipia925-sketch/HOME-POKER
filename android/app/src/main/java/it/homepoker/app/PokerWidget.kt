@@ -35,6 +35,11 @@ class PokerWidget : AppWidgetProvider() {
             ACTION_REFRESH -> { if (Store.token(c) != null) Refresh.now(c); renderAll(c) }
             ACTION_REBUY -> rebuy(c, i.getStringExtra(EXTRA_PID) ?: return)
             ACTION_UNDO -> undo(c)
+            ACTION_MODE -> {
+                val id = i.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1)
+                if (id >= 0) { Store.setTableMode(c, id, i.getBooleanExtra(EXTRA_ON, false)); Store.arm(c, null); renderAll(c) }
+                if (Store.token(c) != null) Refresh.now(c)
+            }
             else -> super.onReceive(c, i)
         }
     }
@@ -110,6 +115,8 @@ class PokerWidget : AppWidgetProvider() {
         const val ACTION_REBUY = "it.homepoker.app.REBUY"
         const val ACTION_UNDO = "it.homepoker.app.UNDO"
         const val EXTRA_PID = "pid"
+        const val ACTION_MODE = "it.homepoker.app.MODE"
+        const val EXTRA_ON = "on"
         private val IT = Locale.ITALY
 
         fun renderAll(c: Context) {
@@ -121,8 +128,8 @@ class PokerWidget : AppWidgetProvider() {
 
         fun render(c: Context, m: AppWidgetManager, id: Int) {
             val v = Model(c)
-            val large = if (v.live) buildLive(c, v, id) else build(c, R.layout.widget_large, v)
-            val small = build(c, R.layout.widget_small, v)
+            val large = if (v.live && Store.tableMode(c, id)) buildLive(c, v, id) else build(c, R.layout.widget_large, v, id)
+            val small = build(c, R.layout.widget_small, v, id)
             val rv = if (Build.VERSION.SDK_INT >= 31) {
                 RemoteViews(mapOf(SizeF(100f, 40f) to small, SizeF(170f, 120f) to large))
             } else {
@@ -139,7 +146,7 @@ class PokerWidget : AppWidgetProvider() {
             var label = ""; var big = ""; var sub = ""; var live = false
             var owed = 0L; var owe = 0L; var chat = 0; var money = false
             var updated = ""; var openUrl = BuildConfig.WEB_URL; var chatUrl: String? = null
-            var balance = ""; var balanceColor = 0xE6FFFFFF.toInt(); var tableName = ""
+            var balance = ""; var balanceColor = 0xE6FFFFFF.toInt(); var tableName = ""; var smallBig: String? = null
 
             init {
                 val d = Store.data(c)
@@ -168,10 +175,11 @@ class PokerWidget : AppWidgetProvider() {
                     main == null -> { label = "HOME POKER"; big = "ENTRA IN UN TAVOLO"; sub = "Dall'app Home Poker"; money = false }
                     lv != null -> {
                         live = true
-                        label = "IN CORSO · " + lv.optString("table").ifEmpty { mainName }.uppercase(IT)
-                        big = eur(lv.optLong("pot"))
+                        label = "IN CORSO · " + lv.optString("table").ifEmpty { mainName }.uppercase(IT) + " · " + eur(lv.optLong("pot"))
+                        big = if (lv.optBoolean("host")) "APRI IL TAVOLO ›" else "VEDI IL TAVOLO ›"
                         val n = lv.optInt("players")
                         sub = "Montepremi · $n al tavolo"
+                        smallBig = eur(lv.optLong("pot"))
                         openUrl = deep("live", lv.optString("tid"), lv.optString("id"))
                     }
                     nx != null -> {
@@ -196,29 +204,34 @@ class PokerWidget : AppWidgetProvider() {
             }
         }
 
-        private fun build(c: Context, layout: Int, v: Model): RemoteViews {
+        private fun mode(c: Context, id: Int, on: Boolean): PendingIntent {
+            val i = Intent(c, PokerWidget::class.java).setAction(ACTION_MODE)
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id).putExtra(EXTRA_ON, on)
+            return PendingIntent.getBroadcast(c, 1000 + id * 2 + (if (on) 1 else 0), i, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        }
+
+        private fun build(c: Context, layout: Int, v: Model, id: Int): RemoteViews {
             val r = RemoteViews(c.packageName, layout)
             val isLarge = layout == R.layout.widget_large
             val vis = { b: Boolean -> if (b) android.view.View.VISIBLE else android.view.View.GONE }
-            r.setTextViewText(R.id.label, v.label)
-            r.setTextViewText(R.id.big, v.big)
+            r.setTextViewText(R.id.label, if (isLarge || !v.live) v.label else v.label.substringBeforeLast(" · "))
+            r.setTextViewText(R.id.big, if (isLarge) v.big else (v.smallBig ?: v.big))
+            r.setViewVisibility(R.id.dot, vis(v.live))
             r.setViewVisibility(R.id.chat, vis(v.chat > 0))
-            r.setTextViewText(R.id.chat, if (layout == R.layout.widget_small) "${v.chat}" else "${v.chat} ${if (v.chat == 1) "nuovo" else "nuovi"}")
+            r.setTextViewText(R.id.chat, if (isLarge) "${v.chat} ${if (v.chat == 1) "nuovo" else "nuovi"}" else "${v.chat}")
             r.setOnClickPendingIntent(R.id.root, open(c, v.openUrl, 1))
             v.chatUrl?.let { r.setOnClickPendingIntent(R.id.chat, open(c, it, 2)) }
             if (isLarge) {
-                r.setTextViewText(R.id.sub, v.sub)
-                r.setViewVisibility(R.id.money, vis(v.money))
-                r.setTextViewText(R.id.owed, eurS(v.owed))
+                // con la serata avviata, la striscia apre il tavolo dentro il widget
+                r.setOnClickPendingIntent(R.id.main, if (v.live) mode(c, id, true) else open(c, v.openUrl, 1))
+                r.setTextViewText(R.id.owed, if (v.money) eurS(v.owed) else "—")
                 r.setTextColor(R.id.owed, if (v.owed > 0) GREEN else IVORY)
-                r.setTextViewText(R.id.owe, eurS(v.owe))
+                r.setTextViewText(R.id.owe, if (v.money) eurS(v.owe) else "—")
                 r.setTextColor(R.id.owe, if (v.owe > 0) RED else IVORY)
-                r.setTextViewText(R.id.updated, v.updated)
-                r.setViewVisibility(R.id.refresh, vis(v.updated.isNotEmpty()))
+                r.setTextViewText(R.id.updated, v.updated.ifEmpty { v.sub })
                 r.setOnClickPendingIntent(R.id.refresh, refresh(c))
                 r.setOnClickPendingIntent(R.id.money, open(c, BuildConfig.WEB_URL, 3))
             } else {
-                r.setViewVisibility(R.id.dot, vis(v.live))
                 r.setTextViewText(R.id.sub, if (v.money) v.balance else v.sub)
             }
             return r
@@ -236,16 +249,11 @@ class PokerWidget : AppWidgetProvider() {
             r.setTextViewText(R.id.kicker, (lv?.optString("table")?.ifEmpty { null } ?: v.tableName).uppercase(IT) + " · $n AL TAVOLO")
             r.setTextViewText(R.id.label, if (lv?.optString("kind") == "torneo") "TORNEO LIVE" else "CASSA LIVE")
             r.setTextViewText(R.id.big, eur(lv?.optLong("pot") ?: 0L))
-            var tot = 0L; var pend = 0L
-            lv?.optJSONArray("list")?.let { a -> for (k in 0 until a.length()) a.optJSONObject(k)?.let { tot += it.optLong("in"); pend += it.optLong("pend") } }
-            r.setTextViewText(R.id.paid, "Incassato ${eurS(tot - pend)}")
-            r.setTextViewText(R.id.pend, "Da pagare ${eurS(pend)}")
-            r.setProgressBar(R.id.bar, 100, if (tot > 0) ((tot - pend) * 100 / tot).toInt() else 100, false)
             r.setViewVisibility(R.id.chat, if (v.chat > 0) android.view.View.VISIBLE else android.view.View.GONE)
             r.setTextViewText(R.id.chat, "${v.chat} ${if (v.chat == 1) "nuovo" else "nuovi"}")
             v.chatUrl?.let { r.setOnClickPendingIntent(R.id.chat, open(c, it, 2)) }
-            r.setOnClickPendingIntent(R.id.head, open(c, v.openUrl, 1))
-            r.setOnClickPendingIntent(R.id.potBox, open(c, v.openUrl, 4))
+            r.setOnClickPendingIntent(R.id.back, mode(c, id, false))
+            r.setOnClickPendingIntent(R.id.title, open(c, v.openUrl, 1))
 
             val svc = Intent(c, LiveListService::class.java).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
             svc.data = Uri.parse(svc.toUri(Intent.URI_INTENT_SCHEME))
