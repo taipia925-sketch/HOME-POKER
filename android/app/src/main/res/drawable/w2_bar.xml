@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- barra incassato (verde) / da pagare (rosso), come nella cassa -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background"><shape><gradient android:angle="0" android:startColor="#FF7A6E" android:endColor="#E0352C" /><corners android:radius="3dp" /></shape></item>
+    <item android:id="@android:id/progress"><clip><shape><gradient android:angle="0" android:startColor="#2FC46C" android:endColor="#5BE892" /><corners android:radius="3dp" /></shape></clip></item>
+</layer-list>

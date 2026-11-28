@@ -12,8 +12,19 @@ import org.json.JSONObject
 /** La lista dei giocatori della serata in corso, dentro il widget. */
 class LiveListService : RemoteViewsService() {
     companion object {
-        // i colori delle fiche: ogni giocatore ha sempre la sua
-        val CHIPS = intArrayOf(0xFFC8323C.toInt(), 0xFF2F5DB8.toInt(), 0xFF1C1C22.toInt(), 0xFF7A3FB0.toInt(), 0xFFD2721E.toInt(), 0xFFB8336A.toInt())
+        // le fiche-avatar dell'app, una ogni 30° di colore
+        val AVA = intArrayOf(R.drawable.w2_ava_0, R.drawable.w2_ava_1, R.drawable.w2_ava_2, R.drawable.w2_ava_3, R.drawable.w2_ava_4, R.drawable.w2_ava_5,
+            R.drawable.w2_ava_6, R.drawable.w2_ava_7, R.drawable.w2_ava_8, R.drawable.w2_ava_9, R.drawable.w2_ava_10, R.drawable.w2_ava_11)
+        /** lo stesso colore che l'app dà a quel nome (hueOf) */
+        fun hueBucket(n: String): Int {
+            var h = 7
+            for (ch in n.lowercase()) h = (h * 31 + ch.code) % 360
+            return Math.round(h / 30f) % 12
+        }
+        fun inits(n: String): String {
+            val w = n.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
+            return ((w.getOrNull(0)?.take(1) ?: "?") + (if (w.size > 1) w[1].take(1) else "")).uppercase()
+        }
     }
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory = Factory(applicationContext)
 
@@ -43,36 +54,32 @@ class LiveListService : RemoteViewsService() {
             val pid = p.optString("pid")
             val name = p.optString("name")
             r.setTextViewText(R.id.name, name)
-            r.setTextViewText(R.id.initial, name.trim().take(1).uppercase())
-            r.setInt(R.id.chipBase, "setColorFilter", CHIPS[Math.floorMod(name.lowercase().hashCode(), CHIPS.size)])
+            r.setTextViewText(R.id.initial, inits(name))
+            r.setImageViewResource(R.id.ava, AVA[hueBucket(name)])
             val n = p.optInt("n")
-            val sb = SpannableStringBuilder(PokerWidget.euroShort(p.optLong("in")) + " · $n buy-in")
+            r.setTextViewText(R.id.info, "$n ${if (n == 1) "ingresso" else "ingressi"} · ${PokerWidget.eurS(p.optLong("in"))}")
             val pend = p.optLong("pend")
-            if (pend > 0) {
-                val st = sb.length
-                sb.append(" · ${PokerWidget.euroShort(pend)} da pagare")
-                sb.setSpan(ForegroundColorSpan(0xFFFF7A7F.toInt()), st, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
-            r.setTextViewText(R.id.info, sb)
+            r.setViewVisibility(R.id.due, if (pend > 0) android.view.View.VISIBLE else android.view.View.GONE)
+            r.setTextViewText(R.id.due, "${PokerWidget.eurS(pend)} da pagare")
             if (!host || buyIn <= 0) {
                 r.setViewVisibility(R.id.btn, android.view.View.GONE)
             } else {
                 r.setViewVisibility(R.id.btn, android.view.View.VISIBLE)
                 when (pid) {
                     Store.busy(c) -> {
-                        r.setTextViewText(R.id.btn, "…")
-                        r.setInt(R.id.btn, "setBackgroundResource", R.drawable.w_chip_gold)
-                        r.setTextColor(R.id.btn, 0xFF3A2A08.toInt())
+                        r.setTextViewText(R.id.btn, "Invio…")
+                        r.setInt(R.id.btn, "setBackgroundResource", R.drawable.w2_rebuy)
+                        r.setTextColor(R.id.btn, 0xFF7CF5B0.toInt())
                     }
                     Store.armed(c) -> {
-                        r.setTextViewText(R.id.btn, "OK?")
-                        r.setInt(R.id.btn, "setBackgroundResource", R.drawable.w_chip_red)
+                        r.setTextViewText(R.id.btn, "Conferma")
+                        r.setInt(R.id.btn, "setBackgroundResource", R.drawable.w2_confirm)
                         r.setTextColor(R.id.btn, 0xFFFFFFFF.toInt())
                     }
                     else -> {
-                        r.setTextViewText(R.id.btn, "+" + PokerWidget.euroShort(buyIn).removePrefix("€ "))
-                        r.setInt(R.id.btn, "setBackgroundResource", R.drawable.w_chip_gold)
-                        r.setTextColor(R.id.btn, 0xFF3A2A08.toInt())
+                        r.setTextViewText(R.id.btn, "+ Re-buy")
+                        r.setInt(R.id.btn, "setBackgroundResource", R.drawable.w2_rebuy)
+                        r.setTextColor(R.id.btn, 0xFF7CF5B0.toInt())
                     }
                 }
                 r.setOnClickFillInIntent(R.id.btn, Intent().putExtra(PokerWidget.EXTRA_PID, pid))

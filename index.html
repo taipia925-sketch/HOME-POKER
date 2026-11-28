@@ -4767,12 +4767,12 @@ afterData=async function(){
   await _afterDataF();
   if(S.deep&&S.deep.v!=='chat'&&S.me&&S.table&&S.table.id===S.deep.t&&S.loaded.games){
     const d=S.deep;S.deep=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
-    if(d.v==='vt'){H.govt({rid:d.g})}else if(d.v==='net'){F.pinp='';go('netting',null,{pid:d.g})}else if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g);
+    if(d.v==='vt'){H.govt({rid:d.g})}else if(d.v==='net'){F.pinp='';go('netting',null,{pid:d.g})}else if(S.games[d.g])go(d.v==='book'?'book':d.v==='live'&&S.games[d.g].status==='live'?'live':'detail',d.g);
   }
 };
 window.addEventListener('hashchange',()=>{const d=deepLink();if(!d||!S.acct||S.locked)return;
   if(d.v==='chat'&&S.table&&S.table.id===d.t)return; // la chat la apre il suo gestore
-  if(S.table&&S.table.id===d.t){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(d.v==='vt'){H.govt({rid:d.g})}else if(d.v==='net'){F.pinp='';go('netting',null,{pid:d.g})}else if(S.games[d.g])go(d.v==='book'?'book':'detail',d.g)}
+  if(S.table&&S.table.id===d.t){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(d.v==='vt'){H.govt({rid:d.g})}else if(d.v==='net'){F.pinp='';go('netting',null,{pid:d.g})}else if(S.games[d.g])go(d.v==='book'?'book':d.v==='live'&&S.games[d.g].status==='live'?'live':'detail',d.g)}
   else{S.deepTried=false;backToTables()}});
 navigator.serviceWorker&&navigator.serviceWorker.addEventListener&&navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.url){location.hash=new URL(e.data.url,location.href).hash}});
 /* all'avvio: se le notifiche sono attive, il server riceve sempre l'indirizzo aggiornato del telefono
