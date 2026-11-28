@@ -155,8 +155,8 @@ class PokerWidget : AppWidgetProvider() {
                 }
                 balanceColor = c.getColor(R.color.muted)
                 if (money) {
-                    if (owe > 0) { balance = "Devi ${euro(owe)}"; balanceColor = c.getColor(R.color.lose) }
-                    else if (owed > 0) { balance = "Ti devono ${euro(owed)}"; balanceColor = c.getColor(R.color.win) }
+                    if (owe > 0) { balance = "Devi ${euroShort(owe)}"; balanceColor = 0xFFFF7A7F.toInt() }
+                    else if (owed > 0) { balance = "Ti devono ${euroShort(owed)}"; balanceColor = 0xFF6FE3A0.toInt() }
                     else { balance = "Conti in pari"; balanceColor = c.getColor(R.color.muted) }
                 }
             }
@@ -175,7 +175,7 @@ class PokerWidget : AppWidgetProvider() {
                         live = true
                         val other = lv.optString("table").takeIf { it.isNotEmpty() && it != mainName }
                         label = "SERATA IN CORSO" + (other?.let { " · $it" } ?: "")
-                        big = euro(lv.optLong("pot"))
+                        big = euroShort(lv.optLong("pot"))
                         val n = lv.optInt("players")
                         sub = "montepremi · $n ${if (n == 1) "giocatore" else "giocatori"} · ${lv.optString("kind", "cash")}"
                         openUrl = deep("detail", lv.optString("tid"), lv.optString("id"))
@@ -208,22 +208,22 @@ class PokerWidget : AppWidgetProvider() {
         private fun build(c: Context, layout: Int, v: Model): RemoteViews {
             val r = RemoteViews(c.packageName, layout)
             val isLarge = layout == R.layout.widget_large
-            r.setTextViewText(R.id.label, if (isLarge) v.label else (if (v.live) "IN CORSO" else v.label.substringBefore(" · ")))
+            r.setTextViewText(R.id.label, if (isLarge) v.label else (if (v.live) "LIVE" + (v.tableName.takeIf { it.isNotEmpty() }?.let { " · " + it.uppercase(IT) } ?: "") else v.label.substringBefore(" · ")))
             r.setTextViewText(R.id.big, v.big)
             r.setViewVisibility(R.id.dot, if (v.live) android.view.View.VISIBLE else android.view.View.GONE)
             r.setViewVisibility(R.id.chat, if (v.chat > 0) android.view.View.VISIBLE else android.view.View.GONE)
-            r.setTextViewText(R.id.chat, if (isLarge) "💬 ${v.chat}" else "${v.chat}")
+            r.setTextViewText(R.id.chat, "${v.chat}")
             r.setOnClickPendingIntent(R.id.root, open(c, v.openUrl, 1))
             v.chatUrl?.let { r.setOnClickPendingIntent(R.id.chat, open(c, it, 2)) }
             if (isLarge) {
-                r.setTextViewText(R.id.table, if (v.tableName.isNotEmpty()) "· ${v.tableName}" else "")
+                r.setTextViewText(R.id.table, "♠\uFE0E " + (v.tableName.ifEmpty { "Home Poker" }).uppercase(IT))
                 r.setTextViewText(R.id.sub, v.sub)
                 r.setViewVisibility(R.id.money, if (v.money) android.view.View.VISIBLE else android.view.View.GONE)
-                r.setTextViewText(R.id.owed, euro(v.owed))
-                r.setTextColor(R.id.owed, c.getColor(if (v.owed > 0) R.color.win else R.color.cream))
-                r.setTextViewText(R.id.owe, euro(v.owe))
-                r.setTextColor(R.id.owe, c.getColor(if (v.owe > 0) R.color.lose else R.color.cream))
-                r.setTextViewText(R.id.updated, v.updated)
+                r.setTextViewText(R.id.owed, euroShort(v.owed))
+                r.setTextColor(R.id.owed, if (v.owed > 0) 0xFF6FE3A0.toInt() else 0xFFF8EBC4.toInt())
+                r.setTextViewText(R.id.owe, euroShort(v.owe))
+                r.setTextColor(R.id.owe, if (v.owe > 0) 0xFFFF7A7F.toInt() else 0xFFF8EBC4.toInt())
+                r.setTextViewText(R.id.updated, v.updated.removePrefix("aggiornato alle "))
                 r.setViewVisibility(R.id.refresh, if (v.updated.isEmpty()) android.view.View.GONE else android.view.View.VISIBLE)
                 r.setOnClickPendingIntent(R.id.refresh, refresh(c))
                 r.setOnClickPendingIntent(R.id.money, open(c, BuildConfig.WEB_URL, 3))
@@ -241,12 +241,12 @@ class PokerWidget : AppWidgetProvider() {
             val r = RemoteViews(c.packageName, R.layout.widget_live)
             val lv = Store.data(c)?.optJSONObject("live")
             val host = lv?.optBoolean("host") == true
-            r.setTextViewText(R.id.label, "SERATA IN CORSO" + (lv?.optString("table")?.takeIf { it.isNotEmpty() }?.let { " · " + it.uppercase(IT) } ?: ""))
+            r.setTextViewText(R.id.label, "♠\uFE0E " + (lv?.optString("table")?.takeIf { it.isNotEmpty() } ?: "Serata in corso").uppercase(IT))
             val n = lv?.optInt("players") ?: 0
-            r.setTextViewText(R.id.sub, "montepremi · $n ${if (n == 1) "giocatore" else "giocatori"} · ${lv?.optString("kind", "cash")}")
-            r.setTextViewText(R.id.big, v.big)
+            r.setTextViewText(R.id.sub, "$n ${if (n == 1) "giocatore" else "giocatori"} · ${lv?.optString("kind", "cash")}")
+            r.setTextViewText(R.id.big, euroShort(lv?.optLong("pot") ?: 0L))
             r.setViewVisibility(R.id.chat, if (v.chat > 0) android.view.View.VISIBLE else android.view.View.GONE)
-            r.setTextViewText(R.id.chat, "💬 ${v.chat}")
+            r.setTextViewText(R.id.chat, "${v.chat}")
             v.chatUrl?.let { r.setOnClickPendingIntent(R.id.chat, open(c, it, 2)) }
             r.setOnClickPendingIntent(R.id.head, open(c, v.openUrl, 1))
 
@@ -271,7 +271,7 @@ class PokerWidget : AppWidgetProvider() {
                 else -> v.updated to R.color.gold_dim
             }
             r.setTextViewText(R.id.status, txt)
-            r.setTextColor(R.id.status, c.getColor(col))
+            r.setTextColor(R.id.status, when (col) { R.color.win -> 0xFF6FE3A0.toInt(); R.color.lose -> 0xFFFF7A7F.toInt(); R.color.muted -> 0xFF9FBFAE.toInt(); else -> 0xFFC9A859.toInt() })
             r.setViewVisibility(R.id.undo, if (undo) android.view.View.VISIBLE else android.view.View.GONE)
             r.setOnClickPendingIntent(R.id.undo, PendingIntent.getBroadcast(c, 21, Intent(c, PokerWidget::class.java).setAction(ACTION_UNDO),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- il panno verde, più chiaro al centro come sotto la lampada -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:type="radial" android:gradientRadius="260dp" android:centerX="0.5" android:centerY="0.25"
+                android:startColor="#1F7A4D" android:centerColor="#145536" android:endColor="#0A2E1D" />
+            <corners android:radius="21dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000" />
+            <corners android:radius="21dp" />
+            <stroke android:width="1dp" android:color="#40F0D48A" android:dashWidth="0dp" />
+        </shape>
+    </item>
+</layer-list>
