@@ -5,140 +5,86 @@
     android:layout_height="match_parent"
     android:background="@drawable/w2_root"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="8dp">
 
-    <!-- scheda rossa: come «CASSA LIVE» nell'app -->
+    <!-- striscia rossa del tavolo aperto: ‹ torna al saldo -->
     <FrameLayout
         android:id="@+id/head"
         android:layout_width="match_parent"
-        android:layout_height="74dp">
+        android:layout_height="48dp">
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             android:src="@drawable/w2_hero" />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="52dp"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="14dp"
-            android:adjustViewBounds="true"
-            android:src="@drawable/w2_chips" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="96dp">
+            android:orientation="horizontal"
+            android:paddingStart="6dp"
+            android:paddingEnd="14dp">
             <TextView
-                android:id="@+id/kicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="BURCIONE · 4 AL TAVOLO"
-                android:textColor="#E0FFFFFF"
-                android:textSize="10sp"
-                android:letterSpacing="0.14"
-                android:fontFamily="@font/is_bold" />
-            <TextView
-                android:id="@+id/label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:text="CASSA LIVE"
+                android:id="@+id/back"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:background="@drawable/w2_status"
+                android:gravity="center"
+                android:text="‹"
                 android:textColor="#FFFFFF"
-                android:textSize="25sp"
-                android:fontFamily="@font/is_bold_italic"
+                android:textSize="22sp"
                 android:includeFontPadding="false"
-                android:shadowColor="#66000000"
-                android:shadowDy="2"
-                android:shadowRadius="6" />
-        </LinearLayout>
-    </FrameLayout>
-
-    <!-- montepremi: come la scheda della cassa -->
-    <LinearLayout
-        android:id="@+id/potBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/w2_wine"
-        android:orientation="vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="14dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="12dp">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="bottom"
-            android:orientation="horizontal">
+                android:paddingBottom="3dp"
+                android:fontFamily="@font/is_bold" />
             <LinearLayout
+                android:id="@+id/title"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical"
                 android:orientation="vertical">
                 <TextView
+                    android:id="@+id/kicker"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Montepremi"
-                    android:textColor="#A4B0A8"
-                    android:textSize="12sp"
-                    android:fontFamily="@font/is_regular" />
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="BURCIONE · 4 AL TAVOLO"
+                    android:textColor="#E0FFFFFF"
+                    android:textSize="9sp"
+                    android:letterSpacing="0.14"
+                    android:fontFamily="@font/is_bold" />
                 <TextView
-                    android:id="@+id/big"
+                    android:id="@+id/label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:text="140,00 €"
-                    android:textColor="#F8ECCB"
-                    android:textSize="32sp"
-                    android:letterSpacing="-0.03"
+                    android:text="CASSA LIVE"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp"
                     android:includeFontPadding="false"
-                    android:fontFamily="@font/bricolage_heavy" />
+                    android:fontFamily="@font/is_bold_italic" />
             </LinearLayout>
-            <LinearLayout
+            <TextView
+                android:id="@+id/big"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="end"
-                android:orientation="vertical">
-                <TextView
-                    android:id="@+id/paid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Incassato 80 €"
-                    android:textColor="#46DA80"
-                    android:textSize="12sp"
-                    android:fontFamily="@font/is_bold" />
-                <TextView
-                    android:id="@+id/pend"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Da pagare 60 €"
-                    android:textColor="#FF5C50"
-                    android:textSize="12sp"
-                    android:fontFamily="@font/is_bold" />
-            </LinearLayout>
+                android:maxLines="1"
+                android:text="140,00 €"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:letterSpacing="-0.02"
+                android:fontFamily="@font/bricolage_heavy" />
         </LinearLayout>
-        <ProgressBar
-            android:id="@+id/bar"
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="6dp"
-            android:layout_marginTop="9dp"
-            android:max="100"
-            android:progress="57"
-            android:progressDrawable="@drawable/w2_bar" />
-    </LinearLayout>
+    </FrameLayout>
 
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:divider="@null"
         android:dividerHeight="0dp"
         android:scrollbars="none" />
