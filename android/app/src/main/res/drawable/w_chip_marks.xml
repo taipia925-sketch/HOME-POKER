@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="32dp" android:height="32dp" android:viewportWidth="32" android:viewportHeight="32">
+    <!-- ombra sul bordo -->
+    <path android:fillColor="#00000000" android:strokeColor="#40000000" android:strokeWidth="1" android:pathData="M16,1.5A14.5,14.5 0 1,1 15.99,1.5Z" />
+    <!-- le tacche bianche sul bordo della fiche -->
+    <path android:fillColor="#EEFFFFFF" android:pathData="M14,1.1h4v4.2h-4z M14,26.7h4v4.2h-4z M1.1,14h4.2v4h-4.2z M26.7,14h4.2v4h-4.2z" />
+    <path android:fillColor="#EEFFFFFF" android:pathData="M5.4,7.6l2.2,-2.2l2.9,2.9l-2.2,2.2z M21.5,23.7l2.2,-2.2l2.9,2.9l-2.2,2.2z M24.4,5.4l2.2,2.2l-2.9,2.9l-2.2,-2.2z M7.6,26.6l-2.2,-2.2l2.9,-2.9l2.2,2.2z" />
+    <!-- anello interno tratteggiato -->
+    <path android:fillColor="#00000000" android:strokeColor="#B3FFFFFF" android:strokeWidth="0.8" android:pathData="M16,6.5A9.5,9.5 0 1,1 15.99,6.5Z" />
+    <path android:fillColor="#26000000" android:pathData="M16,7.2A8.8,8.8 0 1,1 15.99,7.2Z" />
+</vector>
