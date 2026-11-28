@@ -5,9 +5,6 @@
         <item name="android:statusBarColor">@color/felt_dark</item>
         <item name="android:navigationBarColor">@color/felt_dark</item>
     </style>
-    <style name="Theme.HomePoker.Launch">
-        <item name="android:windowBackground">@color/felt_dark</item>
-    </style>
     <style name="Theme.HomePoker.Invisible" parent="android:Theme.Translucent.NoTitleBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsTranslucent">true</item>

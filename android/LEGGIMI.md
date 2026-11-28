@@ -1,8 +1,9 @@
 # Home Poker per Android (app + widget)
 
-L'app Android **è la stessa Home Poker**: apre il sito con Chrome a schermo intero (Trusted Web Activity),
-quindi si resta collegati con il proprio account, e notifiche e Face ID funzionano come nel browser.
-In più ha il **widget** per la schermata Home.
+L'app Android è un **programma vero** (WebView, niente Chrome): dentro gira lo stesso sito di Home Poker.
+La prima volta si entra con nome utente e PIN, poi si resta collegati. In più ha il **widget** per la schermata Home
+e le **notifiche** (chat, serate iniziate o programmate, soldi da dare o avere), controllate ogni 15 minuti.
+Foto, messaggi vocali e file esportati (salvati nei Download) funzionano dentro il programma.
 
 ## Cosa mostra il widget
 - Serata aperta del tavolo: montepremi e lista dei giocatori con quanto hanno messo e quanto devono ancora pagare.
@@ -15,8 +16,8 @@ In più ha il **widget** per la schermata Home.
 - Due misure: piccola (2×1) e grande (4×2), si adatta quando lo ridimensioni.
 
 ## Come si collega all'account
-La web app, quando gira dentro l'app Android, chiede al server un gettone personale (`hpl_widget_token`)
-e lo passa all'app con `homepoker://widget?t=…`. Il widget usa solo quel gettone per leggere il riassunto
+La web app, quando gira dentro il programma (`window.HPAndroid`), chiede al server un gettone personale (`hpl_widget_token`)
+e lo passa al programma con `HPAndroid.link()`. Il widget usa solo quel gettone per leggere il riassunto
 dalla funzione `hpl-widget`: non vede il PIN né la sessione. `hpl_widget_revoke` lo annulla.
 
 ## Compilare
@@ -33,8 +34,6 @@ La chiave di firma **non è nel repository**: è salvata nel database Supabase, 
 `hpl_build_secrets` (`android_keystore_b64`, `android_keystore_pass`), leggibile solo dal server.
 Gli aggiornamenti vanno firmati sempre con la stessa chiave, altrimenti il telefono non li installa sopra.
 
-## Barra dell'indirizzo
-Per nasconderla, Android controlla il file `assetlinks.json` (in questa cartella) all'indirizzo
-`https://taipia925-sketch.github.io/.well-known/assetlinks.json`. Va pubblicato nel repository
-`taipia925-sketch.github.io` (con un file vuoto `.nojekyll`). Finché manca, l'app funziona lo stesso
-ma mostra una sottile barra con l'indirizzo in alto.
+## Collegamento con il sito
+Il file `assetlinks.json` (in questa cartella) è pubblicato in `https://taipia925-sketch.github.io/.well-known/assetlinks.json`
+(repository `taipia925-sketch.github.io`). Fa aprire i link del sito direttamente nel programma e permette Face ID dentro l'app.
